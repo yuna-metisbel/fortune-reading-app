@@ -1270,3 +1270,306 @@ img, svg {
     animation: none;
   }
 }
+
+/* ============================================================
+   SUMMARY CARD
+   ============================================================ */
+
+.summary-card {
+    margin: 20px 0;
+    padding: 32px 24px;
+    background: linear-gradient(180deg, #F0E4FF 0%, #F8F3FF 30%, #FFF5F8 70%, #F0E4FF 100%);
+    border-radius: 24px;
+    border: 1px solid rgba(200, 162, 224, 0.3);
+    box-shadow: 0 8px 32px rgba(74, 59, 107, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+        radial-gradient(2px 2px at 15% 20%, rgba(200, 162, 224, 0.4), transparent),
+        radial-gradient(2px 2px at 85% 15%, rgba(232, 180, 200, 0.3), transparent),
+        radial-gradient(1.5px 1.5px at 50% 80%, rgba(200, 162, 224, 0.3), transparent),
+        radial-gradient(2px 2px at 25% 60%, rgba(232, 213, 245, 0.4), transparent),
+        radial-gradient(1.5px 1.5px at 75% 45%, rgba(232, 180, 200, 0.2), transparent);
+    pointer-events: none;
+}
+
+.summary-header {
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+}
+
+.summary-ornament {
+    color: var(--silver);
+    font-size: 13px;
+    letter-spacing: 8px;
+    margin-bottom: 16px;
+}
+
+.summary-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.summary-name {
+    font-size: 14px;
+    color: var(--text-light);
+}
+
+/* Mandala */
+.summary-mandala {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    position: relative;
+    z-index: 1;
+}
+
+.mandala-ring {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 2px solid rgba(200, 162, 224, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: radial-gradient(circle, rgba(255,255,255,0.8), rgba(232, 213, 245, 0.3));
+    box-shadow: 0 0 30px rgba(200, 162, 224, 0.2);
+}
+
+.mandala-ring::before {
+    content: '';
+    position: absolute;
+    width: 170px; height: 170px;
+    border-radius: 50%;
+    border: 1px dashed rgba(200, 162, 224, 0.3);
+}
+
+.mandala-center {
+    font-size: 40px;
+}
+
+.mandala-labels {
+    position: absolute;
+    width: 200px; height: 200px;
+    font-size: 10px;
+    color: var(--text-light);
+}
+
+.mandala-labels span {
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
+.mandala-labels span:nth-child(1) { top: -5px; left: 50%; }
+.mandala-labels span:nth-child(2) { top: 25%; left: 95%; }
+.mandala-labels span:nth-child(3) { top: 75%; left: 95%; }
+.mandala-labels span:nth-child(4) { top: 105%; left: 50%; }
+.mandala-labels span:nth-child(5) { top: 75%; left: 5%; }
+.mandala-labels span:nth-child(6) { top: 25%; left: 5%; }
+
+/* Section Grid */
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0;
+    position: relative;
+    z-index: 1;
+}
+
+.summary-section {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(200, 162, 224, 0.2);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.summary-section-icon {
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+
+.summary-section-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+
+.summary-points {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.summary-points li {
+    font-size: 11px;
+    color: var(--text-light);
+    line-height: 1.6;
+    padding-left: 12px;
+    position: relative;
+}
+
+.summary-points li::before {
+    content: '✦';
+    position: absolute;
+    left: 0;
+    font-size: 8px;
+    color: var(--main);
+    top: 2px;
+}
+
+.summary-footer {
+    text-align: center;
+    margin-top: 20px;
+    position: relative;
+    z-index: 1;
+    font-size: 11px;
+    color: var(--text-light);
+}
+
+.summary-site {
+    font-size: 10px;
+    color: var(--silver);
+    margin-top: 4px;
+}
+
+.summary-empty {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-light);
+    font-size: 14px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================================
+   ACCORDION
+   ============================================================ */
+
+.accordion-container {
+    padding: 0 0 20px;
+}
+
+.accordion-heading {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 16px;
+    text-align: center;
+    color: var(--text);
+    margin: 24px 0 16px;
+}
+
+.accordion-item {
+    margin-bottom: 8px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(200, 162, 224, 0.2);
+    transition: border-color 0.3s;
+}
+
+.accordion-item.open {
+    border-color: var(--main);
+}
+
+.accordion-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    color: var(--text);
+    text-align: left;
+}
+
+.accordion-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.accordion-title {
+    flex: 1;
+}
+
+.accordion-arrow {
+    font-size: 14px;
+    color: var(--text-light);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+
+.reading-body {
+    padding: 0 16px 16px;
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--text);
+}
+
+.reading-body h4 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 14px;
+    color: var(--accent);
+    margin: 16px 0 8px;
+}
+
+.reading-body strong {
+    color: var(--text);
+    font-weight: 500;
+}
+
+.reading-body ul {
+    padding-left: 16px;
+    margin: 8px 0;
+}
+
+.reading-body li {
+    margin-bottom: 4px;
+}
+
+.reading-body p {
+    margin-bottom: 8px;
+}
+
+/* Result actions */
+.result-actions {
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Override result-page padding to remove horizontal padding for card */
+.result-page {
+    padding-left: 20px;
+    padding-right: 20px;
+}

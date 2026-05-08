@@ -125,16 +125,17 @@ async function handleStream(resp) {
     }
   }
 
-  // Stream complete — show action buttons
+  // Stream complete — redirect to result page
+  if (finishedReadingId) {
+    window.location.href = '/reading/' + finishedReadingId;
+    return;
+  }
+
+  // Fallback: show action buttons if no reading ID was received
   if (actionsEl) actionsEl.classList.add('visible');
 
   if (chatLink && finishedReadingId) {
     chatLink.href = '/chat/' + finishedReadingId;
-  }
-
-  // If we never showed streaming (empty response), redirect to result page
-  if (finishedReadingId && firstChunk) {
-    window.location.href = '/reading/' + finishedReadingId;
   }
 }
 

@@ -1,3 +1,4 @@
+import re
 from datetime import date, time
 from pathlib import Path
 from typing import AsyncIterator
@@ -9,6 +10,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.database import async_session, get_db
 from app.models import Profile, Reading, User
@@ -263,9 +265,52 @@ async def reading_result(
     reading_id: int,
     db: AsyncSession = Depends(get_db),
 ):
-    reading = await db.get(Reading, reading_id)
+    result = await db.execute(
+        select(Reading).where(Reading.id == reading_id).options(selectinload(Reading.profile))
+    )
+    reading = result.scalar_one_or_none()
     if reading is None:
         raise HTTPException(status_code=404, detail="Reading not found")
+
+    # Parse markdown into sections
+    sections = []
+    if reading.content:
+        # Split by ## headers
+        parts = re.split(r'^## ', reading.content, flags=re.MULTILINE)
+        for part in parts[1:]:  # skip the first empty/intro part
+            lines = part.strip().split('\n', 1)
+            title = lines[0].strip()
+            body = lines[1].strip() if len(lines) > 1 else ""
+            # Extract key points (lines starting with - or *)
+            key_points = []
+            for line in body.split('\n'):
+                line = line.strip()
+                if line.startswith('- ') or line.startswith('* '):
+                    key_points.append(line[2:])
+                elif line.startswith('**') and line.endswith('**'):
+                    key_points.append(line.strip('*'))
+            sections.append({
+                "title": title,
+                "body": body,
+                "key_points": key_points[:5],  # top 5 points for summary
+            })
+
+    # Map section titles to icons and short labels for summary card
+    section_icons = {
+        "全体要約": "🔮", "性格": "🌙", "才能": "✨", "強み": "✨",
+        "注意": "⚡", "課題": "⚡", "仕事": "💼", "お金": "💰",
+        "恋愛": "💕", "人間関係": "🤝", "今年": "📅", "月別": "🗓️",
+        "今すぐ": "⭐", "メッセージ": "💌",
+    }
+
+    for section in sections:
+        icon = "✦"
+        for keyword, emoji in section_icons.items():
+            if keyword in section["title"]:
+                icon = emoji
+                break
+        section["icon"] = icon
+
     return templates.TemplateResponse(
-        "reading_result.html", {"request": request, "reading": reading}
+        "reading_result.html", {"request": request, "reading": reading, "sections": sections}
     )
