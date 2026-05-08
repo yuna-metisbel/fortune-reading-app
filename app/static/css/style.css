@@ -1406,8 +1406,8 @@ img, svg {
 
 .summary-section-title {
     font-family: 'Noto Serif JP', serif;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 600;
     color: var(--text);
     margin-bottom: 6px;
 }
@@ -1419,11 +1419,12 @@ img, svg {
 }
 
 .summary-points li {
-    font-size: 11px;
-    color: var(--text-light);
-    line-height: 1.6;
-    padding-left: 12px;
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.7;
+    padding-left: 14px;
     position: relative;
+    margin-bottom: 2px;
 }
 
 .summary-points li::before {
@@ -1432,7 +1433,7 @@ img, svg {
     left: 0;
     font-size: 8px;
     color: var(--main);
-    top: 2px;
+    top: 3px;
 }
 
 .summary-footer {
@@ -1494,24 +1495,26 @@ img, svg {
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 16px;
+    gap: 12px;
+    padding: 18px 16px;
     border: none;
     background: none;
     cursor: pointer;
-    font-family: 'Noto Serif JP', serif;
-    font-size: 15px;
+    font-family: var(--font-serif);
+    font-size: 16px;
+    font-weight: 500;
     color: var(--text);
     text-align: left;
 }
 
 .accordion-icon {
-    font-size: 18px;
+    font-size: 22px;
     flex-shrink: 0;
 }
 
 .accordion-title {
     flex: 1;
+    letter-spacing: 0.03em;
 }
 
 .accordion-arrow {
@@ -1534,29 +1537,68 @@ img, svg {
     color: var(--text);
 }
 
-.reading-body h4 {
-    font-family: 'Noto Serif JP', serif;
-    font-size: 14px;
-    color: var(--accent);
-    margin: 16px 0 8px;
+/* キャッチコピー（各セクション冒頭の太字1行） */
+.reading-body > p:first-child strong,
+.reading-body > p:first-of-type strong {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(232, 213, 245, 0.4), rgba(232, 180, 200, 0.2));
+    border-radius: 12px;
+    border-left: 3px solid var(--main);
+    line-height: 1.5;
 }
 
+.reading-body h4 {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--accent);
+    margin: 20px 0 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(200, 162, 224, 0.2);
+}
+
+/* 本文中の太字 = ポイント */
 .reading-body strong {
     color: var(--text);
     font-weight: 500;
+    font-size: 15px;
+    background: linear-gradient(transparent 60%, rgba(232, 213, 245, 0.4) 60%);
+    padding: 0 2px;
 }
 
 .reading-body ul {
-    padding-left: 16px;
-    margin: 8px 0;
+    padding-left: 8px;
+    margin: 10px 0;
+    list-style: none;
 }
 
 .reading-body li {
-    margin-bottom: 4px;
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.reading-body li::before {
+    content: '✦';
+    position: absolute;
+    left: 0;
+    color: var(--main);
+    font-size: 10px;
+    top: 4px;
 }
 
 .reading-body p {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    line-height: 1.8;
 }
 
 /* Result actions */
