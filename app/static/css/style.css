@@ -1573,3 +1573,24 @@ img, svg {
     padding-left: 20px;
     padding-right: 20px;
 }
+
+/* === Fortune Systems Tags === */
+.fortune-systems {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.system-tag {
+    font-size: 11px;
+    font-family: 'Noto Serif JP', serif;
+    color: var(--accent);
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(200, 162, 224, 0.25);
+    border-radius: 20px;
+    padding: 4px 12px;
+    letter-spacing: 0.5px;
+}
