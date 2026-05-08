@@ -148,3 +148,56 @@ def calculate_rokusei(birth_year: int, birth_month: int, birth_day: int) -> dict
         "reigou": reigou,
         "reigou_pair": reigou_pair,
     }
+
+
+# ── 12年周期（運命周期）計算 ──
+
+# 12年周期の運勢名（順番は固定）
+CYCLE_NAMES = [
+    "種子", "緑生", "立花", "健弱", "達成", "乱気",
+    "再会", "財成", "安定", "陰影", "停止", "減退",
+]
+
+# 大殺界に該当する位置（陰影・停止・減退）
+DAISAKKAI_POSITIONS = {"陰影", "停止", "減退"}
+
+
+def calculate_cycle_position(birth_year: int, birth_month: int, birth_day: int, target_year: int) -> dict:
+    """指定年における六星占術の12年周期の位置を算出する。
+
+    Args:
+        birth_year: 生まれ年
+        birth_month: 生まれ月
+        birth_day: 生まれ日
+        target_year: 調べたい年（例: 2026）
+
+    Returns:
+        dict with keys:
+            cycle_position: str  運勢名（例: "達成"）
+            is_daisakkai: bool   大殺界かどうか
+            cycle_year: int      12年周期の何年目か（1-12）
+    """
+    rokusei = calculate_rokusei(birth_year, birth_month, birth_day)
+    star = rokusei["star"]
+
+    # 各星人の「種子」が始まる基準年（公式データに基づく近似）
+    # 星人ごとに12年周期のスタート年が異なる
+    seed_year_bases = {
+        "土星人": 2009,
+        "金星人": 2010,
+        "火星人": 2011,
+        "天王星人": 2006,
+        "木星人": 2007,
+        "水星人": 2008,
+    }
+
+    base = seed_year_bases.get(star, 2009)
+    offset = (target_year - base) % 12
+    cycle_position = CYCLE_NAMES[offset]
+    is_daisakkai = cycle_position in DAISAKKAI_POSITIONS
+
+    return {
+        "cycle_position": cycle_position,
+        "is_daisakkai": is_daisakkai,
+        "cycle_year": offset + 1,
+    }

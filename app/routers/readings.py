@@ -22,7 +22,7 @@ from app.services.prompts import (
     build_compatibility_user_prompt,
     build_personal_user_prompt,
 )
-from app.services.rokusei import calculate_rokusei
+from app.services.rokusei import calculate_cycle_position, calculate_rokusei
 from app.services.shichusuimei import calculate_year_pillar
 
 router = APIRouter()
@@ -80,6 +80,14 @@ def _compute_fortune_data(birth_date_str: str) -> tuple[dict | None, dict | None
     try:
         bd = date.fromisoformat(birth_date_str)
         rokusei_result = calculate_rokusei(bd.year, bd.month, bd.day)
+        current_year = date.today().year
+        cycle = calculate_cycle_position(bd.year, bd.month, bd.day, current_year)
+        rokusei_result["cycle_position"] = cycle["cycle_position"]
+        rokusei_result["is_daisakkai"] = cycle["is_daisakkai"]
+        rokusei_result["cycle_year"] = cycle["cycle_year"]
+        rokusei_result["star_full"] += f"／{current_year}年の運勢位置：{cycle['cycle_position']}"
+        if cycle["is_daisakkai"]:
+            rokusei_result["star_full"] += "【大殺界】"
         shichusuimei_result = calculate_year_pillar(bd.year)
         return rokusei_result, shichusuimei_result
     except (ValueError, TypeError):
