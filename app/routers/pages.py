@@ -30,3 +30,8 @@ async def compatibility_new(request: Request, db: AsyncSession = Depends(get_db)
     result = await db.execute(select(Profile).order_by(Profile.created_at.desc()))
     profiles = result.scalars().all()
     return templates.TemplateResponse("compatibility_form.html", {"request": request, "profiles": profiles})
+
+
+@router.get("/reading/generate/{reading_id}")
+async def reading_generate(request: Request, reading_id: int):
+    return templates.TemplateResponse("reading_generate.html", {"request": request, "reading_id": reading_id})
