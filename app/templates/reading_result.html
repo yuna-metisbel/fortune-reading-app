@@ -5,6 +5,19 @@
 <div class="result-page">
   <a href="/" class="back-link">← トップに戻る</a>
 
+  <!-- POSTER IMAGE -->
+  {% if reading.image_url %}
+  <div class="poster-image">
+    <img src="{{ reading.image_url }}" alt="鑑定結果ポスター">
+  </div>
+  {% else %}
+  <div class="poster-image-action">
+    <button id="gen-image-btn" class="btn btn-secondary" onclick="generateImage({{ reading.id }})">
+      🎨 鑑定ポスターを生成する
+    </button>
+  </div>
+  {% endif %}
+
   <!-- SUMMARY CARD -->
   <div id="summary-card" class="summary-card">
     <div class="summary-header">
@@ -155,5 +168,26 @@ function renderMarkdownBody(el) {
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.reading-body').forEach(renderMarkdownBody);
 });
+
+async function generateImage(readingId) {
+  var btn = document.getElementById('gen-image-btn');
+  btn.disabled = true;
+  btn.textContent = '🔮 生成中...（30秒ほどかかります）';
+
+  try {
+    var resp = await fetch('/api/readings/' + readingId + '/generate-image', { method: 'POST' });
+    var data = await resp.json();
+
+    if (data.image_url) {
+      btn.parentElement.outerHTML = '<div class="poster-image"><img src="' + data.image_url + '" alt="鑑定結果ポスター"></div>';
+    } else {
+      btn.textContent = '画像生成に失敗しました。もう一度お試しください。';
+      btn.disabled = false;
+    }
+  } catch (e) {
+    btn.textContent = '画像生成に失敗しました。もう一度お試しください。';
+    btn.disabled = false;
+  }
+}
 </script>
 {% endblock %}

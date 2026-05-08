@@ -48,6 +48,7 @@ class Reading(Base):
     theme: Mapped[str] = mapped_column(Text)
     content: Mapped[str] = mapped_column(Text, default="")
     prompt_used: Mapped[str] = mapped_column(Text, default="")
+    image_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped["User"] = relationship(back_populates="readings")

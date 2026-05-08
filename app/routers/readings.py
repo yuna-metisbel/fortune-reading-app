@@ -5,7 +5,7 @@ from typing import AsyncIterator
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.requests import Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -15,12 +15,15 @@ from sqlalchemy.orm import selectinload
 from app.database import async_session, get_db
 from app.models import Profile, Reading, User
 from app.services.claude_client import stream_message
+from app.services.image_generator import generate_reading_image
 from app.services.prompts import (
     SYSTEM_PROMPT_COMPATIBILITY,
     SYSTEM_PROMPT_PERSONAL,
     build_compatibility_user_prompt,
     build_personal_user_prompt,
 )
+from app.services.rokusei import calculate_rokusei
+from app.services.shichusuimei import calculate_year_pillar
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
@@ -70,6 +73,17 @@ async def _get_or_create_user(db: AsyncSession) -> User:
         db.add(user)
         await db.flush()
     return user
+
+
+def _compute_fortune_data(birth_date_str: str) -> tuple[dict | None, dict | None]:
+    """生年月日文字列から六星占術・四柱推命の計算結果を返す。"""
+    try:
+        bd = date.fromisoformat(birth_date_str)
+        rokusei_result = calculate_rokusei(bd.year, bd.month, bd.day)
+        shichusuimei_result = calculate_year_pillar(bd.year)
+        return rokusei_result, shichusuimei_result
+    except (ValueError, TypeError):
+        return None, None
 
 
 async def _get_or_create_profile(
@@ -123,6 +137,8 @@ async def personal_stream(
         blood_type=body.blood_type,
     )
 
+    rokusei_result, shichusuimei_result = _compute_fortune_data(body.birth_date)
+
     user_prompt = build_personal_user_prompt(
         nickname=body.nickname,
         birth_date=body.birth_date,
@@ -131,6 +147,8 @@ async def personal_stream(
         gender=body.gender,
         blood_type=body.blood_type,
         theme=body.theme,
+        rokusei_result=rokusei_result,
+        shichusuimei_result=shichusuimei_result,
     )
 
     reading = Reading(
@@ -203,6 +221,9 @@ async def compatibility_stream(
         except ValueError:
             met_date = None
 
+    p1_rokusei, p1_shichusuimei = _compute_fortune_data(body.person1_birth_date)
+    p2_rokusei, p2_shichusuimei = _compute_fortune_data(body.person2_birth_date)
+
     user_prompt = build_compatibility_user_prompt(
         person1_nickname=body.person1_nickname,
         person1_birth_date=body.person1_birth_date,
@@ -219,6 +240,10 @@ async def compatibility_stream(
         relationship_type=body.relationship_type,
         met_date=body.met_date,
         theme=body.theme,
+        person1_rokusei=p1_rokusei,
+        person1_shichusuimei=p1_shichusuimei,
+        person2_rokusei=p2_rokusei,
+        person2_shichusuimei=p2_shichusuimei,
     )
 
     reading = Reading(
@@ -314,3 +339,52 @@ async def reading_result(
     return templates.TemplateResponse(
         "reading_result.html", {"request": request, "reading": reading, "sections": sections}
     )
+
+
+# ---------------------------------------------------------------------------
+# POST /api/readings/{reading_id}/generate-image
+# ---------------------------------------------------------------------------
+
+@router.post("/api/readings/{reading_id}/generate-image")
+async def generate_image(
+    reading_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Reading).where(Reading.id == reading_id).options(selectinload(Reading.profile))
+    )
+    reading = result.scalar_one_or_none()
+    if reading is None:
+        raise HTTPException(status_code=404, detail="Reading not found")
+
+    # Build summary from sections
+    sections_text = ""
+    if reading.content:
+        parts = re.split(r'^## ', reading.content, flags=re.MULTILINE)
+        for part in parts[1:]:
+            lines = part.strip().split('\n', 1)
+            title = lines[0].strip()
+            body = lines[1] if len(lines) > 1 else ""
+            points: list[str] = []
+            for line in body.split('\n'):
+                line = line.strip()
+                if line.startswith('- ') or line.startswith('* '):
+                    points.append(line[2:])
+                if len(points) >= 2:
+                    break
+            section_text = f"「{title}」"
+            if points:
+                section_text += "：" + "、".join(points)
+            sections_text += section_text + "\n"
+
+    nickname = reading.profile.nickname if reading.profile else "あなた"
+    image_url = await generate_reading_image(
+        nickname=nickname,
+        sections_summary=sections_text,
+    )
+
+    if image_url:
+        reading.image_url = image_url
+        await db.commit()
+
+    return JSONResponse({"image_url": image_url})

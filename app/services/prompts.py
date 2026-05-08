@@ -150,6 +150,8 @@ def build_personal_user_prompt(
     gender: str | None,
     blood_type: str | None,
     theme: str | None,
+    rokusei_result: dict | None = None,
+    shichusuimei_result: dict | None = None,
 ) -> str:
     """個人リーディング用のユーザープロンプトを構築する。
 
@@ -161,6 +163,8 @@ def build_personal_user_prompt(
         gender: 性別（例: "女性"）、不明の場合は None
         blood_type: 血液型（例: "A"）、不明の場合は None
         theme: 特に知りたいテーマや悩み、None の場合は省略
+        rokusei_result: 六星占術の計算結果 dict、None の場合は省略
+        shichusuimei_result: 四柱推命の年柱計算結果 dict、None の場合は省略
 
     Returns:
         フォーマット済みのユーザープロンプト文字列
@@ -179,6 +183,15 @@ def build_personal_user_prompt(
         f"- 血液型：{_val(blood_type)}",
     ]
 
+    if rokusei_result:
+        lines.append(f"- 六星占術：{rokusei_result['star_full']}")
+
+    if shichusuimei_result:
+        lines.append(
+            f"- 四柱推命（年柱）：{shichusuimei_result['pillar']}"
+            f"（{shichusuimei_result['stem_element']}の{shichusuimei_result['yinyang']}）"
+        )
+
     if theme:
         lines += [
             "",
@@ -190,6 +203,14 @@ def build_personal_user_prompt(
         "",
         "上記の情報をもとに、指定のフォーマットで詳細なリーディングを行ってください。",
     ]
+
+    if rokusei_result:
+        lines += [
+            "",
+            "【重要】六星占術の運命星は上記の通り正確に算出済みです。"
+            "リーディング内では必ずこの結果をそのまま使用してください。"
+            "独自に再計算しないでください。",
+        ]
 
     return "\n".join(lines)
 
@@ -210,6 +231,10 @@ def build_compatibility_user_prompt(
     relationship_type: str | None,
     met_date: str | None,
     theme: str | None,
+    person1_rokusei: dict | None = None,
+    person1_shichusuimei: dict | None = None,
+    person2_rokusei: dict | None = None,
+    person2_shichusuimei: dict | None = None,
 ) -> str:
     """相性リーディング用のユーザープロンプトを構築する。
 
@@ -229,6 +254,10 @@ def build_compatibility_user_prompt(
         relationship_type: 関係性の種類（例: "恋人候補", "既婚", "友人"）、None の場合は省略
         met_date: 出会った時期（例: "2023年春"）、None の場合は省略
         theme: 特に知りたいテーマや悩み、None の場合は省略
+        person1_rokusei: 1人目の六星占術計算結果 dict、None の場合は省略
+        person1_shichusuimei: 1人目の四柱推命年柱結果 dict、None の場合は省略
+        person2_rokusei: 2人目の六星占術計算結果 dict、None の場合は省略
+        person2_shichusuimei: 2人目の四柱推命年柱結果 dict、None の場合は省略
 
     Returns:
         フォーマット済みのユーザープロンプト文字列
@@ -245,6 +274,17 @@ def build_compatibility_user_prompt(
         f"- 出生地：{_val(person1_birth_place)}",
         f"- 性別：{_val(person1_gender)}",
         f"- 血液型：{_val(person1_blood_type)}",
+    ]
+
+    if person1_rokusei:
+        lines.append(f"- 六星占術：{person1_rokusei['star_full']}")
+    if person1_shichusuimei:
+        lines.append(
+            f"- 四柱推命（年柱）：{person1_shichusuimei['pillar']}"
+            f"（{person1_shichusuimei['stem_element']}の{person1_shichusuimei['yinyang']}）"
+        )
+
+    lines += [
         "",
         f"## {person2_nickname}（2人目）の情報",
         f"- 生年月日：{person2_birth_date}",
@@ -253,6 +293,14 @@ def build_compatibility_user_prompt(
         f"- 性別：{_val(person2_gender)}",
         f"- 血液型：{_val(person2_blood_type)}",
     ]
+
+    if person2_rokusei:
+        lines.append(f"- 六星占術：{person2_rokusei['star_full']}")
+    if person2_shichusuimei:
+        lines.append(
+            f"- 四柱推命（年柱）：{person2_shichusuimei['pillar']}"
+            f"（{person2_shichusuimei['stem_element']}の{person2_shichusuimei['yinyang']}）"
+        )
 
     if relationship_type or met_date:
         lines += ["", "## 二人の関係について"]
@@ -272,5 +320,14 @@ def build_compatibility_user_prompt(
         "",
         "上記の情報をもとに、指定のフォーマットで詳細な相性リーディングを行ってください。",
     ]
+
+    has_rokusei = person1_rokusei or person2_rokusei
+    if has_rokusei:
+        lines += [
+            "",
+            "【重要】六星占術の運命星は上記の通り正確に算出済みです。"
+            "リーディング内では必ずこの結果をそのまま使用してください。"
+            "独自に再計算しないでください。",
+        ]
 
     return "\n".join(lines)

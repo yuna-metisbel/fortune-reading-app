@@ -1574,6 +1574,24 @@ img, svg {
     padding-right: 20px;
 }
 
+/* ── Poster Image ── */
+.poster-image {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.poster-image img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(74, 59, 107, 0.15);
+}
+
+.poster-image-action {
+    margin: 20px 0;
+    text-align: center;
+}
+
 /* === Fortune Systems Tags === */
 .fortune-systems {
     display: flex;

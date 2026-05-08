@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 
+import sqlalchemy as sa
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
@@ -15,6 +16,11 @@ BASE_DIR = Path(__file__).resolve().parent
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Add image_url column if it doesn't exist (simple migration)
+        try:
+            await conn.execute(sa.text("ALTER TABLE readings ADD COLUMN image_url TEXT"))
+        except Exception:
+            pass  # Column already exists
     yield
 
 
