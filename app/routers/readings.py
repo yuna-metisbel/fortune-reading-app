@@ -1,4 +1,5 @@
 from datetime import date, time
+from pathlib import Path
 from typing import AsyncIterator
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -20,7 +21,7 @@ from app.services.prompts import (
 )
 
 router = APIRouter()
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
 
 
 # ---------------------------------------------------------------------------

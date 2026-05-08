@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import AsyncIterator
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -14,7 +15,7 @@ from app.services.claude_client import stream_message
 from app.services.prompts import SYSTEM_PROMPT_CHAT
 
 router = APIRouter()
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
 
 
 # ---------------------------------------------------------------------------
