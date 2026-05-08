@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}{{ reading.theme[:20] }}... — 星図リーディング{% endblock %}
+
+{% block content %}
+<div class="result-page">
+  <a href="/" class="back-link">トップに戻る</a>
+
+  <div class="result-header">
+    <div class="result-type-badge">
+      {% if reading.type == 'compatibility' %}✨ 相性リーディング{% else %}🌙 魂のリーディング{% endif %}
+    </div>
+    <h1 class="result-title">{{ reading.theme }}</h1>
+    <p class="result-date">{{ reading.created_at.strftime('%Y年%m月%d日') }}</p>
+  </div>
+
+  <div id="reading-body" class="reading-content">
+    {{ reading.content | safe }}
+  </div>
+</div>
+
+<div class="fixed-cta">
+  <a href="/chat/{{ reading.id }}" class="fixed-cta-btn">
+    💬 鑑定師に相談する
+  </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  // Converts plain-text markdown-like content into formatted HTML
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function renderMarkdown(text) {
+    if (!text) return '';
+    var escaped = escapeHtml(text);
+    var lines = escaped.split('\n');
+    var html = '';
+    var inList = false;
+
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+
+      if (/^### (.+)/.test(line)) {
+        if (inList) { html += '</ul>'; inList = false; }
+        html += '<h3>' + line.replace(/^### /, '') + '</h3>';
+      } else if (/^## (.+)/.test(line)) {
+        if (inList) { html += '</ul>'; inList = false; }
+        html += '<h2>' + line.replace(/^## /, '') + '</h2>';
+      } else if (/^# (.+)/.test(line)) {
+        if (inList) { html += '</ul>'; inList = false; }
+        html += '<h2>' + line.replace(/^# /, '') + '</h2>';
+      } else if (/^[-*] (.+)/.test(line)) {
+        if (!inList) { html += '<ul>'; inList = true; }
+        html += '<li>' + line.replace(/^[-*] /, '') + '</li>';
+      } else if (/^\d+\. (.+)/.test(line)) {
+        if (inList) { html += '</ul>'; inList = false; }
+        html += '<li>' + line.replace(/^\d+\. /, '') + '</li>';
+      } else if (line.trim() === '') {
+        if (inList) { html += '</ul>'; inList = false; }
+        html += '';
+      } else {
+        if (inList) { html += '</ul>'; inList = false; }
+        html += '<p>' + line + '</p>';
+      }
+    }
+    if (inList) html += '</ul>';
+
+    // Bold: **text**
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    // Italic: *text*
+    html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+    return html;
+  }
+
+  var bodyEl = document.getElementById('reading-body');
+  if (bodyEl) {
+    var raw = bodyEl.textContent || bodyEl.innerText;
+    // Only convert if the content looks like plain text (no existing HTML tags)
+    if (raw && !/<[a-z][\s\S]*>/i.test(bodyEl.innerHTML.trim().substring(0, 50))) {
+      bodyEl.innerHTML = renderMarkdown(raw);
+    }
+  }
+})();
+</script>
+{% endblock %}

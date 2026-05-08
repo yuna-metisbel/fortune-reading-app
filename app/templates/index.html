@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}星図リーディング{% endblock %}
+
+{% block content %}
+<div class="top-header fade-in">
+  <span class="top-ornament">☽ · ✦ · ☽</span>
+  <h1 class="top-title">あなたの魂が描く、<br>人生の星図</h1>
+  <p class="top-subtitle">本来のあなたを思い出し、調和の流れに乗るスピリチュアルリーディング</p>
+</div>
+
+<div class="menu-cards fade-in">
+  <a href="/reading/new" class="menu-card">
+    <span class="menu-card-icon">🌙</span>
+    <div class="menu-card-body">
+      <div class="menu-card-title">魂のリーディング</div>
+      <div class="menu-card-desc">生年月日と星の配置から、あなたの本質と<br>今の流れを読み解きます</div>
+    </div>
+    <span class="menu-card-arrow">›</span>
+  </a>
+
+  <a href="/compatibility/new" class="menu-card">
+    <span class="menu-card-icon">✨</span>
+    <div class="menu-card-body">
+      <div class="menu-card-title">相性リーディング</div>
+      <div class="menu-card-desc">二人の魂のつながりと、関係の流れを<br>星から読み解きます</div>
+    </div>
+    <span class="menu-card-arrow">›</span>
+  </a>
+</div>
+
+{% if readings %}
+<div class="section-header fade-in">
+  <div class="section-title">過去のリーディング</div>
+</div>
+
+<div class="reading-list fade-in">
+  {% for reading in readings %}
+  <a href="/reading/{{ reading.id }}" class="reading-item">
+    <span class="reading-item-icon">{% if reading.type == 'compatibility' %}✨{% else %}🌙{% endif %}</span>
+    <div class="reading-item-body">
+      <div class="reading-item-theme">{{ reading.theme }}</div>
+      <div class="reading-item-date">{{ reading.created_at.strftime('%Y年%m月%d日') }}</div>
+    </div>
+    <span class="reading-item-type">{% if reading.type == 'compatibility' %}相性{% else %}個人{% endif %}</span>
+  </a>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="empty-state fade-in">
+  <div class="empty-state-icon">🌙</div>
+  <p>まだリーディングの記録がありません。<br>上のメニューから始めてみましょう。</p>
+</div>
+{% endif %}
+{% endblock %}

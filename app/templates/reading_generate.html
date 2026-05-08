@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}リーディング中... — 星図リーディング{% endblock %}
+
+{% block content %}
+<div class="generate-page">
+
+  <!-- Loading State -->
+  <div id="loading-crystal" class="loading-crystal fade-in">
+    <span class="loading-crystal-emoji">🔮</span>
+    <h2 class="loading-title">星の配置を読み解いています</h2>
+    <p class="loading-text">少々お待ちください<span class="loading-dots"></span></p>
+  </div>
+
+  <!-- Streaming Area (hidden initially) -->
+  <div id="streaming-area" class="streaming-area" role="region" aria-live="polite" aria-label="リーディング結果">
+    <div class="streaming-header">✦ &nbsp;あなたへのメッセージ&nbsp; ✦</div>
+    <div id="streaming-content" class="streaming-content"></div>
+  </div>
+
+  <!-- Action Buttons (hidden initially) -->
+  <div id="generate-actions" class="generate-actions">
+    <a id="chat-link" href="#" class="btn btn-primary">
+      💬 鑑定師に相談する
+    </a>
+    <a href="/" class="btn btn-secondary">
+      ← トップに戻る
+    </a>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>const readingId = {{ reading_id }};</script>
+<script src="/static/js/reading.js"></script>
+{% endblock %}

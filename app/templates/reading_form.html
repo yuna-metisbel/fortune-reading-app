@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}魂のリーディング — 星図リーディング{% endblock %}
+
+{% block content %}
+<div class="form-page">
+  <a href="/" class="back-link">トップに戻る</a>
+
+  <div class="form-header">
+    <h1 class="form-title">🌙 魂のリーディング</h1>
+    <p class="form-subtitle">あなたの情報を入力してください</p>
+  </div>
+
+  {% if profiles %}
+  <div class="saved-profile-bar">
+    <label for="saved-profile">保存済み</label>
+    <select id="saved-profile">
+      <option value="">プロフィールを選択...</option>
+      {% for profile in profiles %}
+      <option value="{{ profile.id }}"
+        data-nickname="{{ profile.nickname }}"
+        data-birth-date="{{ profile.birth_date.isoformat() }}"
+        data-birth-time="{{ profile.birth_time.strftime('%H:%M') if profile.birth_time else '' }}"
+        data-birth-place="{{ profile.birth_place or '' }}"
+        data-gender="{{ profile.gender or '' }}"
+        data-blood-type="{{ profile.blood_type or '' }}">
+        {{ profile.nickname }}（{{ profile.birth_date.strftime('%Y/%m/%d') }}）
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+  {% endif %}
+
+  <form id="reading-form" novalidate>
+    <div class="form-section">
+      <h2 class="form-section-title">✦ 基本情報</h2>
+
+      <div class="form-group">
+        <label for="nickname">ニックネーム</label>
+        <input type="text" id="nickname" name="nickname" placeholder="例：さくら" required autocomplete="off">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="birth_date">生年月日</label>
+          <input type="date" id="birth_date" name="birth_date" required>
+        </div>
+        <div class="form-group">
+          <label for="birth_time">出生時刻（任意）</label>
+          <input type="time" id="birth_time" name="birth_time">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="birth_place">出生地（任意）</label>
+        <input type="text" id="birth_place" name="birth_place" placeholder="例：東京都渋谷区" autocomplete="off">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="gender">性別（任意）</label>
+          <select id="gender" name="gender">
+            <option value="">選択してください</option>
+            <option value="女性">女性</option>
+            <option value="男性">男性</option>
+            <option value="その他">その他</option>
+            <option value="無回答">無回答</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="blood_type">血液型（任意）</label>
+          <select id="blood_type" name="blood_type">
+            <option value="">選択してください</option>
+            <option value="A">A型</option>
+            <option value="B">B型</option>
+            <option value="O">O型</option>
+            <option value="AB">AB型</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="form-section-title">💫 リーディングのテーマ</h2>
+      <div class="form-group">
+        <label for="theme">今、どんなことが気になっていますか？</label>
+        <textarea id="theme" name="theme" placeholder="例：仕事の転職を考えているが、自分に合った道が分からない。恋愛面でも悩みがある。" required></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-full">
+      ✦ 星図を読み解く
+    </button>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/reading.js"></script>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block title %}相性リーディング — 星図リーディング{% endblock %}
+
+{% block content %}
+<div class="form-page">
+  <a href="/" class="back-link">トップに戻る</a>
+
+  <div class="form-header">
+    <h1 class="form-title">✨ 相性リーディング</h1>
+    <p class="form-subtitle">二人の情報を入力してください</p>
+  </div>
+
+  <form id="compatibility-form" novalidate>
+
+    <!-- Person 1 -->
+    <div class="form-section">
+      <h2 class="form-section-title">🌙 あなたの情報</h2>
+
+      {% if profiles %}
+      <div class="saved-profile-bar">
+        <label for="saved-profile-p1">保存済み</label>
+        <select id="saved-profile-p1" data-target="p1">
+          <option value="">プロフィールを選択...</option>
+          {% for profile in profiles %}
+          <option value="{{ profile.id }}"
+            data-nickname="{{ profile.nickname }}"
+            data-birth-date="{{ profile.birth_date.isoformat() }}"
+            data-birth-time="{{ profile.birth_time.strftime('%H:%M') if profile.birth_time else '' }}"
+            data-birth-place="{{ profile.birth_place or '' }}"
+            data-gender="{{ profile.gender or '' }}"
+            data-blood-type="{{ profile.blood_type or '' }}">
+            {{ profile.nickname }}（{{ profile.birth_date.strftime('%Y/%m/%d') }}）
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label for="person1_nickname">ニックネーム</label>
+        <input type="text" id="person1_nickname" name="person1_nickname" placeholder="例：さくら" required autocomplete="off">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="person1_birth_date">生年月日</label>
+          <input type="date" id="person1_birth_date" name="person1_birth_date" required>
+        </div>
+        <div class="form-group">
+          <label for="person1_birth_time">出生時刻（任意）</label>
+          <input type="time" id="person1_birth_time" name="person1_birth_time">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="person1_birth_place">出生地（任意）</label>
+        <input type="text" id="person1_birth_place" name="person1_birth_place" placeholder="例：東京都" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="person1_gender">性別（任意）</label>
+          <select id="person1_gender" name="person1_gender">
+            <option value="">選択してください</option>
+            <option value="女性">女性</option>
+            <option value="男性">男性</option>
+            <option value="その他">その他</option>
+            <option value="無回答">無回答</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="person1_blood_type">血液型（任意）</label>
+          <select id="person1_blood_type" name="person1_blood_type">
+            <option value="">選択してください</option>
+            <option value="A">A型</option>
+            <option value="B">B型</option>
+            <option value="O">O型</option>
+            <option value="AB">AB型</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Person 2 -->
+    <div class="form-section">
+      <h2 class="form-section-title">✦ 相手の情報</h2>
+
+      {% if profiles %}
+      <div class="saved-profile-bar">
+        <label for="saved-profile-p2">保存済み</label>
+        <select id="saved-profile-p2" data-target="p2">
+          <option value="">プロフィールを選択...</option>
+          {% for profile in profiles %}
+          <option value="{{ profile.id }}"
+            data-nickname="{{ profile.nickname }}"
+            data-birth-date="{{ profile.birth_date.isoformat() }}"
+            data-birth-time="{{ profile.birth_time.strftime('%H:%M') if profile.birth_time else '' }}"
+            data-birth-place="{{ profile.birth_place or '' }}"
+            data-gender="{{ profile.gender or '' }}"
+            data-blood-type="{{ profile.blood_type or '' }}">
+            {{ profile.nickname }}（{{ profile.birth_date.strftime('%Y/%m/%d') }}）
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label for="person2_nickname">ニックネーム</label>
+        <input type="text" id="person2_nickname" name="person2_nickname" placeholder="例：ケンジ" required autocomplete="off">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="person2_birth_date">生年月日</label>
+          <input type="date" id="person2_birth_date" name="person2_birth_date" required>
+        </div>
+        <div class="form-group">
+          <label for="person2_birth_time">出生時刻（任意）</label>
+          <input type="time" id="person2_birth_time" name="person2_birth_time">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="person2_birth_place">出生地（任意）</label>
+        <input type="text" id="person2_birth_place" name="person2_birth_place" placeholder="例：大阪府" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="person2_gender">性別（任意）</label>
+          <select id="person2_gender" name="person2_gender">
+            <option value="">選択してください</option>
+            <option value="女性">女性</option>
+            <option value="男性">男性</option>
+            <option value="その他">その他</option>
+            <option value="無回答">無回答</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="person2_blood_type">血液型（任意）</label>
+          <select id="person2_blood_type" name="person2_blood_type">
+            <option value="">選択してください</option>
+            <option value="A">A型</option>
+            <option value="B">B型</option>
+            <option value="O">O型</option>
+            <option value="AB">AB型</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Relationship Info -->
+    <div class="form-section">
+      <h2 class="form-section-title">💫 二人のこと</h2>
+
+      <div class="form-group">
+        <label for="relationship_type">関係性</label>
+        <select id="relationship_type" name="relationship_type" required>
+          <option value="">選択してください</option>
+          <option value="交際中">交際中</option>
+          <option value="片思い">片思い</option>
+          <option value="友人">友人</option>
+          <option value="家族">家族</option>
+          <option value="職場・仕事">職場・仕事</option>
+          <option value="元カレ・元カノ">元カレ・元カノ</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="met_date">出会った時期（任意）</label>
+        <input type="text" id="met_date" name="met_date" placeholder="例：2022年春、3年前 など" autocomplete="off">
+      </div>
+
+      <div class="form-group">
+        <label for="theme">二人についての相談テーマ</label>
+        <textarea id="theme" name="theme" placeholder="例：付き合って2年になる彼との将来が気になる。結婚を考えているが、相手の気持ちが読めない。" required></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-full">
+      ✦ 二人の星図を読み解く
+    </button>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/reading.js"></script>
+{% endblock %}
