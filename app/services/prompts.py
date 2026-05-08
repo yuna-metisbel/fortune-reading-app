@@ -152,6 +152,7 @@ def build_personal_user_prompt(
     theme: str | None,
     rokusei_result: dict | None = None,
     shichusuimei_result: dict | None = None,
+    numerology_result: dict | None = None,
 ) -> str:
     """個人リーディング用のユーザープロンプトを構築する。
 
@@ -165,6 +166,7 @@ def build_personal_user_prompt(
         theme: 特に知りたいテーマや悩み、None の場合は省略
         rokusei_result: 六星占術の計算結果 dict、None の場合は省略
         shichusuimei_result: 四柱推命の年柱計算結果 dict、None の場合は省略
+        numerology_result: 数秘術の計算結果 dict、None の場合は省略
 
     Returns:
         フォーマット済みのユーザープロンプト文字列
@@ -191,6 +193,9 @@ def build_personal_user_prompt(
             f"- 四柱推命（年柱）：{shichusuimei_result['pillar']}"
             f"（{shichusuimei_result['stem_element']}の{shichusuimei_result['yinyang']}）"
         )
+
+    if numerology_result:
+        lines.append(f"- 数秘術ライフパスナンバー：{numerology_result['description']}")
 
     if theme:
         lines += [
@@ -233,8 +238,10 @@ def build_compatibility_user_prompt(
     theme: str | None,
     person1_rokusei: dict | None = None,
     person1_shichusuimei: dict | None = None,
+    person1_numerology: dict | None = None,
     person2_rokusei: dict | None = None,
     person2_shichusuimei: dict | None = None,
+    person2_numerology: dict | None = None,
 ) -> str:
     """相性リーディング用のユーザープロンプトを構築する。
 
@@ -283,6 +290,8 @@ def build_compatibility_user_prompt(
             f"- 四柱推命（年柱）：{person1_shichusuimei['pillar']}"
             f"（{person1_shichusuimei['stem_element']}の{person1_shichusuimei['yinyang']}）"
         )
+    if person1_numerology:
+        lines.append(f"- 数秘術ライフパスナンバー：{person1_numerology['description']}")
 
     lines += [
         "",
@@ -301,6 +310,8 @@ def build_compatibility_user_prompt(
             f"- 四柱推命（年柱）：{person2_shichusuimei['pillar']}"
             f"（{person2_shichusuimei['stem_element']}の{person2_shichusuimei['yinyang']}）"
         )
+    if person2_numerology:
+        lines.append(f"- 数秘術ライフパスナンバー：{person2_numerology['description']}")
 
     if relationship_type or met_date:
         lines += ["", "## 二人の関係について"]

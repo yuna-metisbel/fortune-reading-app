@@ -22,6 +22,7 @@ from app.services.prompts import (
     build_compatibility_user_prompt,
     build_personal_user_prompt,
 )
+from app.services.numerology import calculate_life_path
 from app.services.rokusei import calculate_cycle_position, calculate_rokusei
 from app.services.shichusuimei import calculate_year_pillar
 
@@ -75,8 +76,8 @@ async def _get_or_create_user(db: AsyncSession) -> User:
     return user
 
 
-def _compute_fortune_data(birth_date_str: str) -> tuple[dict | None, dict | None]:
-    """生年月日文字列から六星占術・四柱推命の計算結果を返す。"""
+def _compute_fortune_data(birth_date_str: str) -> tuple[dict | None, dict | None, dict | None]:
+    """生年月日文字列から六星占術・四柱推命・数秘術の計算結果を返す。"""
     try:
         bd = date.fromisoformat(birth_date_str)
         rokusei_result = calculate_rokusei(bd.year, bd.month, bd.day)
@@ -89,9 +90,10 @@ def _compute_fortune_data(birth_date_str: str) -> tuple[dict | None, dict | None
         if cycle["is_daisakkai"]:
             rokusei_result["star_full"] += "【大殺界】"
         shichusuimei_result = calculate_year_pillar(bd.year)
-        return rokusei_result, shichusuimei_result
+        numerology_result = calculate_life_path(bd.year, bd.month, bd.day)
+        return rokusei_result, shichusuimei_result, numerology_result
     except (ValueError, TypeError):
-        return None, None
+        return None, None, None
 
 
 async def _get_or_create_profile(
@@ -145,7 +147,7 @@ async def personal_stream(
         blood_type=body.blood_type,
     )
 
-    rokusei_result, shichusuimei_result = _compute_fortune_data(body.birth_date)
+    rokusei_result, shichusuimei_result, numerology_result = _compute_fortune_data(body.birth_date)
 
     user_prompt = build_personal_user_prompt(
         nickname=body.nickname,
@@ -157,6 +159,7 @@ async def personal_stream(
         theme=body.theme,
         rokusei_result=rokusei_result,
         shichusuimei_result=shichusuimei_result,
+        numerology_result=numerology_result,
     )
 
     reading = Reading(
@@ -229,8 +232,8 @@ async def compatibility_stream(
         except ValueError:
             met_date = None
 
-    p1_rokusei, p1_shichusuimei = _compute_fortune_data(body.person1_birth_date)
-    p2_rokusei, p2_shichusuimei = _compute_fortune_data(body.person2_birth_date)
+    p1_rokusei, p1_shichusuimei, p1_numerology = _compute_fortune_data(body.person1_birth_date)
+    p2_rokusei, p2_shichusuimei, p2_numerology = _compute_fortune_data(body.person2_birth_date)
 
     user_prompt = build_compatibility_user_prompt(
         person1_nickname=body.person1_nickname,
@@ -250,8 +253,10 @@ async def compatibility_stream(
         theme=body.theme,
         person1_rokusei=p1_rokusei,
         person1_shichusuimei=p1_shichusuimei,
+        person1_numerology=p1_numerology,
         person2_rokusei=p2_rokusei,
         person2_shichusuimei=p2_shichusuimei,
+        person2_numerology=p2_numerology,
     )
 
     reading = Reading(
