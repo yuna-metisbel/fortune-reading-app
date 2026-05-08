@@ -1654,3 +1654,17 @@ img, svg {
     padding: 4px 12px;
     letter-spacing: 0.5px;
 }
+
+/* === Poster Loading === */
+.poster-loading {
+    text-align: center;
+    padding: 32px;
+    font-size: 16px;
+    color: var(--text-light);
+    animation: crystal-pulse 2s ease-in-out infinite;
+}
+
+@keyframes crystal-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}

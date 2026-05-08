@@ -370,30 +370,13 @@ async def generate_image(
     if reading is None:
         raise HTTPException(status_code=404, detail="Reading not found")
 
-    # Build summary from sections
-    sections_text = ""
-    if reading.content:
-        parts = re.split(r'^## ', reading.content, flags=re.MULTILINE)
-        for part in parts[1:]:
-            lines = part.strip().split('\n', 1)
-            title = lines[0].strip()
-            body = lines[1] if len(lines) > 1 else ""
-            points: list[str] = []
-            for line in body.split('\n'):
-                line = line.strip()
-                if line.startswith('- ') or line.startswith('* '):
-                    points.append(line[2:])
-                if len(points) >= 2:
-                    break
-            section_text = f"「{title}」"
-            if points:
-                section_text += "：" + "、".join(points)
-            sections_text += section_text + "\n"
+    if reading.image_url:
+        return JSONResponse({"image_url": reading.image_url})
 
     nickname = reading.profile.nickname if reading.profile else "あなた"
     image_url = await generate_reading_image(
         nickname=nickname,
-        sections_summary=sections_text,
+        sections_summary="",
     )
 
     if image_url:
