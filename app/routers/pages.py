@@ -20,6 +20,11 @@ async def index(request: Request, db: AsyncSession = Depends(get_db)):
     return templates.TemplateResponse("index.html", {"request": request, "readings": readings})
 
 
+@router.get("/sample", response_class=HTMLResponse)
+async def sample_page(request: Request):
+    return templates.TemplateResponse("sample.html", {"request": request})
+
+
 @router.get("/reading/new", response_class=HTMLResponse)
 async def reading_new(request: Request, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Profile).order_by(Profile.created_at.desc()))

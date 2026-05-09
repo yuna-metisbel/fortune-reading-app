@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}サンプル鑑定 — 星図リーディング{% endblock %}
+
+{% block content %}
+<div class="page" style="padding-top:20px;">
+  <a href="/" class="back-link">トップに戻る</a>
+
+  <div class="glass-card" style="margin:16px 0; text-align:center;">
+    <p style="font-size:13px; color:var(--main); font-weight:500; margin-bottom:8px;">📖 サンプル鑑定結果</p>
+    <p style="font-size:12px; color:var(--text-light); line-height:1.7;">
+      以下は実際の鑑定結果のサンプルです。<br>
+      6つの占術を統合した本格的なリーディングをお届けします。
+    </p>
+  </div>
+
+  <!-- ポスターカード（サンプル） -->
+  <div class="poster-card">
+    <div class="poster-deco-moon poster-deco-moon--tl">🌙</div>
+    <div class="poster-deco-moon poster-deco-moon--tr">🌙</div>
+
+    <div class="poster-header">
+      <div class="poster-header-ornament">☽ · ✦ · ☽</div>
+      <h1 class="poster-header-title">あなたの魂が描く、人生の星図</h1>
+      <p class="poster-header-sub">本来のあなたを思い出し、調和の流れに乗るスピリチュアルリーディング</p>
+      <p class="poster-header-name">サンプル さんの星図</p>
+    </div>
+
+    <div class="poster-mandala">
+      <div class="poster-mandala-wrap">
+        <div class="poster-mandala-label poster-mandala-label--top">直感</div>
+        <div class="poster-mandala-label poster-mandala-label--tr">知性</div>
+        <div class="poster-mandala-label poster-mandala-label--br">行動</div>
+        <div class="poster-mandala-label poster-mandala-label--bot">再生</div>
+        <div class="poster-mandala-label poster-mandala-label--bl">感性</div>
+        <div class="poster-mandala-label poster-mandala-label--tl">共感</div>
+        <div class="poster-mandala-ring poster-mandala-ring--outer"></div>
+        <div class="poster-mandala-ring poster-mandala-ring--mid"></div>
+        <div class="poster-mandala-ring poster-mandala-ring--inner">
+          <span class="poster-mandala-gem">🔮</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="poster-grid">
+      <div class="poster-section">
+        <div class="poster-section-header">
+          <span class="poster-section-icon">🔮</span>
+          <h3 class="poster-section-title">魂のテーマ</h3>
+        </div>
+        <ul class="poster-section-points">
+          <li>「光をやさしく届ける、癒しの調和者」</li>
+          <li>数秘：ライフパスナンバー 7 ＝ 探求と内省の人</li>
+          <li>六星占術：金星人プラス ＝ 美と調和を大切にする</li>
+          <li>四柱推命：甲午 ＝ 明るく堂々とした木の陽</li>
+        </ul>
+      </div>
+      <div class="poster-section">
+        <div class="poster-section-header">
+          <span class="poster-section-icon">🌸</span>
+          <h3 class="poster-section-title">自然な性格</h3>
+        </div>
+        <ul class="poster-section-points">
+          <li>繊細で感受性が強い、空気を読むのが得意</li>
+          <li>美しいものやハーモニーに自然と惹かれる</li>
+          <li>誠実で一途、一人の時間も大切にする</li>
+        </ul>
+      </div>
+      <div class="poster-section">
+        <div class="poster-section-header">
+          <span class="poster-section-icon">✨</span>
+          <h3 class="poster-section-title">強み</h3>
+        </div>
+        <ul class="poster-section-points">
+          <li>深い共感力で人を癒す天性の才能</li>
+          <li>直感が鋭く、本質を見抜く力がある</li>
+          <li>コツコツ積み上げる持続力</li>
+        </ul>
+      </div>
+      <div class="poster-section">
+        <div class="poster-section-header">
+          <span class="poster-section-icon">⚡</span>
+          <h3 class="poster-section-title">弱点・課題</h3>
+        </div>
+        <ul class="poster-section-points">
+          <li>他者の評価を気にしすぎる傾向</li>
+          <li>自分を後回しにして疲弊しやすい</li>
+          <li>決断を先延ばしにしがち</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="poster-message">
+      <div class="poster-message-header">
+        <span>🌙</span>
+        <h3 class="poster-message-title">あなたへのメッセージ</h3>
+        <span>🌙</span>
+      </div>
+      <p class="poster-message-body">あなたの優しさは、最大の武器であり最大の盾。まず自分を大切にすることから、全てが動き出す。</p>
+      <p class="poster-message-sign">With Love &amp; Light ✦</p>
+    </div>
+
+    <div class="poster-footer">
+      <p>サンプル鑑定</p>
+      <p class="poster-footer-site">fortune-reading-app.onrender.com</p>
+    </div>
+  </div>
+
+  <div style="padding:0; margin:24px 0;">
+    <p style="font-size:13px; color:var(--text-light); text-align:center; margin-bottom:16px; line-height:1.8;">
+      実際の鑑定では、さらに詳細な10セクション＋タロットメッセージ付き。<br>
+      あなただけの完全オリジナル鑑定をお届けします。
+    </p>
+    <a href="/reading/new" class="btn btn-primary btn-full" style="margin-bottom:10px;">🌙 魂のリーディングを受ける（¥2,000）</a>
+    <a href="/compatibility/new" class="btn btn-secondary btn-full">✨ 相性リーディングを受ける（¥3,000）</a>
+  </div>
+</div>
+{% endblock %}

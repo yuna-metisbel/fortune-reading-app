@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.database import engine
 from app.models import Base
-from app.routers import chat, pages, profiles, readings
+from app.routers import chat, pages, payment, profiles, readings
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -17,10 +17,16 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         # Add image_url column if it doesn't exist (simple migration)
-        try:
-            await conn.execute(sa.text("ALTER TABLE readings ADD COLUMN image_url TEXT"))
-        except Exception:
-            pass  # Column already exists
+        for col_sql in [
+            "ALTER TABLE readings ADD COLUMN image_url TEXT",
+            "ALTER TABLE readings ADD COLUMN payment_status TEXT DEFAULT 'free'",
+            "ALTER TABLE readings ADD COLUMN stripe_session_id TEXT",
+            "ALTER TABLE readings ADD COLUMN form_data_json TEXT",
+        ]:
+            try:
+                await conn.execute(sa.text(col_sql))
+            except Exception:
+                pass
     yield
 
 
@@ -31,3 +37,4 @@ app.include_router(pages.router)
 app.include_router(profiles.router)
 app.include_router(readings.router)
 app.include_router(chat.router)
+app.include_router(payment.router)

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}決済キャンセル — 星図リーディング{% endblock %}
+
+{% block content %}
+<div class="page" style="text-align:center; padding-top:80px;">
+  <div class="glass-card" style="max-width:400px; margin:0 auto;">
+    <p style="font-size:40px; margin-bottom:16px;">🌙</p>
+    <h2 style="font-family:var(--font-serif); font-size:18px; margin-bottom:12px;">決済がキャンセルされました</h2>
+    <p style="color:var(--text-light); font-size:14px; margin-bottom:24px;">
+      お支払いは完了していません。<br>もう一度お試しいただけます。
+    </p>
+    <a href="{{ redirect_url }}" class="btn btn-primary" style="margin-bottom:8px;">フォームに戻る</a>
+    <br>
+    <a href="/" class="btn btn-secondary" style="margin-top:8px;">トップに戻る</a>
+  </div>
+</div>
+{% endblock %}

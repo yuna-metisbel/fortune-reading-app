@@ -153,7 +153,7 @@ function initPersonalForm() {
       submitBtn.textContent = '読み解き中...';
     }
 
-    var data = {
+    var formData = {
       nickname:    form.nickname.value.trim(),
       birth_date:  form.birth_date.value,
       birth_time:  form.birth_time ? form.birth_time.value || null : null,
@@ -164,23 +164,21 @@ function initPersonalForm() {
     };
 
     try {
-      var resp = await fetch('/api/readings/personal/stream', {
+      var resp = await fetch('/api/payment/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ reading_type: 'personal', form_data: formData }),
       });
 
       if (!resp.ok) {
-        alert('エラーが発生しました。もう一度お試しください。');
+        var errData = await resp.json().catch(function() { return {}; });
+        alert(errData.detail || 'エラーが発生しました。もう一度お試しください。');
         if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✦ 星図を読み解く'; }
         return;
       }
 
-      // Navigate to generate page which streams the result
-      // But since we're POSTing directly, handle the stream here on the same page
-      // by transitioning the UI to a streaming view
-      _showStreamingView();
-      await handleStream(resp);
+      var result = await resp.json();
+      window.location.href = result.checkout_url;
 
     } catch (err) {
       console.error(err);
@@ -229,7 +227,7 @@ function initCompatibilityForm() {
       submitBtn.textContent = '読み解き中...';
     }
 
-    var data = {
+    var formData = {
       person1_nickname:    form.person1_nickname.value.trim(),
       person1_birth_date:  form.person1_birth_date.value,
       person1_birth_time:  form.person1_birth_time ? form.person1_birth_time.value || null : null,
@@ -248,20 +246,21 @@ function initCompatibilityForm() {
     };
 
     try {
-      var resp = await fetch('/api/readings/compatibility/stream', {
+      var resp = await fetch('/api/payment/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ reading_type: 'compatibility', form_data: formData }),
       });
 
       if (!resp.ok) {
-        alert('エラーが発生しました。もう一度お試しください。');
+        var errData = await resp.json().catch(function() { return {}; });
+        alert(errData.detail || 'エラーが発生しました。もう一度お試しください。');
         if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✦ 二人の星図を読み解く'; }
         return;
       }
 
-      _showStreamingView();
-      await handleStream(resp);
+      var result = await resp.json();
+      window.location.href = result.checkout_url;
 
     } catch (err) {
       console.error(err);

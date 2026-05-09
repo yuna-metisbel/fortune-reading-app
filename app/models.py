@@ -55,6 +55,9 @@ class Reading(Base):
     content: Mapped[str] = mapped_column(Text, default="")
     prompt_used: Mapped[str] = mapped_column(Text, default="")
     image_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    payment_status: Mapped[str] = mapped_column(String(20), default="free")
+    stripe_session_id: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    form_data_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now_jst)
 
     user: Mapped["User"] = relationship(back_populates="readings")

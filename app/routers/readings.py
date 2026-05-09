@@ -294,6 +294,120 @@ async def compatibility_stream(
 
 
 # ---------------------------------------------------------------------------
+# POST /api/readings/generate/{reading_id} — 決済完了後のリーディング生成
+# ---------------------------------------------------------------------------
+
+@router.post("/api/readings/generate/{reading_id}")
+async def generate_paid_reading(
+    reading_id: int,
+    body: dict,
+    db: AsyncSession = Depends(get_db),
+) -> StreamingResponse:
+    reading = await db.get(Reading, reading_id)
+    if reading is None:
+        raise HTTPException(status_code=404, detail="Reading not found")
+    if reading.payment_status != "paid":
+        raise HTTPException(status_code=403, detail="Payment required")
+
+    user = await _get_or_create_user(db)
+
+    if reading.type == "personal":
+        profile = await _get_or_create_profile(
+            db, user_id=user.id,
+            nickname=body.get("nickname", ""),
+            birth_date_str=body.get("birth_date", "2000-01-01"),
+            birth_time_str=body.get("birth_time"),
+            birth_place=body.get("birth_place"),
+            gender=body.get("gender"),
+            blood_type=body.get("blood_type"),
+        )
+        reading.profile_id = profile.id
+        await db.commit()
+
+        rokusei, shichusuimei, numerology = _compute_fortune_data(body.get("birth_date", "2000-01-01"))
+        user_prompt = build_personal_user_prompt(
+            nickname=body.get("nickname", ""),
+            birth_date=body.get("birth_date", ""),
+            birth_time=body.get("birth_time"),
+            birth_place=body.get("birth_place"),
+            gender=body.get("gender"),
+            blood_type=body.get("blood_type"),
+            theme=body.get("theme", ""),
+            rokusei_result=rokusei,
+            shichusuimei_result=shichusuimei,
+            numerology_result=numerology,
+        )
+        system_prompt = SYSTEM_PROMPT_PERSONAL
+    else:
+        profile1 = await _get_or_create_profile(
+            db, user_id=user.id,
+            nickname=body.get("person1_nickname", ""),
+            birth_date_str=body.get("person1_birth_date", "2000-01-01"),
+            birth_time_str=body.get("person1_birth_time"),
+            birth_place=body.get("person1_birth_place"),
+            gender=body.get("person1_gender"),
+            blood_type=body.get("person1_blood_type"),
+        )
+        profile2 = await _get_or_create_profile(
+            db, user_id=user.id,
+            nickname=body.get("person2_nickname", ""),
+            birth_date_str=body.get("person2_birth_date", "2000-01-01"),
+            birth_time_str=body.get("person2_birth_time"),
+            birth_place=body.get("person2_birth_place"),
+            gender=body.get("person2_gender"),
+            blood_type=body.get("person2_blood_type"),
+        )
+        reading.profile_id = profile1.id
+        reading.profile_id_2 = profile2.id
+        if body.get("met_date"):
+            try:
+                reading.met_date = date.fromisoformat(body["met_date"])
+            except ValueError:
+                pass
+        await db.commit()
+
+        p1_rok, p1_shi, p1_num = _compute_fortune_data(body.get("person1_birth_date", "2000-01-01"))
+        p2_rok, p2_shi, p2_num = _compute_fortune_data(body.get("person2_birth_date", "2000-01-01"))
+        user_prompt = build_compatibility_user_prompt(
+            person1_nickname=body.get("person1_nickname", ""),
+            person1_birth_date=body.get("person1_birth_date", ""),
+            person1_birth_time=body.get("person1_birth_time"),
+            person1_birth_place=body.get("person1_birth_place"),
+            person1_gender=body.get("person1_gender"),
+            person1_blood_type=body.get("person1_blood_type"),
+            person2_nickname=body.get("person2_nickname", ""),
+            person2_birth_date=body.get("person2_birth_date", ""),
+            person2_birth_time=body.get("person2_birth_time"),
+            person2_birth_place=body.get("person2_birth_place"),
+            person2_gender=body.get("person2_gender"),
+            person2_blood_type=body.get("person2_blood_type"),
+            relationship_type=body.get("relationship_type", ""),
+            met_date=body.get("met_date"),
+            theme=body.get("theme", ""),
+            person1_rokusei=p1_rok, person1_shichusuimei=p1_shi, person1_numerology=p1_num,
+            person2_rokusei=p2_rok, person2_shichusuimei=p2_shi, person2_numerology=p2_num,
+        )
+        system_prompt = SYSTEM_PROMPT_COMPATIBILITY
+
+    reading.prompt_used = user_prompt
+    await db.commit()
+
+    async def event_stream() -> AsyncIterator[str]:
+        chunks: list[str] = []
+        async for chunk in stream_message(system_prompt, user_prompt):
+            chunks.append(chunk)
+            yield f"data: {chunk}\n\n"
+        content = "".join(chunks)
+        async with async_session() as save_db:
+            r = await save_db.get(Reading, reading_id)
+            r.content = content
+            await save_db.commit()
+        yield f"event: done\ndata: {reading_id}\n\n"
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
+
+
+# ---------------------------------------------------------------------------
 # GET /reading/{reading_id}
 # ---------------------------------------------------------------------------
 

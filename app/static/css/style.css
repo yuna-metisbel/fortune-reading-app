@@ -398,6 +398,16 @@ img, svg {
   line-height: 1.6;
 }
 
+.menu-card-price {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--main);
+  margin-top: 6px;
+  letter-spacing: 0.02em;
+}
+
 .menu-card-arrow {
   font-size: 18px;
   color: var(--main);
