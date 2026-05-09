@@ -40,11 +40,28 @@
     {% set s8 = sections[8] if sections|length > 8 else none %}
     {% set s9 = sections[9] if sections|length > 9 else none %}
 
-    <!-- Row 1: 魂のテーマ | Mandala | 自然な性格 -->
-    <div class="poster-row poster-row--top">
+    <!-- Center Mandala -->
+    <div class="poster-mandala">
+      <div class="poster-mandala-wrap">
+        <div class="poster-mandala-label poster-mandala-label--top">直感</div>
+        <div class="poster-mandala-label poster-mandala-label--tr">知性</div>
+        <div class="poster-mandala-label poster-mandala-label--br">行動</div>
+        <div class="poster-mandala-label poster-mandala-label--bot">再生</div>
+        <div class="poster-mandala-label poster-mandala-label--bl">感性</div>
+        <div class="poster-mandala-label poster-mandala-label--tl">共感</div>
+        <div class="poster-mandala-ring poster-mandala-ring--outer"></div>
+        <div class="poster-mandala-ring poster-mandala-ring--mid"></div>
+        <div class="poster-mandala-ring poster-mandala-ring--inner">
+          <span class="poster-mandala-gem">🔮</span>
+        </div>
+      </div>
+    </div>
 
-      <!-- 魂のテーマ (s0: 全体要約) -->
-      <div class="poster-section poster-section--soul-theme">
+    <!-- Grid: 2-column layout -->
+    <div class="poster-grid">
+
+      <!-- 魂のテーマ -->
+      <div class="poster-section">
         <div class="poster-section-header">
           <span class="poster-section-icon">{{ s0.icon if s0 else '🌟' }}</span>
           <h3 class="poster-section-title">魂のテーマ</h3>
@@ -52,33 +69,14 @@
         {% if s0 and s0.key_points %}
         <ul class="poster-section-points">
           {% for point in s0.key_points[:4] %}
-          <li>{{ point[:40] }}</li>
+          <li>{{ point }}</li>
           {% endfor %}
         </ul>
         {% endif %}
       </div>
 
-      <!-- Center Mandala -->
-      <div class="poster-mandala">
-        <div class="poster-mandala-wrap">
-          <!-- Labels top/right/bottom/left -->
-          <div class="poster-mandala-label poster-mandala-label--top">直感・インスピレーション</div>
-          <div class="poster-mandala-label poster-mandala-label--tr">知性</div>
-          <div class="poster-mandala-label poster-mandala-label--br">行動・実践</div>
-          <div class="poster-mandala-label poster-mandala-label--bot">愛容・再生</div>
-          <div class="poster-mandala-label poster-mandala-label--bl">感性・美意識</div>
-          <div class="poster-mandala-label poster-mandala-label--tl">愛情・共感</div>
-          <!-- Rings -->
-          <div class="poster-mandala-ring poster-mandala-ring--outer"></div>
-          <div class="poster-mandala-ring poster-mandala-ring--mid"></div>
-          <div class="poster-mandala-ring poster-mandala-ring--inner">
-            <span class="poster-mandala-gem">🔮</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 自然な性格 (s1: 性格・本質) -->
-      <div class="poster-section poster-section--nature">
+      <!-- 自然な性格 -->
+      <div class="poster-section">
         <div class="poster-section-header">
           <span class="poster-section-icon">{{ s1.icon if s1 else '🌸' }}</span>
           <h3 class="poster-section-title">自然な性格</h3>
@@ -86,52 +84,44 @@
         {% if s1 and s1.key_points %}
         <ul class="poster-section-points">
           {% for point in s1.key_points[:4] %}
-          <li>{{ point[:40] }}</li>
+          <li>{{ point }}</li>
           {% endfor %}
         </ul>
         {% endif %}
       </div>
 
-    </div><!-- /poster-row--top -->
-
-    <!-- Row 2: 強み | 弱点・課題 -->
-    <div class="poster-row poster-row--strengths">
-
-      <div class="poster-section poster-section--half">
+      <!-- 強み -->
+      <div class="poster-section">
         <div class="poster-section-header">
-          <span class="poster-section-icon">{{ s2.icon if s2 else '⚡' }}</span>
+          <span class="poster-section-icon">{{ s2.icon if s2 else '✨' }}</span>
           <h3 class="poster-section-title">強み</h3>
         </div>
         {% if s2 and s2.key_points %}
         <ul class="poster-section-points">
           {% for point in s2.key_points[:4] %}
-          <li>{{ point[:38] }}</li>
+          <li>{{ point }}</li>
           {% endfor %}
         </ul>
         {% endif %}
       </div>
 
-      <div class="poster-section poster-section--half">
+      <!-- 弱点・課題 -->
+      <div class="poster-section">
         <div class="poster-section-header">
-          <span class="poster-section-icon">{{ s3.icon if s3 else '⚠️' }}</span>
+          <span class="poster-section-icon">{{ s3.icon if s3 else '⚡' }}</span>
           <h3 class="poster-section-title">弱点・課題</h3>
         </div>
         {% if s3 and s3.key_points %}
         <ul class="poster-section-points">
           {% for point in s3.key_points[:4] %}
-          <li>{{ point[:38] }}</li>
+          <li>{{ point }}</li>
           {% endfor %}
         </ul>
         {% endif %}
       </div>
 
-    </div><!-- /poster-row--strengths -->
-
-    <!-- Row 3: 恋愛傾向 | 人間関係の特徴 | 仕事の向き -->
-    <div class="poster-row poster-row--three">
-
-      <!-- 恋愛傾向 (s5 前半: 恋愛・人間関係) -->
-      <div class="poster-section poster-section--third">
+      <!-- 恋愛傾向 -->
+      <div class="poster-section">
         <div class="poster-section-header">
           <span class="poster-section-icon">{{ s5.icon if s5 else '💕' }}</span>
           <h3 class="poster-section-title">恋愛傾向</h3>
@@ -139,14 +129,14 @@
         {% if s5 and s5.key_points %}
         <ul class="poster-section-points">
           {% for point in s5.key_points[:3] %}
-          <li>{{ point[:35] }}</li>
+          <li>{{ point }}</li>
           {% endfor %}
         </ul>
         {% endif %}
       </div>
 
-      <!-- 人間関係の特徴 (s5 後半 / s6) -->
-      <div class="poster-section poster-section--third poster-section--center-accent">
+      <!-- 人間関係の特徴 -->
+      <div class="poster-section">
         <div class="poster-section-header">
           <span class="poster-section-icon">{{ s6.icon if s6 else '🤝' }}</span>
           <h3 class="poster-section-title">人間関係の特徴</h3>
@@ -155,14 +145,14 @@
         {% if rel_section and rel_section.key_points %}
         <ul class="poster-section-points">
           {% for point in rel_section.key_points[:3] %}
-          <li>{{ point[:35] }}</li>
+          <li>{{ point }}</li>
           {% endfor %}
         </ul>
         {% endif %}
       </div>
 
-      <!-- 仕事の向いている方向 (s4: 仕事・お金) -->
-      <div class="poster-section poster-section--third">
+      <!-- 仕事の向き -->
+      <div class="poster-section">
         <div class="poster-section-header">
           <span class="poster-section-icon">{{ s4.icon if s4 else '💼' }}</span>
           <h3 class="poster-section-title">仕事の向き</h3>
@@ -170,19 +160,14 @@
         {% if s4 and s4.key_points %}
         <ul class="poster-section-points">
           {% for point in s4.key_points[:3] %}
-          <li>{{ point[:35] }}</li>
+          <li>{{ point }}</li>
           {% endfor %}
         </ul>
         {% endif %}
       </div>
 
-    </div><!-- /poster-row--three -->
-
-    <!-- Row 4: 運気を高める習慣 | おすすめアイテム | 避けたいもの -->
-    <div class="poster-row poster-row--three">
-
-      <!-- 運気を高める習慣 (s6: 今年のテーマ) -->
-      <div class="poster-section poster-section--third">
+      <!-- 運気を高める習慣 -->
+      <div class="poster-section">
         <div class="poster-section-header">
           <span class="poster-section-icon">{{ s6.icon if s6 else '🌿' }}</span>
           <h3 class="poster-section-title">運気を高める習慣</h3>
@@ -190,19 +175,18 @@
         {% if s6 and s6.key_points %}
         <ul class="poster-section-points">
           {% for point in s6.key_points[:3] %}
-          <li>{{ point[:35] }}</li>
+          <li>{{ point }}</li>
           {% endfor %}
         </ul>
         {% endif %}
       </div>
 
-      <!-- おすすめアイテム (s8: 今すぐやること) -->
-      <div class="poster-section poster-section--third poster-section--gems-area">
+      <!-- おすすめアイテム -->
+      <div class="poster-section poster-section--gems-area">
         <div class="poster-section-header">
           <span class="poster-section-icon">{{ s8.icon if s8 else '💎' }}</span>
           <h3 class="poster-section-title">おすすめアイテム</h3>
         </div>
-        <!-- Crystal gems row -->
         <div class="poster-gems">
           <span title="アメジスト">💜</span>
           <span title="ムーンストーン">🤍</span>
@@ -212,14 +196,14 @@
         {% if s8 and s8.key_points %}
         <ul class="poster-section-points">
           {% for point in s8.key_points[:2] %}
-          <li>{{ point[:35] }}</li>
+          <li>{{ point }}</li>
           {% endfor %}
         </ul>
         {% endif %}
       </div>
 
-      <!-- 避けたいもの・注意点 (s3: 注意点・課題 から抜粋) -->
-      <div class="poster-section poster-section--third">
+      <!-- 避けたいもの -->
+      <div class="poster-section">
         <div class="poster-section-header">
           <span class="poster-section-icon">🦋</span>
           <h3 class="poster-section-title">避けたいもの</h3>
@@ -227,13 +211,13 @@
         {% if s3 and s3.key_points %}
         <ul class="poster-section-points">
           {% for point in s3.key_points[:3] %}
-          <li>{{ point[:35] }}</li>
+          <li>{{ point }}</li>
           {% endfor %}
         </ul>
         {% endif %}
       </div>
 
-    </div><!-- /poster-row--three -->
+    </div><!-- /poster-grid -->
 
     <!-- Timeline row: 人生のサイクルとテーマ (s7: 月別の流れ) -->
     <div class="poster-timeline">
@@ -246,7 +230,7 @@
           {% for point in s7.key_points[:5] %}
           <div class="poster-timeline-item">
             <div class="poster-timeline-dot"></div>
-            <div class="poster-timeline-text">{{ point[:30] }}</div>
+            <div class="poster-timeline-text">{{ point }}</div>
           </div>
           {% endfor %}
         {% else %}
