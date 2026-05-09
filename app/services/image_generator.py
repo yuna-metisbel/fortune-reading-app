@@ -1,42 +1,45 @@
-"""無料画像生成（Pollinations.ai）を使用して鑑定ポスター画像を生成するモジュール。
+"""DALL-E 3 を使用して鑑定結果ポスター画像を生成するモジュール。"""
 
-APIキー不要。URLベースで画像を生成する。
-"""
+import openai
 
-import urllib.parse
-
-import httpx
+from app.config import settings
 
 
 async def generate_reading_image(nickname: str, sections_summary: str) -> str | None:
-    """Pollinations.ai でスピリチュアル鑑定ポスターの背景画像を生成する。
-
-    Args:
-        nickname: 占い対象者のニックネーム
-        sections_summary: 鑑定セクションの要約テキスト
+    """DALL-E 3 でスピリチュアル鑑定ポスター画像を生成する。
 
     Returns:
         生成された画像の URL、失敗時は None
     """
+    if not settings.openai_api_key:
+        return None
+
+    client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
+
     prompt = (
-        "A mystical spiritual astrology poster, pastel lavender purple silver white color scheme, "
-        "dreamy ethereal atmosphere, soft clouds, crescent moon, stars, glowing crystals, "
-        "light particles, delicate ornamental frame, mandala star chart in the center with "
-        "a shining crystal, moonstone amethyst rose quartz decorations, butterflies, "
-        "flower motifs, hanging ornaments, light effects, feminine gentle mystical mood, "
-        "soft gradients, no text, no words, no letters, clean decorative background only, "
-        "high quality illustration style"
+        "A mystical spiritual astrology reading poster in pastel lavender, purple, silver and white tones. "
+        "Dreamy ethereal atmosphere with soft clouds, crescent moon, stars, glowing crystals, "
+        "and light particles. A large circular mandala star chart in the center with a shining crystal. "
+        "Decorated with moonstone, amethyst, rose quartz gems, butterflies, moon motifs, "
+        "hanging ornaments, flowers, and light effects. "
+        "Soft feminine mystical mood with delicate ornamental frames. "
+        "The poster has sections arranged around the mandala for: "
+        "Soul Theme, Natural Personality, Strengths, Challenges, Love Tendency, "
+        "Relationships, Career Direction, Lucky Habits, Recommended Items, Cautions, "
+        "Life Cycles, and Personal Message. "
+        "Japanese aesthetic, elegant, cute, soft readable layout. "
+        "High quality illustration, no photorealistic elements. "
+        f"Title area says '{nickname}' in decorative text."
     )
 
-    encoded = urllib.parse.quote(prompt)
-    url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1792&model=flux&nologo=true&seed={hash(nickname) % 10000}"
-
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            resp = await client.head(url, follow_redirects=True)
-            if resp.status_code == 200:
-                return url
+        response = await client.images.generate(
+            model="dall-e-3",
+            prompt=prompt,
+            size="1024x1792",
+            quality="hd",
+            n=1,
+        )
+        return response.data[0].url
     except Exception:
-        pass
-
-    return url
+        return None
