@@ -339,10 +339,22 @@ function initGeneratePage() {
   }
 }
 
+// ── Auto-fill latest profile into compatibility form ────────
+function autoFillLatestProfile() {
+  var p1Select = document.getElementById('saved-profile-p1');
+  if (!p1Select) return;
+  if (p1Select.options.length <= 1) return;
+
+  var latestOpt = p1Select.options[1];
+  p1Select.value = latestOpt.value;
+  _fillFields('person1_', latestOpt);
+}
+
 // ── Bootstrap ────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function () {
   initPersonalForm();
   initCompatibilityForm();
   initSavedProfileHandlers();
   initGeneratePage();
+  autoFillLatestProfile();
 });
