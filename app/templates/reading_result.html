@@ -266,9 +266,9 @@
         <span>🌙</span>
       </div>
       {% if s9 and s9.key_points %}
-      <p class="poster-message-body">{{ s9.key_points[0][:120] if s9.key_points else '' }}</p>
+      <p class="poster-message-body">{{ s9.key_points[0] if s9.key_points else '' }}</p>
       {% elif s9 and s9.body %}
-      <p class="poster-message-body">{{ s9.body[:120] }}</p>
+      <p class="poster-message-body">{{ s9.body }}</p>
       {% endif %}
       <p class="poster-message-sign">With Love &amp; Light ✦</p>
     </div>
