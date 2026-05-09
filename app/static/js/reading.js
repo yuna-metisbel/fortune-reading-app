@@ -102,7 +102,7 @@ async function handleStream(resp) {
       }
 
       if (line.startsWith('data:')) {
-        var data = line.replace('data:', '').trim();
+        var data = line.charAt(5) === ' ' ? line.slice(6) : line.slice(5);
 
         if (isEventDone) {
           // data after "event: done" is the reading ID

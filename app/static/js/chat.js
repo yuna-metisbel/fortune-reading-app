@@ -164,7 +164,7 @@ async function sendMessage() {
         if (line === 'event: done' || line.startsWith('event:')) continue;
 
         if (line.startsWith('data:')) {
-          var data = line.replace('data:', '').trim();
+          var data = line.charAt(5) === ' ' ? line.slice(6) : line.slice(5);
           if (data === 'ok') continue;
 
           rawText += data;
