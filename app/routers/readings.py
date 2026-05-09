@@ -349,13 +349,9 @@ async def reading_result(
                 break
         section["icon"] = icon
 
-    try:
-        return templates.TemplateResponse(
-            "reading_result.html", {"request": request, "reading": reading, "sections": sections}
-        )
-    except Exception as e:
-        import traceback
-        return JSONResponse({"error": str(e), "trace": traceback.format_exc()}, status_code=500)
+    return templates.TemplateResponse(
+        "reading_result.html", {"request": request, "reading": reading, "sections": sections}
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -154,12 +154,8 @@
         {% set rel_section = s6 if s6 else s5 %}
         {% if rel_section and rel_section.key_points %}
         <ul class="poster-section-points">
-          {% for point in rel_section.key_points[3:6] if loop.index <= 3 %}
-          <li>{{ point[:35] }}</li>
-          {% else %}
           {% for point in rel_section.key_points[:3] %}
           <li>{{ point[:35] }}</li>
-          {% endfor %}
           {% endfor %}
         </ul>
         {% endif %}
