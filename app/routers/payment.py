@@ -1,4 +1,5 @@
 import json
+import traceback
 from pathlib import Path
 
 import stripe
@@ -13,7 +14,7 @@ from sqlalchemy.orm import selectinload
 
 from app.config import settings
 from app.database import get_db
-from app.models import Reading
+from app.models import Reading, User
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
@@ -38,43 +39,53 @@ async def create_checkout(
     if body.reading_type not in PRICES:
         raise HTTPException(status_code=400, detail="Invalid reading type")
 
-    price = PRICES[body.reading_type]
+    try:
+        price = PRICES[body.reading_type]
 
-    reading = Reading(
-        user_id=1,
-        type=body.reading_type,
-        profile_id=0,
-        theme=body.form_data.get("theme", ""),
-        payment_status="pending",
-        form_data_json=json.dumps(body.form_data, ensure_ascii=False),
-    )
-    db.add(reading)
-    await db.commit()
-    await db.refresh(reading)
+        result = await db.execute(select(User).limit(1))
+        user = result.scalar_one_or_none()
+        if user is None:
+            user = User(name="default")
+            db.add(user)
+            await db.flush()
 
-    stripe.api_key = settings.stripe_secret_key
-    base = settings.base_url
+        reading = Reading(
+            user_id=user.id,
+            type=body.reading_type,
+            profile_id=0,
+            theme=body.form_data.get("theme", ""),
+            payment_status="pending",
+            form_data_json=json.dumps(body.form_data, ensure_ascii=False),
+        )
+        db.add(reading)
+        await db.commit()
+        await db.refresh(reading)
 
-    session = stripe.checkout.Session.create(
-        payment_method_types=["card"],
-        line_items=[{
-            "price_data": {
-                "currency": "jpy",
-                "product_data": {"name": price["label"]},
-                "unit_amount": price["amount"],
-            },
-            "quantity": 1,
-        }],
-        mode="payment",
-        client_reference_id=str(reading.id),
-        success_url=f"{base}/payment/success?session_id={{CHECKOUT_SESSION_ID}}",
-        cancel_url=f"{base}/payment/cancel?reading_type={body.reading_type}",
-    )
+        stripe.api_key = settings.stripe_secret_key
+        base = settings.base_url
 
-    reading.stripe_session_id = session.id
-    await db.commit()
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[{
+                "price_data": {
+                    "currency": "jpy",
+                    "product_data": {"name": price["label"]},
+                    "unit_amount": price["amount"],
+                },
+                "quantity": 1,
+            }],
+            mode="payment",
+            client_reference_id=str(reading.id),
+            success_url=f"{base}/payment/success?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{base}/payment/cancel?reading_type={body.reading_type}",
+        )
 
-    return JSONResponse({"checkout_url": session.url})
+        reading.stripe_session_id = session.id
+        await db.commit()
+
+        return JSONResponse({"checkout_url": session.url})
+    except Exception as e:
+        return JSONResponse({"error": str(e), "trace": traceback.format_exc()}, status_code=500)
 
 
 @router.get("/payment/success")
