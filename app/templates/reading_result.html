@@ -5,6 +5,11 @@
 <div class="result-page">
   <a href="/" class="back-link">← トップに戻る</a>
 
+  <!-- DALL-E POSTER IMAGE -->
+  <div id="poster-image-area" class="poster-image">
+    <div id="poster-loading" class="poster-loading">🔮 ポスター画像を生成中...</div>
+  </div>
+
   <!-- POSTER SUMMARY CARD -->
   <div id="summary-card" class="poster-card">
 
@@ -391,7 +396,36 @@ function renderMarkdownBody(el) {
 
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.reading-body').forEach(renderMarkdownBody);
+  loadPosterImage();
 });
+
+async function loadPosterImage() {
+  var area = document.getElementById('poster-image-area');
+  var loading = document.getElementById('poster-loading');
+  if (!area) return;
+
+  try {
+    var resp = await fetch('/api/readings/{{ reading.id }}/image', { method: 'POST' });
+    var data = await resp.json();
+
+    if (data.image_url) {
+      var img = document.createElement('img');
+      img.src = data.image_url;
+      img.alt = '星図リーディング ポスター';
+      img.style.width = '100%';
+      img.style.borderRadius = '16px';
+      img.style.boxShadow = '0 8px 32px rgba(74,59,107,0.15)';
+      loading.remove();
+      area.appendChild(img);
+    } else {
+      loading.textContent = '';
+      loading.style.display = 'none';
+    }
+  } catch (e) {
+    loading.textContent = '';
+    loading.style.display = 'none';
+  }
+}
 
 async function savePosterAsImage() {
   var btn = document.getElementById('save-poster-btn');
