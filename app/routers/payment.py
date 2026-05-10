@@ -1,16 +1,16 @@
+import base64
 import json
 import traceback
 from pathlib import Path
 
-import stripe
+import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.requests import Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.config import settings
 from app.database import get_db
@@ -23,6 +23,29 @@ PRICES = {
     "personal": {"amount": 2000, "label": "魂のリーディング（個人鑑定）"},
     "compatibility": {"amount": 3000, "label": "相性リーディング（二人の鑑定）"},
 }
+
+
+def _paypal_base_url() -> str:
+    if settings.paypal_mode == "live":
+        return "https://api-m.paypal.com"
+    return "https://api-m.sandbox.paypal.com"
+
+
+async def _paypal_access_token() -> str:
+    credentials = base64.b64encode(
+        f"{settings.paypal_client_id}:{settings.paypal_client_secret}".encode()
+    ).decode()
+    async with httpx.AsyncClient() as client:
+        resp = await client.post(
+            f"{_paypal_base_url()}/v1/oauth2/token",
+            headers={
+                "Authorization": f"Basic {credentials}",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            data={"grant_type": "client_credentials"},
+        )
+        resp.raise_for_status()
+        return resp.json()["access_token"]
 
 
 class CheckoutRequest(BaseModel):
@@ -61,29 +84,48 @@ async def create_checkout(
         await db.commit()
         await db.refresh(reading)
 
-        stripe.api_key = settings.stripe_secret_key
+        token = await _paypal_access_token()
         base = settings.base_url
 
-        session = stripe.checkout.Session.create(
-            payment_method_types=["card"],
-            line_items=[{
-                "price_data": {
-                    "currency": "jpy",
-                    "product_data": {"name": price["label"]},
-                    "unit_amount": price["amount"],
+        order_payload = {
+            "intent": "CAPTURE",
+            "purchase_units": [{
+                "reference_id": str(reading.id),
+                "description": price["label"],
+                "amount": {
+                    "currency_code": "JPY",
+                    "value": str(price["amount"]),
                 },
-                "quantity": 1,
             }],
-            mode="payment",
-            client_reference_id=str(reading.id),
-            success_url=f"{base}/payment/success?session_id={{CHECKOUT_SESSION_ID}}",
-            cancel_url=f"{base}/payment/cancel?reading_type={body.reading_type}",
+            "application_context": {
+                "brand_name": "Educatelling",
+                "locale": "ja-JP",
+                "return_url": f"{base}/payment/success",
+                "cancel_url": f"{base}/payment/cancel?reading_type={body.reading_type}",
+                "user_action": "PAY_NOW",
+            },
+        }
+
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                f"{_paypal_base_url()}/v2/checkout/orders",
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json",
+                },
+                json=order_payload,
+            )
+            resp.raise_for_status()
+            order = resp.json()
+
+        approval_url = next(
+            link["href"] for link in order["links"] if link["rel"] == "approve"
         )
 
-        reading.stripe_session_id = session.id
+        reading.stripe_session_id = order["id"]
         await db.commit()
 
-        return JSONResponse({"checkout_url": session.url})
+        return JSONResponse({"checkout_url": approval_url})
     except Exception as e:
         return JSONResponse({"error": str(e), "trace": traceback.format_exc()}, status_code=500)
 
@@ -91,37 +133,52 @@ async def create_checkout(
 @router.get("/payment/success")
 async def payment_success(
     request: Request,
-    session_id: str,
+    token: str = "",
+    PayerID: str = "",
+    session_id: str = "",
     db: AsyncSession = Depends(get_db),
 ):
-    stripe.api_key = settings.stripe_secret_key
+    order_id = token or session_id
+    if not order_id:
+        raise HTTPException(status_code=400, detail="Missing order ID")
 
     try:
-        session = stripe.checkout.Session.retrieve(session_id)
-    except stripe.StripeError:
-        raise HTTPException(status_code=400, detail="Invalid session")
+        access_token = await _paypal_access_token()
 
-    if session.payment_status != "paid":
-        raise HTTPException(status_code=400, detail="Payment not completed")
+        async with httpx.AsyncClient() as client:
+            capture_resp = await client.post(
+                f"{_paypal_base_url()}/v2/checkout/orders/{order_id}/capture",
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Content-Type": "application/json",
+                },
+            )
+            capture_resp.raise_for_status()
+            capture_data = capture_resp.json()
 
-    reading_id = int(session.client_reference_id)
-    reading = await db.get(Reading, reading_id)
-    if reading is None:
-        raise HTTPException(status_code=404, detail="Reading not found")
+        if capture_data["status"] != "COMPLETED":
+            raise HTTPException(status_code=400, detail="Payment not completed")
 
-    reading.payment_status = "paid"
-    await db.commit()
+        reading_id = int(capture_data["purchase_units"][0]["reference_id"])
+        reading = await db.get(Reading, reading_id)
+        if reading is None:
+            raise HTTPException(status_code=404, detail="Reading not found")
 
-    form_data = json.loads(reading.form_data_json) if reading.form_data_json else {}
+        reading.payment_status = "paid"
+        await db.commit()
 
-    return templates.TemplateResponse(
-        "payment_success.html",
-        {
-            "request": request,
-            "reading": reading,
-            "form_data": form_data,
-        },
-    )
+        form_data = json.loads(reading.form_data_json) if reading.form_data_json else {}
+
+        return templates.TemplateResponse(
+            "payment_success.html",
+            {
+                "request": request,
+                "reading": reading,
+                "form_data": form_data,
+            },
+        )
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(status_code=400, detail=f"PayPal error: {e.response.text}")
 
 
 @router.get("/payment/cancel")

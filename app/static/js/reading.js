@@ -129,21 +129,19 @@ function initPersonalForm() {
     };
 
     try {
-      // TODO: Stripe審査完了後、以下を /api/payment/create-checkout に切り替え
-      var resp = await fetch('/api/readings/personal/stream', {
+      var resp = await fetch('/api/payment/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ reading_type: 'personal', form_data: formData }),
       });
 
-      if (!resp.ok) {
-        alert('エラーが発生しました。もう一度お試しください。');
+      var data = await resp.json();
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        alert('決済の開始に失敗しました: ' + (data.error || '不明なエラー'));
         if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✦ 星図を読み解く'; }
-        return;
       }
-
-      _showStreamingView();
-      await handleStream(resp);
 
     } catch (err) {
       console.error(err);
@@ -238,21 +236,19 @@ function initCompatibilityForm() {
     };
 
     try {
-      // TODO: Stripe審査完了後、以下を /api/payment/create-checkout に切り替え
-      var resp = await fetch('/api/readings/compatibility/stream', {
+      var resp = await fetch('/api/payment/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ reading_type: 'compatibility', form_data: formData }),
       });
 
-      if (!resp.ok) {
-        alert('エラーが発生しました。もう一度お試しください。');
+      var data = await resp.json();
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        alert('決済の開始に失敗しました: ' + (data.error || '不明なエラー'));
         if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✦ 二人の星図を読み解く'; }
-        return;
       }
-
-      _showStreamingView();
-      await handleStream(resp);
 
     } catch (err) {
       console.error(err);
