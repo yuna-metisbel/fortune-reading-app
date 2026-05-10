@@ -6,10 +6,10 @@
 :root {
   --main:         #B388FF;
   --main-vivid:   #9C5CFF;
-  --accent:       #FF80AB;
+  --accent:       #E9D5FF;
   --glow:         #D946EF;
   --text:         #F3E8FF;
-  --text-light:   #D8B4FE;
+  --text-light:   rgba(255, 255, 255, 0.65);
   --white:        #FFFFFF;
   --glass-bg:     rgba(255, 255, 255, 0.1);
   --glass-border: rgba(255, 255, 255, 0.2);
@@ -337,16 +337,13 @@ img, svg {
 
 .top-title {
   font-family: var(--font-heading);
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 700;
-  line-height: 1.55;
+  line-height: 1.5;
   margin-bottom: 16px;
-  background: linear-gradient(135deg, var(--main-vivid) 0%, var(--accent) 40%, var(--glow) 70%, var(--main-vivid) 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer-text 4s linear infinite;
+  color: #fff;
+  text-shadow: 0 0 30px rgba(179, 136, 255, 0.7), 0 0 60px rgba(156, 92, 255, 0.4), 0 2px 4px rgba(0,0,0,0.15);
+  letter-spacing: 0.04em;
 }
 
 @keyframes shimmer-text {
@@ -430,10 +427,8 @@ img, svg {
   font-weight: 700;
   margin-top: 6px;
   letter-spacing: 0.06em;
-  background: linear-gradient(135deg, var(--glow), var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #FFD700;
+  text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
 }
 
 .menu-card-arrow {
