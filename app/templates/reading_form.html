@@ -36,23 +36,23 @@
 
       <div class="form-group">
         <label for="nickname">ニックネーム</label>
-        <input type="text" id="nickname" name="nickname" placeholder="例：さくら" required autocomplete="off">
+        <input type="text" id="nickname" name="nickname" placeholder="例：さくら" required autocomplete="off" value="yuna">
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label for="birth_date">生年月日</label>
-          <input type="date" id="birth_date" name="birth_date" required value="2000-01-01" min="1940-01-01" max="2015-12-31">
+          <input type="date" id="birth_date" name="birth_date" required value="1995-06-26" min="1940-01-01" max="2015-12-31">
         </div>
         <div class="form-group">
           <label for="birth_time">出生時刻（任意）</label>
-          <input type="time" id="birth_time" name="birth_time">
+          <input type="time" id="birth_time" name="birth_time" value="06:25">
         </div>
       </div>
 
       <div class="form-group">
         <label for="birth_place">出生地（任意）</label>
-        <input type="text" id="birth_place" name="birth_place" placeholder="例：東京都渋谷区" autocomplete="off">
+        <input type="text" id="birth_place" name="birth_place" placeholder="例：東京都渋谷区" autocomplete="off" value="函館">
       </div>
 
       <div class="form-row">
@@ -60,7 +60,7 @@
           <label for="gender">性別（任意）</label>
           <select id="gender" name="gender">
             <option value="">選択してください</option>
-            <option value="女性">女性</option>
+            <option value="女性" selected>女性</option>
             <option value="男性">男性</option>
             <option value="その他">その他</option>
             <option value="無回答">無回答</option>
@@ -72,7 +72,7 @@
             <option value="">選択してください</option>
             <option value="A">A型</option>
             <option value="B">B型</option>
-            <option value="O">O型</option>
+            <option value="O" selected>O型</option>
             <option value="AB">AB型</option>
           </select>
         </div>
