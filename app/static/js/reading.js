@@ -60,82 +60,47 @@ function renderMarkdown(text) {
 
 // ── SSE stream handler ───────────────────────────────────────
 async function handleStream(resp) {
-  var loadingEl  = document.getElementById('loading-crystal');
-  var streamArea = document.getElementById('streaming-area');
-  var streamEl   = document.getElementById('streaming-content');
-  var actionsEl  = document.getElementById('generate-actions');
-  var chatLink   = document.getElementById('chat-link');
-
-  if (!streamEl) return;
-
   var reader = resp.body.getReader();
   var decoder = new TextDecoder('utf-8');
   var buffer = '';
-  var rawText = '';
   var finishedReadingId = null;
   var isEventDone = false;
-
-  // Show streaming area, hide loading crystal after first chunk
-  var firstChunk = true;
 
   while (true) {
     var result = await reader.read();
     if (result.done) break;
 
     buffer += decoder.decode(result.value, { stream: true });
-
-    // Process complete SSE lines
     var lines = buffer.split('\n');
-    buffer = lines.pop(); // keep incomplete last line
+    buffer = lines.pop();
 
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i].trim();
-
       if (line === '') continue;
 
       if (line.startsWith('event:')) {
-        var evtName = line.replace('event:', '').trim();
-        if (evtName === 'done') {
-          isEventDone = true;
-        }
+        if (line.replace('event:', '').trim() === 'done') isEventDone = true;
         continue;
       }
 
-      if (line.startsWith('data:')) {
+      if (line.startsWith('data:') && isEventDone) {
         var data = line.charAt(5) === ' ' ? line.slice(6) : line.slice(5);
-
-        if (isEventDone) {
-          // data after "event: done" is the reading ID
-          finishedReadingId = parseInt(data, 10);
-          isEventDone = false;
-        } else {
-          // Regular text chunk
-          rawText += data.replace(/⏎/g, '\n');
-
-          if (firstChunk) {
-            firstChunk = false;
-            if (loadingEl) loadingEl.style.display = 'none';
-            if (streamArea) streamArea.classList.add('visible');
-          }
-
-          streamEl.innerHTML = renderMarkdown(rawText);
-          streamEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        }
+        finishedReadingId = parseInt(data, 10);
+        isEventDone = false;
       }
     }
   }
 
-  // Stream complete — redirect to result page
+  if (window._ritualInterval) clearInterval(window._ritualInterval);
+
   if (finishedReadingId) {
-    window.location.href = '/reading/' + finishedReadingId;
-    return;
-  }
-
-  // Fallback: show action buttons if no reading ID was received
-  if (actionsEl) actionsEl.classList.add('visible');
-
-  if (chatLink && finishedReadingId) {
-    chatLink.href = '/chat/' + finishedReadingId;
+    var barEl = document.getElementById('ritual-bar');
+    var phaseEl = document.getElementById('ritual-phase');
+    if (barEl) barEl.style.width = '100%';
+    if (phaseEl) phaseEl.textContent = '鑑定が完了しました';
+    setTimeout(function() {
+      window.location.href = '/reading/' + finishedReadingId;
+    }, 800);
   }
 }
 
@@ -189,28 +154,55 @@ function initPersonalForm() {
 }
 
 function _showStreamingView() {
-  // If the form page is being used, we inject the streaming UI inline
   var formPage = document.querySelector('.form-page');
   if (!formPage) return;
 
-  // Replace form with streaming UI
   formPage.innerHTML = [
     '<div class="generate-page" style="padding-top:40px">',
-    '  <div id="loading-crystal" class="loading-crystal fade-in">',
-    '    <span class="loading-crystal-emoji">🔮</span>',
-    '    <h2 class="loading-title">星の配置を読み解いています</h2>',
-    '    <p class="loading-text">少々お待ちください<span class="loading-dots"></span></p>',
+    '  <div class="ritual-animation fade-in">',
+    '    <div class="ritual-orb">',
+    '      <div class="ritual-ring ritual-ring--1"></div>',
+    '      <div class="ritual-ring ritual-ring--2"></div>',
+    '      <div class="ritual-ring ritual-ring--3"></div>',
+    '      <div class="ritual-core">🔮</div>',
+    '    </div>',
+    '    <div class="ritual-stars">',
+    '      <span class="ritual-star" style="--d:0s;--x:-60px;--y:-80px">✦</span>',
+    '      <span class="ritual-star" style="--d:0.4s;--x:70px;--y:-50px">✧</span>',
+    '      <span class="ritual-star" style="--d:0.8s;--x:-40px;--y:60px">✦</span>',
+    '      <span class="ritual-star" style="--d:1.2s;--x:55px;--y:70px">✧</span>',
+    '      <span class="ritual-star" style="--d:1.6s;--x:0px;--y:-100px">☽</span>',
+    '    </div>',
+    '    <h2 class="ritual-title">星の配置を読み解いています</h2>',
+    '    <p class="ritual-phase" id="ritual-phase">西洋占星術の星座を確認中</p>',
+    '    <div class="ritual-progress"><div class="ritual-bar" id="ritual-bar"></div></div>',
     '  </div>',
-    '  <div id="streaming-area" class="streaming-area" aria-live="polite">',
-    '    <div class="streaming-header">✦ &nbsp;あなたへのメッセージ&nbsp; ✦</div>',
-    '    <div id="streaming-content" class="streaming-content"></div>',
-    '  </div>',
-    '  <div id="generate-actions" class="generate-actions">',
-    '    <a id="chat-link" href="#" class="btn btn-primary">💬 鑑定師に相談する</a>',
-    '    <a href="/" class="btn btn-secondary">← トップに戻る</a>',
-    '  </div>',
+    '  <div id="streaming-area" class="streaming-area" style="display:none"></div>',
+    '  <div id="streaming-content" style="display:none"></div>',
     '</div>',
   ].join('');
+
+  var phases = [
+    '西洋占星術の星座を確認中',
+    '数秘術のライフパスを算出中',
+    '九星気学の本命星を照合中',
+    '六星占術の運命星を判定中',
+    '四柱推命の命式を解読中',
+    'タロットカードを引いています',
+    '6つの占術を統合しています',
+    'あなただけのメッセージを紡いでいます',
+  ];
+  var phaseEl = document.getElementById('ritual-phase');
+  var barEl = document.getElementById('ritual-bar');
+  var idx = 0;
+  var phaseInterval = setInterval(function() {
+    idx++;
+    if (idx < phases.length) {
+      phaseEl.textContent = phases[idx];
+      barEl.style.width = Math.min((idx + 1) / phases.length * 100, 95) + '%';
+    }
+  }, 4000);
+  window._ritualInterval = phaseInterval;
 }
 
 // ── Compatibility reading form ───────────────────────────────

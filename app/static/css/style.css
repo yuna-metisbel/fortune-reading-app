@@ -2078,3 +2078,139 @@ img, svg {
     0%, 100% { opacity: 0.6; }
     50% { opacity: 1; }
 }
+
+/* ============================================================
+   RITUAL ANIMATION — 鑑定中のスピリチュアルアニメーション
+   ============================================================ */
+
+.ritual-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.ritual-orb {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin-bottom: 32px;
+}
+
+.ritual-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ritual-ring--1 {
+  width: 160px;
+  height: 160px;
+  border-color: rgba(200, 162, 224, 0.3);
+  animation: ritual-spin 12s linear infinite;
+}
+
+.ritual-ring--2 {
+  width: 120px;
+  height: 120px;
+  border-color: rgba(232, 180, 200, 0.4);
+  border-style: dashed;
+  animation: ritual-spin 8s linear infinite reverse;
+}
+
+.ritual-ring--3 {
+  width: 80px;
+  height: 80px;
+  border-color: rgba(200, 162, 224, 0.5);
+  animation: ritual-spin 6s linear infinite;
+}
+
+.ritual-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px;
+  filter: drop-shadow(0 0 20px rgba(200, 162, 224, 0.8));
+  animation: ritual-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes ritual-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes ritual-pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    filter: drop-shadow(0 0 20px rgba(200, 162, 224, 0.6));
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+    filter: drop-shadow(0 0 35px rgba(200, 162, 224, 1));
+  }
+}
+
+.ritual-stars {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.ritual-star {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 14px;
+  color: var(--main);
+  opacity: 0;
+  animation: ritual-twinkle 2.5s ease-in-out infinite;
+  animation-delay: var(--d);
+  transform: translate(var(--x), var(--y));
+}
+
+@keyframes ritual-twinkle {
+  0%, 100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(0.5); }
+  50% { opacity: 1; transform: translate(var(--x), var(--y)) scale(1.2); }
+}
+
+.ritual-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.ritual-phase {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-bottom: 24px;
+  min-height: 20px;
+  transition: opacity 0.3s;
+  animation: text-shimmer 2s ease-in-out infinite;
+}
+
+.ritual-progress {
+  width: 200px;
+  height: 3px;
+  background: rgba(200, 162, 224, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ritual-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--main), var(--rose));
+  border-radius: 2px;
+  transition: width 1s ease;
+}
