@@ -1,312 +1,99 @@
 {% extends "base.html" %}
 {% block title %}{{ reading.theme }} — 星図リーディング{% endblock %}
 
+{% block head %}
+<meta property="og:title" content="{{ reading.profile.nickname if reading.profile else 'あなた' }}の星図リーディング">
+<meta property="og:description" content="6つの占術を統合したスピリチュアルリーディング">
+{% if reading.image_url %}
+<meta property="og:image" content="{{ reading.image_url }}">
+{% endif %}
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+{% endblock %}
+
 {% block content %}
 <div class="result-page">
-  <a href="/" class="back-link">← トップに戻る</a>
+  <a href="/" class="back-link">トップに戻る</a>
 
-  <!-- DALL-E POSTER IMAGE -->
-  <div id="poster-image-area" class="poster-image">
-    <div id="poster-loading" class="poster-loading">🔮 ポスター画像を生成中...</div>
-  </div>
-
-  <!-- POSTER SUMMARY CARD -->
-  <div id="summary-card" class="poster-card">
-
-    <!-- Decorative elements -->
-    <div class="poster-deco-moon poster-deco-moon--tl">🌙</div>
-    <div class="poster-deco-moon poster-deco-moon--tr">🌙</div>
-    <div class="poster-deco-star poster-deco-star--1">✨</div>
-    <div class="poster-deco-star poster-deco-star--2">✨</div>
-    <div class="poster-deco-star poster-deco-star--3">✦</div>
-    <div class="poster-deco-crystal poster-deco-crystal--l">💎</div>
-    <div class="poster-deco-crystal poster-deco-crystal--r">🔮</div>
-
-    <!-- Header -->
-    <div class="poster-header">
-      <div class="poster-header-ornament">☽ · ✦ · ☽</div>
-      <h1 class="poster-header-title">あなたの魂が描く、人生の星図</h1>
-      <p class="poster-header-sub">本来のあなたを思い出し、調和の流れに乗るスピリチュアルリーディング</p>
-      {% if reading.profile %}
-      <p class="poster-header-name">{{ reading.profile.nickname }} さんの星図</p>
-      {% endif %}
-    </div>
-
-    {% if sections %}
-    {# Assign sections to named variables for clean mapping #}
-    {% set s0 = sections[0] if sections|length > 0 else none %}
-    {% set s1 = sections[1] if sections|length > 1 else none %}
-    {% set s2 = sections[2] if sections|length > 2 else none %}
-    {% set s3 = sections[3] if sections|length > 3 else none %}
-    {% set s4 = sections[4] if sections|length > 4 else none %}
-    {% set s5 = sections[5] if sections|length > 5 else none %}
-    {% set s6 = sections[6] if sections|length > 6 else none %}
-    {% set s7 = sections[7] if sections|length > 7 else none %}
-    {% set s8 = sections[8] if sections|length > 8 else none %}
-    {% set s9 = sections[9] if sections|length > 9 else none %}
-
-    <!-- Center Mandala -->
-    <div class="poster-mandala">
-      <div class="poster-mandala-wrap">
-        <div class="poster-mandala-label poster-mandala-label--top">直感</div>
-        <div class="poster-mandala-label poster-mandala-label--tr">知性</div>
-        <div class="poster-mandala-label poster-mandala-label--br">行動</div>
-        <div class="poster-mandala-label poster-mandala-label--bot">再生</div>
-        <div class="poster-mandala-label poster-mandala-label--bl">感性</div>
-        <div class="poster-mandala-label poster-mandala-label--tl">共感</div>
-        <div class="poster-mandala-ring poster-mandala-ring--outer"></div>
-        <div class="poster-mandala-ring poster-mandala-ring--mid"></div>
-        <div class="poster-mandala-ring poster-mandala-ring--inner">
-          <span class="poster-mandala-gem">🔮</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Grid: 2-column layout -->
-    <div class="poster-grid">
-
-      <!-- 魂のテーマ -->
-      <div class="poster-section">
-        <div class="poster-section-header">
-          <span class="poster-section-icon">{{ s0.icon if s0 else '🌟' }}</span>
-          <h3 class="poster-section-title">魂のテーマ</h3>
-        </div>
-        {% if s0 and s0.key_points %}
-        <ul class="poster-section-points">
-          {% for point in s0.key_points[:4] %}
-          <li>{{ point }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </div>
-
-      <!-- 自然な性格 -->
-      <div class="poster-section">
-        <div class="poster-section-header">
-          <span class="poster-section-icon">{{ s1.icon if s1 else '🌸' }}</span>
-          <h3 class="poster-section-title">自然な性格</h3>
-        </div>
-        {% if s1 and s1.key_points %}
-        <ul class="poster-section-points">
-          {% for point in s1.key_points[:4] %}
-          <li>{{ point }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </div>
-
-      <!-- 強み -->
-      <div class="poster-section">
-        <div class="poster-section-header">
-          <span class="poster-section-icon">{{ s2.icon if s2 else '✨' }}</span>
-          <h3 class="poster-section-title">強み</h3>
-        </div>
-        {% if s2 and s2.key_points %}
-        <ul class="poster-section-points">
-          {% for point in s2.key_points[:4] %}
-          <li>{{ point }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </div>
-
-      <!-- 弱点・課題 -->
-      <div class="poster-section">
-        <div class="poster-section-header">
-          <span class="poster-section-icon">{{ s3.icon if s3 else '⚡' }}</span>
-          <h3 class="poster-section-title">弱点・課題</h3>
-        </div>
-        {% if s3 and s3.key_points %}
-        <ul class="poster-section-points">
-          {% for point in s3.key_points[:4] %}
-          <li>{{ point }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </div>
-
-      <!-- 恋愛傾向 -->
-      <div class="poster-section">
-        <div class="poster-section-header">
-          <span class="poster-section-icon">{{ s5.icon if s5 else '💕' }}</span>
-          <h3 class="poster-section-title">恋愛傾向</h3>
-        </div>
-        {% if s5 and s5.key_points %}
-        <ul class="poster-section-points">
-          {% for point in s5.key_points[:3] %}
-          <li>{{ point }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </div>
-
-      <!-- 人間関係の特徴 -->
-      <div class="poster-section">
-        <div class="poster-section-header">
-          <span class="poster-section-icon">{{ s6.icon if s6 else '🤝' }}</span>
-          <h3 class="poster-section-title">人間関係の特徴</h3>
-        </div>
-        {% set rel_section = s6 if s6 else s5 %}
-        {% if rel_section and rel_section.key_points %}
-        <ul class="poster-section-points">
-          {% for point in rel_section.key_points[:3] %}
-          <li>{{ point }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </div>
-
-      <!-- 仕事の向き -->
-      <div class="poster-section">
-        <div class="poster-section-header">
-          <span class="poster-section-icon">{{ s4.icon if s4 else '💼' }}</span>
-          <h3 class="poster-section-title">仕事の向き</h3>
-        </div>
-        {% if s4 and s4.key_points %}
-        <ul class="poster-section-points">
-          {% for point in s4.key_points[:3] %}
-          <li>{{ point }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </div>
-
-      <!-- 運気を高める習慣 -->
-      <div class="poster-section">
-        <div class="poster-section-header">
-          <span class="poster-section-icon">{{ s6.icon if s6 else '🌿' }}</span>
-          <h3 class="poster-section-title">運気を高める習慣</h3>
-        </div>
-        {% if s6 and s6.key_points %}
-        <ul class="poster-section-points">
-          {% for point in s6.key_points[:3] %}
-          <li>{{ point }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </div>
-
-      <!-- おすすめアイテム -->
-      <div class="poster-section poster-section--gems-area">
-        <div class="poster-section-header">
-          <span class="poster-section-icon">{{ s8.icon if s8 else '💎' }}</span>
-          <h3 class="poster-section-title">おすすめアイテム</h3>
-        </div>
-        <div class="poster-gems">
-          <span title="アメジスト">💜</span>
-          <span title="ムーンストーン">🤍</span>
-          <span title="セレナイト">💎</span>
-          <span title="ローズクォーツ">🩷</span>
-        </div>
-        {% if s8 and s8.key_points %}
-        <ul class="poster-section-points">
-          {% for point in s8.key_points[:2] %}
-          <li>{{ point }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </div>
-
-      <!-- 避けたいもの -->
-      <div class="poster-section">
-        <div class="poster-section-header">
-          <span class="poster-section-icon">🦋</span>
-          <h3 class="poster-section-title">避けたいもの</h3>
-        </div>
-        {% if s3 and s3.key_points %}
-        <ul class="poster-section-points">
-          {% for point in s3.key_points[:3] %}
-          <li>{{ point }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </div>
-
-    </div><!-- /poster-grid -->
-
-    <!-- Timeline row: 人生のサイクルとテーマ (s7: 月別の流れ) -->
-    <div class="poster-timeline">
-      <div class="poster-timeline-header">
-        <span class="poster-timeline-icon">🌙</span>
-        <h3 class="poster-timeline-title">人生のサイクルとテーマ</h3>
-      </div>
-      <div class="poster-timeline-track">
-        {% if s7 and s7.key_points %}
-          {% for point in s7.key_points[:5] %}
-          <div class="poster-timeline-item">
-            <div class="poster-timeline-dot"></div>
-            <div class="poster-timeline-text">{{ point }}</div>
-          </div>
-          {% endfor %}
-        {% else %}
-        <div class="poster-timeline-item">
-          <div class="poster-timeline-dot"></div>
-          <div class="poster-timeline-text">〜18歳 感受期</div>
-        </div>
-        <div class="poster-timeline-item">
-          <div class="poster-timeline-dot"></div>
-          <div class="poster-timeline-text">19〜28歳 探求期</div>
-        </div>
-        <div class="poster-timeline-item">
-          <div class="poster-timeline-dot"></div>
-          <div class="poster-timeline-text">29〜36歳 花開き期</div>
-        </div>
-        <div class="poster-timeline-item">
-          <div class="poster-timeline-dot"></div>
-          <div class="poster-timeline-text">37〜45歳 安定期</div>
-        </div>
-        <div class="poster-timeline-item">
-          <div class="poster-timeline-dot"></div>
-          <div class="poster-timeline-text">46歳〜 実り期</div>
-        </div>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Final message (s9: メッセージ) -->
-    <div class="poster-message">
-      <div class="poster-message-header">
-        <span>🌙</span>
-        <h3 class="poster-message-title">あなたへのメッセージ</h3>
-        <span>🌙</span>
-      </div>
-      {% if s9 and s9.key_points %}
-      <p class="poster-message-body">{{ s9.key_points[0] if s9.key_points else '' }}</p>
-      {% elif s9 and s9.body %}
-      <p class="poster-message-body">{{ s9.body }}</p>
-      {% endif %}
-      <p class="poster-message-sign">With Love &amp; Light ✦</p>
-    </div>
-
+  <!-- POSTER CARD with DALL-E background overlay -->
+  <div class="poster-card-wrap" id="poster-card">
+    {% if reading.image_url %}
+    <img class="poster-bg" src="{{ reading.image_url }}" alt="">
     {% else %}
-    <div class="poster-empty">
-      <p>🔮 鑑定結果を読み込んでいます…</p>
-    </div>
+    <div class="poster-bg poster-bg--fallback"></div>
     {% endif %}
 
-    <!-- Footer -->
-    <div class="poster-footer">
-      <p>{{ reading.created_at.strftime('%Y年%m月%d日') }} 鑑定</p>
-      <p class="poster-footer-site">fortune-reading-app.onrender.com</p>
+    <div class="poster-overlay">
+      <!-- Header -->
+      <div class="p-header">
+        <span class="p-ornament">☽ · ✦ · ☽</span>
+        <h1 class="p-title">あなたの魂が描く<br>人生の星図</h1>
+        <p class="p-name">{{ reading.profile.nickname if reading.profile else 'あなた' }}'s reading</p>
+      </div>
+
+      <!-- Soul Theme -->
+      {% if sections %}
+      {% set s0 = sections[0] if sections|length > 0 else none %}
+      <div class="p-soul">
+        <div class="p-soul-label">— soul theme —</div>
+        <div class="p-soul-text">{% if s0 and s0.key_points %}{{ s0.key_points[0] }}{% endif %}</div>
+      </div>
+
+      <!-- 4-card grid -->
+      <div class="p-grid">
+        {% set card_config = [
+          {'idx': 1, 'label': 'personality', 'title': '自然な性格'},
+          {'idx': 2, 'label': 'strength', 'title': '強み'},
+          {'idx': 5, 'label': 'love', 'title': '恋愛傾向'},
+          {'idx': 4, 'label': 'career', 'title': '仕事の方向'}
+        ] %}
+        {% for card in card_config %}
+          {% set sec = sections[card.idx] if sections|length > card.idx else none %}
+          <div class="p-card">
+            <div class="p-card-label">{{ card.label }}</div>
+            <div class="p-card-title">{{ card.title }}</div>
+            {% if sec and sec.key_points %}
+            <div class="p-card-catch">{{ sec.key_points[0] }}</div>
+            <div class="p-keywords">
+              {% for kp in sec.key_points[1:4] %}
+              <span class="p-kw">{{ kp }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Message -->
+      {% set last = sections[-1] if sections else none %}
+      <div class="p-message">
+        <div class="p-msg-title">🌙 あなたへのメッセージ 🌙</div>
+        <p class="p-msg-body">{% if last and last.key_points %}{{ last.key_points[0] }}{% endif %}</p>
+        <p class="p-msg-sign">With Love & Light</p>
+      </div>
+      {% endif %}
+
+      <div class="p-footer">fortune-reading-app.onrender.com</div>
     </div>
-
-  </div><!-- /poster-card -->
-
-  <!-- SAVE AS IMAGE BUTTON -->
-  <div class="poster-save-action">
-    <button id="save-poster-btn" class="btn btn-primary btn-full" onclick="savePosterAsImage()">
-      📥 鑑定ポスターを画像保存する
-    </button>
   </div>
 
-  <!-- DETAILED ACCORDION -->
-  {% if sections %}
-  <div class="accordion-container">
-    <h2 class="accordion-heading">✦ 詳細リーディング</h2>
+  <!-- Share -->
+  <div class="share-bar">
+    <button class="share-btn share-btn--save" id="save-poster-btn" onclick="savePoster()">ストーリーに保存</button>
+    <button class="share-btn share-btn--link" onclick="copyLink()">リンクをコピー</button>
+  </div>
+
+  <!-- More Detail Toggle -->
+  <button class="more-detail-btn" id="more-detail-btn" onclick="toggleDetail()">
+    もっと詳しく読む（6つの占術の詳細）
+  </button>
+
+  <!-- Accordion (hidden by default) -->
+  <div class="accordion-container" id="detail-area" style="display:none;">
+    {% if sections %}
     {% for section in sections %}
     <div class="accordion-item">
       <button class="accordion-trigger" onclick="toggleAccordion(this)">
-        <span class="accordion-icon">{{ section.icon }}</span>
         <span class="accordion-title">{{ section.title }}</span>
         <span class="accordion-arrow">▸</span>
       </button>
@@ -315,24 +102,19 @@
       </div>
     </div>
     {% endfor %}
+    {% endif %}
   </div>
-  {% else %}
-  <!-- Fallback: raw content if no sections parsed -->
-  <div class="accordion-container">
-    <div class="reading-content" style="margin:0 0 20px;">
-      <div id="raw-reading-body" class="reading-body" data-raw="{{ reading.content | e }}"></div>
-    </div>
-  </div>
-  {% endif %}
 
+  <!-- Action buttons -->
   <div class="result-actions">
-    <a href="/chat/{{ reading.id }}" class="btn btn-primary">💬 鑑定師に相談する</a>
+    <a href="/chat/{{ reading.id }}" class="btn btn-primary">鑑定師に相談する</a>
     <a href="/" class="btn btn-secondary">トップに戻る</a>
   </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 function toggleAccordion(btn) {
   var item = btn.parentElement;
@@ -351,12 +133,24 @@ function toggleAccordion(btn) {
   }
 }
 
-// Render markdown in accordion bodies
+function toggleDetail() {
+  var area = document.getElementById('detail-area');
+  var btn = document.getElementById('more-detail-btn');
+  if (area.style.display === 'none') {
+    area.style.display = 'block';
+    btn.textContent = '詳細を閉じる';
+    btn.classList.add('more-detail-btn--open');
+  } else {
+    area.style.display = 'none';
+    btn.textContent = 'もっと詳しく読む（6つの占術の詳細）';
+    btn.classList.remove('more-detail-btn--open');
+  }
+}
+
 function renderMarkdownBody(el) {
   var raw = el.dataset.raw || '';
   if (!raw) return;
 
-  // Escape HTML first
   function esc(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
@@ -386,54 +180,19 @@ function renderMarkdownBody(el) {
   }
   if (inList) html += '</ul>';
 
-  // Bold: **text**
   html = html.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
-  // Italic: *text*
   html = html.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
 
   el.innerHTML = html;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.reading-body').forEach(renderMarkdownBody);
-  loadPosterImage();
-});
-
-async function loadPosterImage() {
-  var area = document.getElementById('poster-image-area');
-  var loading = document.getElementById('poster-loading');
-  if (!area) return;
-
-  try {
-    var resp = await fetch('/api/readings/{{ reading.id }}/generate-image', { method: 'POST' });
-    var data = await resp.json();
-
-    if (data.image_url) {
-      var img = document.createElement('img');
-      img.src = data.image_url;
-      img.alt = '星図リーディング ポスター';
-      img.style.width = '100%';
-      img.style.borderRadius = '16px';
-      img.style.boxShadow = '0 8px 32px rgba(74,59,107,0.15)';
-      loading.remove();
-      area.appendChild(img);
-    } else {
-      loading.textContent = '';
-      loading.style.display = 'none';
-    }
-  } catch (e) {
-    loading.textContent = '';
-    loading.style.display = 'none';
-  }
-}
-
-async function savePosterAsImage() {
+async function savePoster() {
   var btn = document.getElementById('save-poster-btn');
   btn.disabled = true;
-  btn.textContent = '🔮 画像を生成中...';
+  btn.textContent = '画像を生成中...';
 
   try {
-    var card = document.getElementById('summary-card');
+    var card = document.getElementById('poster-card');
     var canvas = await html2canvas(card, {
       scale: 2,
       backgroundColor: null,
@@ -443,13 +202,39 @@ async function savePosterAsImage() {
     link.download = '星図リーディング.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
-    btn.textContent = '📥 鑑定ポスターを画像保存する';
+    btn.textContent = 'ストーリーに保存';
     btn.disabled = false;
   } catch (e) {
-    btn.textContent = '画像保存に失敗しました。もう一度お試しください。';
+    btn.textContent = '画像保存に失敗しました';
     btn.disabled = false;
+    setTimeout(function() { btn.textContent = 'ストーリーに保存'; }, 3000);
   }
 }
+
+function copyLink() {
+  var url = window.location.href;
+  navigator.clipboard.writeText(url).then(function() {
+    var btn = document.querySelector('.share-btn--link');
+    var orig = btn.textContent;
+    btn.textContent = 'コピーしました';
+    setTimeout(function() { btn.textContent = orig; }, 2000);
+  }).catch(function() {
+    // Fallback for older browsers
+    var input = document.createElement('input');
+    input.value = url;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    document.body.removeChild(input);
+    var btn = document.querySelector('.share-btn--link');
+    var orig = btn.textContent;
+    btn.textContent = 'コピーしました';
+    setTimeout(function() { btn.textContent = orig; }, 2000);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.reading-body').forEach(renderMarkdownBody);
+});
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 {% endblock %}
