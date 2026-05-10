@@ -39,14 +39,29 @@
         <input type="text" id="nickname" name="nickname" placeholder="例：さくら" required autocomplete="off">
       </div>
 
-      <div class="form-row">
+      <div class="form-row form-row--3col">
         <div class="form-group">
-          <label for="birth_date">生年月日</label>
-          <input type="date" id="birth_date" name="birth_date" required min="1940-01-01" max="2015-12-31">
+          <label for="birth_year">生年</label>
+          <input type="text" id="birth_year" name="birth_year" placeholder="1995" inputmode="numeric" maxlength="4" required autocomplete="off">
         </div>
         <div class="form-group">
-          <label for="birth_time">出生時刻（任意）</label>
-          <input type="time" id="birth_time" name="birth_time">
+          <label for="birth_month">月</label>
+          <input type="text" id="birth_month" name="birth_month" placeholder="6" inputmode="numeric" maxlength="2" required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="birth_day">日</label>
+          <input type="text" id="birth_day" name="birth_day" placeholder="26" inputmode="numeric" maxlength="2" required autocomplete="off">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="birth_hour">出生時刻（任意）</label>
+          <div class="form-time-row">
+            <input type="text" id="birth_hour" name="birth_hour" placeholder="14" inputmode="numeric" maxlength="2" autocomplete="off">
+            <span class="form-time-sep">:</span>
+            <input type="text" id="birth_minute" name="birth_minute" placeholder="30" inputmode="numeric" maxlength="2" autocomplete="off">
+          </div>
         </div>
       </div>
 

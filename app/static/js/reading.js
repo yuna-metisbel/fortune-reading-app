@@ -118,10 +118,19 @@ function initPersonalForm() {
       submitBtn.textContent = '読み解き中...';
     }
 
+    var y = (form.birth_year.value || '').trim();
+    var m = (form.birth_month.value || '').trim().padStart(2, '0');
+    var d = (form.birth_day.value || '').trim().padStart(2, '0');
+    var birthDate = y + '-' + m + '-' + d;
+
+    var bh = (form.birth_hour ? form.birth_hour.value.trim() : '');
+    var bm = (form.birth_minute ? form.birth_minute.value.trim() : '');
+    var birthTime = (bh && bm) ? bh.padStart(2, '0') + ':' + bm.padStart(2, '0') : null;
+
     var formData = {
       nickname:    form.nickname.value.trim(),
-      birth_date:  form.birth_date.value,
-      birth_time:  form.birth_time ? form.birth_time.value || null : null,
+      birth_date:  birthDate,
+      birth_time:  birthTime,
       birth_place: form.birth_place ? form.birth_place.value.trim() || null : null,
       gender:      form.gender ? form.gender.value || null : null,
       blood_type:  form.blood_type ? form.blood_type.value || null : null,
@@ -217,16 +226,28 @@ function initCompatibilityForm() {
       submitBtn.textContent = '読み解き中...';
     }
 
+    function buildDate(prefix) {
+      var y = (form[prefix + 'birth_year'].value || '').trim();
+      var m = (form[prefix + 'birth_month'].value || '').trim().padStart(2, '0');
+      var d = (form[prefix + 'birth_day'].value || '').trim().padStart(2, '0');
+      return y + '-' + m + '-' + d;
+    }
+    function buildTime(prefix) {
+      var h = form[prefix + 'birth_hour'] ? form[prefix + 'birth_hour'].value.trim() : '';
+      var m = form[prefix + 'birth_minute'] ? form[prefix + 'birth_minute'].value.trim() : '';
+      return (h && m) ? h.padStart(2, '0') + ':' + m.padStart(2, '0') : null;
+    }
+
     var formData = {
       person1_nickname:    form.person1_nickname.value.trim(),
-      person1_birth_date:  form.person1_birth_date.value,
-      person1_birth_time:  form.person1_birth_time ? form.person1_birth_time.value || null : null,
+      person1_birth_date:  buildDate('person1_'),
+      person1_birth_time:  buildTime('person1_'),
       person1_birth_place: form.person1_birth_place ? form.person1_birth_place.value.trim() || null : null,
       person1_gender:      form.person1_gender ? form.person1_gender.value || null : null,
       person1_blood_type:  form.person1_blood_type ? form.person1_blood_type.value || null : null,
       person2_nickname:    form.person2_nickname.value.trim(),
-      person2_birth_date:  form.person2_birth_date.value,
-      person2_birth_time:  form.person2_birth_time ? form.person2_birth_time.value || null : null,
+      person2_birth_date:  buildDate('person2_'),
+      person2_birth_time:  buildTime('person2_'),
       person2_birth_place: form.person2_birth_place ? form.person2_birth_place.value.trim() || null : null,
       person2_gender:      form.person2_gender ? form.person2_gender.value || null : null,
       person2_blood_type:  form.person2_blood_type ? form.person2_blood_type.value || null : null,
@@ -296,11 +317,26 @@ function _fillFields(prefix, opt) {
     if (el && val !== undefined && val !== null) el.value = val;
   }
   setVal('nickname',    opt.dataset.nickname   || '');
-  setVal('birth_date',  opt.dataset.birthDate  || '');
-  setVal('birth_time',  opt.dataset.birthTime  || '');
+  var bd = opt.dataset.birthDate || '';
+  if (bd) {
+    var parts = bd.split('-');
+    setVal('birth_year',  parts[0] || '');
+    setVal('birth_month', parts[1] ? String(parseInt(parts[1])) : '');
+    setVal('birth_day',   parts[2] ? String(parseInt(parts[2])) : '');
+  }
+  var bt = opt.dataset.birthTime || '';
+  if (bt) {
+    var tp = bt.split(':');
+    setVal('birth_hour',   tp[0] || '');
+    setVal('birth_minute', tp[1] || '');
+  }
   setVal('birth_place', opt.dataset.birthPlace || '');
   setVal('gender',      opt.dataset.gender     || '');
   setVal('blood_type',  opt.dataset.bloodType  || '');
+
+  // Legacy support: also fill combined fields if they exist
+  if (bd) setVal('birth_date', bd);
+  if (bt) setVal('birth_time', bt);
 }
 
 // ── Generate page SSE auto-start ─────────────────────────────

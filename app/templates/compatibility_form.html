@@ -6,7 +6,7 @@
   <a href="/" class="back-link">トップに戻る</a>
 
   <div class="form-header">
-    <h1 class="form-title">✨ 相性リーディング</h1>
+    <h1 class="form-title">相性リーディング</h1>
     <p class="form-subtitle">二人の情報を入力してください</p>
   </div>
 
@@ -14,7 +14,7 @@
 
     <!-- Person 1 -->
     <div class="form-section">
-      <h2 class="form-section-title">🌙 あなたの情報</h2>
+      <h2 class="form-section-title">あなたの情報</h2>
 
       {% if profiles %}
       <div class="saved-profile-bar">
@@ -40,14 +40,28 @@
         <label for="person1_nickname">ニックネーム</label>
         <input type="text" id="person1_nickname" name="person1_nickname" placeholder="例：さくら" required autocomplete="off">
       </div>
-      <div class="form-row">
+      <div class="form-row form-row--3col">
         <div class="form-group">
-          <label for="person1_birth_date">生年月日</label>
-          <input type="date" id="person1_birth_date" name="person1_birth_date" required value="2000-01-01" min="1940-01-01" max="2015-12-31">
+          <label for="person1_birth_year">生年</label>
+          <input type="text" id="person1_birth_year" name="person1_birth_year" placeholder="1995" inputmode="numeric" maxlength="4" required autocomplete="off">
         </div>
         <div class="form-group">
-          <label for="person1_birth_time">出生時刻（任意）</label>
-          <input type="time" id="person1_birth_time" name="person1_birth_time">
+          <label for="person1_birth_month">月</label>
+          <input type="text" id="person1_birth_month" name="person1_birth_month" placeholder="6" inputmode="numeric" maxlength="2" required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="person1_birth_day">日</label>
+          <input type="text" id="person1_birth_day" name="person1_birth_day" placeholder="26" inputmode="numeric" maxlength="2" required autocomplete="off">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="person1_birth_hour">出生時刻（任意）</label>
+          <div class="form-time-row">
+            <input type="text" id="person1_birth_hour" name="person1_birth_hour" placeholder="14" inputmode="numeric" maxlength="2" autocomplete="off">
+            <span class="form-time-sep">:</span>
+            <input type="text" id="person1_birth_minute" name="person1_birth_minute" placeholder="30" inputmode="numeric" maxlength="2" autocomplete="off">
+          </div>
         </div>
       </div>
       <div class="form-group">
@@ -80,7 +94,7 @@
 
     <!-- Person 2 -->
     <div class="form-section">
-      <h2 class="form-section-title">✦ 相手の情報</h2>
+      <h2 class="form-section-title">相手の情報</h2>
 
       {% if profiles %}
       <div class="saved-profile-bar">
@@ -106,14 +120,28 @@
         <label for="person2_nickname">ニックネーム</label>
         <input type="text" id="person2_nickname" name="person2_nickname" placeholder="例：ケンジ" required autocomplete="off">
       </div>
-      <div class="form-row">
+      <div class="form-row form-row--3col">
         <div class="form-group">
-          <label for="person2_birth_date">生年月日</label>
-          <input type="date" id="person2_birth_date" name="person2_birth_date" required value="2000-01-01" min="1940-01-01" max="2015-12-31">
+          <label for="person2_birth_year">生年</label>
+          <input type="text" id="person2_birth_year" name="person2_birth_year" placeholder="1999" inputmode="numeric" maxlength="4" required autocomplete="off">
         </div>
         <div class="form-group">
-          <label for="person2_birth_time">出生時刻（任意）</label>
-          <input type="time" id="person2_birth_time" name="person2_birth_time">
+          <label for="person2_birth_month">月</label>
+          <input type="text" id="person2_birth_month" name="person2_birth_month" placeholder="5" inputmode="numeric" maxlength="2" required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="person2_birth_day">日</label>
+          <input type="text" id="person2_birth_day" name="person2_birth_day" placeholder="7" inputmode="numeric" maxlength="2" required autocomplete="off">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="person2_birth_hour">出生時刻（任意）</label>
+          <div class="form-time-row">
+            <input type="text" id="person2_birth_hour" name="person2_birth_hour" placeholder="14" inputmode="numeric" maxlength="2" autocomplete="off">
+            <span class="form-time-sep">:</span>
+            <input type="text" id="person2_birth_minute" name="person2_birth_minute" placeholder="30" inputmode="numeric" maxlength="2" autocomplete="off">
+          </div>
         </div>
       </div>
       <div class="form-group">
@@ -146,7 +174,7 @@
 
     <!-- Relationship Info -->
     <div class="form-section">
-      <h2 class="form-section-title">💫 二人のこと</h2>
+      <h2 class="form-section-title">二人のこと</h2>
 
       <div class="form-group">
         <label for="relationship_type">関係性</label>
@@ -174,7 +202,7 @@
     </div>
 
     <button type="submit" class="btn btn-primary btn-full">
-      ✦ 二人の星図を読み解く
+      二人の星図を読み解く
     </button>
   </form>
 </div>
