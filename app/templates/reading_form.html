@@ -6,7 +6,7 @@
   <a href="/" class="back-link">トップに戻る</a>
 
   <div class="form-header">
-    <h1 class="form-title">🌙 魂のリーディング</h1>
+    <h1 class="form-title">魂のリーディング</h1>
     <p class="form-subtitle">あなたの情報を入力してください</p>
   </div>
 
@@ -32,27 +32,27 @@
 
   <form id="reading-form" novalidate>
     <div class="form-section">
-      <h2 class="form-section-title">✦ 基本情報</h2>
+      <h2 class="form-section-title">基本情報</h2>
 
       <div class="form-group">
         <label for="nickname">ニックネーム</label>
-        <input type="text" id="nickname" name="nickname" placeholder="例：さくら" required autocomplete="off" value="yuna">
+        <input type="text" id="nickname" name="nickname" placeholder="例：さくら" required autocomplete="off">
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label for="birth_date">生年月日</label>
-          <input type="date" id="birth_date" name="birth_date" required value="1995-06-26" min="1940-01-01" max="2015-12-31">
+          <input type="date" id="birth_date" name="birth_date" required min="1940-01-01" max="2015-12-31">
         </div>
         <div class="form-group">
           <label for="birth_time">出生時刻（任意）</label>
-          <input type="time" id="birth_time" name="birth_time" value="06:25">
+          <input type="time" id="birth_time" name="birth_time">
         </div>
       </div>
 
       <div class="form-group">
         <label for="birth_place">出生地（任意）</label>
-        <input type="text" id="birth_place" name="birth_place" placeholder="例：東京都渋谷区" autocomplete="off" value="函館">
+        <input type="text" id="birth_place" name="birth_place" placeholder="例：東京都渋谷区" autocomplete="off">
       </div>
 
       <div class="form-row">
@@ -60,7 +60,7 @@
           <label for="gender">性別（任意）</label>
           <select id="gender" name="gender">
             <option value="">選択してください</option>
-            <option value="女性" selected>女性</option>
+            <option value="女性">女性</option>
             <option value="男性">男性</option>
             <option value="その他">その他</option>
             <option value="無回答">無回答</option>
@@ -72,7 +72,7 @@
             <option value="">選択してください</option>
             <option value="A">A型</option>
             <option value="B">B型</option>
-            <option value="O" selected>O型</option>
+            <option value="O">O型</option>
             <option value="AB">AB型</option>
           </select>
         </div>
@@ -80,7 +80,7 @@
     </div>
 
     <div class="form-section">
-      <h2 class="form-section-title">💫 リーディングのテーマ</h2>
+      <h2 class="form-section-title">リーディングのテーマ</h2>
       <div class="form-group">
         <label for="theme">今、どんなことが気になっていますか？</label>
         <textarea id="theme" name="theme" placeholder="例：仕事の転職を考えているが、自分に合った道が分からない。恋愛面でも悩みがある。" required></textarea>
@@ -88,7 +88,7 @@
     </div>
 
     <button type="submit" class="btn btn-primary btn-full">
-      ✦ 星図を読み解く
+      星図を読み解く
     </button>
   </form>
 </div>

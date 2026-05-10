@@ -498,7 +498,7 @@ img, svg {
   transform: translateX(4px);
   box-shadow: var(--shadow-card);
   color: var(--text);
-  border-color: rgba(200, 162, 224, 0.5);
+  border-color: rgba(179, 136, 255, 0.5);
 }
 
 .reading-item-icon {
@@ -662,18 +662,18 @@ img, svg {
   font-size: 72px;
   display: block;
   animation: crystal-pulse 2.4s ease-in-out infinite;
-  filter: drop-shadow(0 0 16px rgba(200,162,224,0.6));
+  filter: drop-shadow(0 0 16px rgba(179,136,255,0.6));
   margin-bottom: 24px;
 }
 
 @keyframes crystal-pulse {
   0%, 100% {
     transform: scale(1);
-    filter: drop-shadow(0 0 16px rgba(200,162,224,0.6));
+    filter: drop-shadow(0 0 16px rgba(179,136,255,0.6));
   }
   50% {
     transform: scale(1.1);
-    filter: drop-shadow(0 0 28px rgba(200,162,224,0.9));
+    filter: drop-shadow(0 0 28px rgba(179,136,255,0.9));
   }
 }
 
@@ -859,7 +859,7 @@ img, svg {
   color: var(--text);
   margin: 24px 0 10px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(200,162,224,0.25);
+  border-bottom: 1px solid rgba(179,136,255,0.25);
   position: relative;
 }
 
@@ -1124,7 +1124,7 @@ img, svg {
   font-size: 40px;
   margin-bottom: 10px;
   display: block;
-  filter: drop-shadow(0 2px 6px rgba(200,162,224,0.5));
+  filter: drop-shadow(0 2px 6px rgba(179,136,255,0.5));
 }
 
 .chat-welcome-text {
@@ -1363,7 +1363,7 @@ img, svg {
   color: rgba(255,255,255,0.7);
   display: block;
   margin-bottom: 8px;
-  text-shadow: 0 0 12px rgba(200,162,224,0.6);
+  text-shadow: 0 0 12px rgba(179,136,255,0.6);
 }
 
 .p-title {
@@ -1372,7 +1372,7 @@ img, svg {
   font-weight: 700;
   color: #fff;
   line-height: 1.5;
-  text-shadow: 0 2px 16px rgba(100,50,150,0.5), 0 0 30px rgba(200,162,224,0.3);
+  text-shadow: 0 2px 16px rgba(100,50,150,0.5), 0 0 30px rgba(179,136,255,0.3);
   margin-bottom: 6px;
 }
 
@@ -1412,7 +1412,7 @@ img, svg {
   font-size: 18px;
   font-weight: 700;
   color: #fff;
-  text-shadow: 0 2px 12px rgba(200,162,224,0.5);
+  text-shadow: 0 2px 12px rgba(179,136,255,0.5);
   line-height: 1.5;
 }
 
@@ -1577,7 +1577,7 @@ img, svg {
   font-weight: 500;
   color: var(--text-light);
   background: transparent;
-  border: 1px dashed rgba(200, 162, 224, 0.4);
+  border: 1px dashed rgba(179, 136, 255, 0.4);
   border-radius: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1605,7 +1605,7 @@ img, svg {
 }
 
 .accordion-heading {
-    font-family: 'Noto Serif JP', serif;
+    font-family: var(--font-heading);
     font-size: 16px;
     text-align: center;
     color: var(--text);
@@ -1619,7 +1619,7 @@ img, svg {
     background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(200, 162, 224, 0.2);
+    border: 1px solid rgba(179, 136, 255, 0.2);
     transition: border-color 0.3s;
 }
 
@@ -1683,7 +1683,7 @@ img, svg {
     color: var(--text);
     margin-bottom: 12px;
     padding: 12px 16px;
-    background: linear-gradient(135deg, rgba(232, 213, 245, 0.4), rgba(232, 180, 200, 0.2));
+    background: linear-gradient(135deg, rgba(179, 136, 255, 0.2), rgba(255, 128, 171, 0.15));
     border-radius: 12px;
     border-left: 3px solid var(--main);
     line-height: 1.5;
@@ -1696,7 +1696,7 @@ img, svg {
     color: var(--accent);
     margin: 20px 0 8px;
     padding-bottom: 4px;
-    border-bottom: 1px solid rgba(200, 162, 224, 0.2);
+    border-bottom: 1px solid rgba(179, 136, 255, 0.2);
 }
 
 /* 本文中の太字 = ポイント */
@@ -1704,7 +1704,7 @@ img, svg {
     color: var(--text);
     font-weight: 500;
     font-size: 15px;
-    background: linear-gradient(transparent 60%, rgba(232, 213, 245, 0.4) 60%);
+    background: linear-gradient(transparent 60%, rgba(179, 136, 255, 0.25) 60%);
     padding: 0 2px;
 }
 
@@ -1804,14 +1804,14 @@ img, svg {
 .ritual-ring--1 {
   width: 160px;
   height: 160px;
-  border-color: rgba(200, 162, 224, 0.3);
+  border-color: rgba(179, 136, 255, 0.3);
   animation: ritual-spin 12s linear infinite;
 }
 
 .ritual-ring--2 {
   width: 120px;
   height: 120px;
-  border-color: rgba(232, 180, 200, 0.4);
+  border-color: rgba(255, 128, 171, 0.4);
   border-style: dashed;
   animation: ritual-spin 8s linear infinite reverse;
 }
@@ -1819,7 +1819,7 @@ img, svg {
 .ritual-ring--3 {
   width: 80px;
   height: 80px;
-  border-color: rgba(200, 162, 224, 0.5);
+  border-color: rgba(179, 136, 255, 0.5);
   animation: ritual-spin 6s linear infinite;
 }
 
@@ -1829,7 +1829,7 @@ img, svg {
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 40px;
-  filter: drop-shadow(0 0 20px rgba(200, 162, 224, 0.8));
+  filter: drop-shadow(0 0 20px rgba(179, 136, 255, 0.8));
   animation: ritual-pulse 2.5s ease-in-out infinite;
 }
 
@@ -1841,11 +1841,11 @@ img, svg {
 @keyframes ritual-pulse {
   0%, 100% {
     transform: translate(-50%, -50%) scale(1);
-    filter: drop-shadow(0 0 20px rgba(200, 162, 224, 0.6));
+    filter: drop-shadow(0 0 20px rgba(179, 136, 255, 0.6));
   }
   50% {
     transform: translate(-50%, -50%) scale(1.15);
-    filter: drop-shadow(0 0 35px rgba(200, 162, 224, 1));
+    filter: drop-shadow(0 0 35px rgba(179, 136, 255, 1));
   }
 }
 
@@ -1896,7 +1896,7 @@ img, svg {
 .ritual-progress {
   width: 200px;
   height: 3px;
-  background: rgba(200, 162, 224, 0.2);
+  background: rgba(179, 136, 255, 0.2);
   border-radius: 2px;
   overflow: hidden;
 }
