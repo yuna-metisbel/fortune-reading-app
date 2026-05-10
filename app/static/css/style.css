@@ -8,11 +8,11 @@
   --main-vivid:   #9C5CFF;
   --accent:       #FF80AB;
   --glow:         #D946EF;
-  --text:         #3D2463;
-  --text-light:   #7C5DAF;
+  --text:         #F3E8FF;
+  --text-light:   #D8B4FE;
   --white:        #FFFFFF;
-  --glass-bg:     rgba(255, 255, 255, 0.55);
-  --glass-border: rgba(179, 136, 255, 0.3);
+  --glass-bg:     rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
 
   --shadow-soft:  0 4px 24px rgba(156, 92, 255, 0.15);
   --shadow-card:  0 8px 32px rgba(156, 92, 255, 0.18);
@@ -49,7 +49,7 @@ body {
   font-size: 15px;
   line-height: 1.8;
   color: var(--text);
-  background: linear-gradient(135deg, #DDD6FE 0%, #E9D5FF 25%, #F0ABFC33 50%, #E9D5FF 75%, #DDD6FE 100%);
+  background: linear-gradient(135deg, #A78BFA 0%, #C084FC 25%, #A855F7 50%, #C084FC 75%, #A78BFA 100%);
   background-size: 400% 400%;
   animation: bg-shift 12s ease-in-out infinite;
   background-attachment: fixed;
@@ -96,15 +96,16 @@ img, svg {
 
 .sparkle-star {
   position: absolute;
-  color: rgba(179, 136, 255, 0.6);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 12px;
   animation: twinkle ease-in-out infinite;
   pointer-events: none;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 16px rgba(200, 162, 224, 0.4);
 }
 
 @keyframes twinkle {
   0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
-  50% { opacity: 1; transform: scale(1) rotate(20deg); }
+  50% { opacity: 1; transform: scale(1.2) rotate(20deg); }
 }
 
 /* ── Glass Card ── */
@@ -135,7 +136,7 @@ img, svg {
   animation: border-glow 4s ease-in-out infinite;
 }
 .glow-card-inner {
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: calc(var(--radius-lg) - 1.5px);
@@ -187,7 +188,7 @@ img, svg {
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
   border: 1px solid var(--glass-border);
   color: var(--text);
   backdrop-filter: blur(8px);
@@ -195,7 +196,7 @@ img, svg {
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.2);
   color: var(--text);
   border-color: var(--main);
   transform: translateY(-1px);
@@ -229,7 +230,7 @@ img, svg {
   font-weight: 300;
   font-size: 15px;
   color: var(--text);
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
   border: 1.5px solid var(--glass-border);
   border-radius: var(--radius-md);
   outline: none;
@@ -240,7 +241,7 @@ img, svg {
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-  color: var(--glass-border);
+  color: rgba(255, 255, 255, 0.35);
   font-weight: 300;
 }
 
@@ -248,7 +249,7 @@ img, svg {
 .form-group select:focus,
 .form-group textarea:focus {
   border-color: var(--main);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.15);
   box-shadow: 0 0 0 3px rgba(179, 136, 255, 0.18), 0 2px 8px rgba(179, 136, 255, 0.12);
 }
 
