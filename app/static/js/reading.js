@@ -138,24 +138,25 @@ function initPersonalForm() {
     };
 
     try {
-      var resp = await fetch('/api/payment/create-checkout', {
+      var resp = await fetch('/api/readings/personal/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reading_type: 'personal', form_data: formData }),
+        body: JSON.stringify(formData),
       });
 
-      var data = await resp.json();
-      if (data.checkout_url) {
-        window.location.href = data.checkout_url;
-      } else {
-        alert('決済の開始に失敗しました: ' + (data.error || '不明なエラー'));
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✦ 星図を読み解く'; }
+      if (!resp.ok) {
+        alert('エラーが発生しました。もう一度お試しください。');
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '星図を読み解く'; }
+        return;
       }
+
+      _showStreamingView();
+      await handleStream(resp);
 
     } catch (err) {
       console.error(err);
       alert('通信エラーが発生しました。');
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✦ 星図を読み解く'; }
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '星図を読み解く'; }
     }
   });
 }
@@ -257,24 +258,25 @@ function initCompatibilityForm() {
     };
 
     try {
-      var resp = await fetch('/api/payment/create-checkout', {
+      var resp = await fetch('/api/readings/compatibility/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reading_type: 'compatibility', form_data: formData }),
+        body: JSON.stringify(formData),
       });
 
-      var data = await resp.json();
-      if (data.checkout_url) {
-        window.location.href = data.checkout_url;
-      } else {
-        alert('決済の開始に失敗しました: ' + (data.error || '不明なエラー'));
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✦ 二人の星図を読み解く'; }
+      if (!resp.ok) {
+        alert('エラーが発生しました。もう一度お試しください。');
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '二人の星図を読み解く'; }
+        return;
       }
+
+      _showStreamingView();
+      await handleStream(resp);
 
     } catch (err) {
       console.error(err);
       alert('通信エラーが発生しました。');
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✦ 二人の星図を読み解く'; }
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '二人の星図を読み解く'; }
     }
   });
 }

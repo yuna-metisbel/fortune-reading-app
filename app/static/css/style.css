@@ -18,12 +18,12 @@
   --shadow-card:  0 8px 32px rgba(156, 92, 255, 0.18);
   --shadow-glow:  0 0 20px rgba(179, 136, 255, 0.4);
 
-  --radius-sm:    8px;
-  --radius-md:    16px;
-  --radius-lg:    24px;
-  --radius-xl:    32px;
+  --radius-sm:    4px;
+  --radius-md:    6px;
+  --radius-lg:    8px;
+  --radius-xl:    8px;
 
-  --font-heading: 'Zen Maru Gothic', 'Noto Sans JP', sans-serif;
+  --font-heading: 'Noto Sans JP', sans-serif;
   --font-body:    'Noto Sans JP', sans-serif;
   --font-accent:  'Quicksand', sans-serif;
 
@@ -132,7 +132,7 @@ img, svg {
   position: relative;
   border-radius: var(--radius-lg);
   padding: 1.5px;
-  background: linear-gradient(135deg, var(--main), var(--accent), #82B1FF, var(--main));
+  background: linear-gradient(135deg, var(--main), #E0B0FF, var(--glow), var(--main));
   background-size: 300% 300%;
   animation: border-glow 4s ease-in-out infinite;
 }
@@ -304,24 +304,91 @@ img, svg {
    TOP PAGE
    ============================================================ */
 
-/* ── Hero Crystal ── */
+/* ── Hero Orb ── */
+.hero-orb {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .hero-crystal {
-  font-size: 64px;
-  display: block;
-  text-align: center;
-  margin-bottom: 16px;
+  font-size: 56px;
+  position: relative;
+  z-index: 2;
   animation: crystal-float 3s ease-in-out infinite;
-  filter: drop-shadow(0 4px 16px rgba(156, 92, 255, 0.4));
+  filter: drop-shadow(0 0 24px rgba(156, 92, 255, 0.6));
+}
+
+.hero-ring {
+  position: absolute;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.hero-ring--1 {
+  width: 180px;
+  height: 180px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  animation: ring-spin 20s linear infinite;
+}
+
+.hero-ring--2 {
+  width: 150px;
+  height: 150px;
+  border: 1px solid rgba(200, 160, 255, 0.2);
+  animation: ring-spin 14s linear infinite reverse;
+}
+
+.hero-ring--3 {
+  width: 120px;
+  height: 120px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  animation: ring-spin 10s linear infinite;
+}
+
+.hero-ring--4 {
+  width: 90px;
+  height: 90px;
+  border: 1px solid rgba(200, 160, 255, 0.18);
+  animation: ring-spin 7s linear infinite reverse;
+}
+
+.hero-spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+  transform: rotate(var(--a)) translateY(calc(-1 * var(--d))) rotate(calc(-1 * var(--a)));
+  animation: spark-pulse 2.5s ease-in-out infinite;
+  animation-delay: calc(var(--a) / 360 * 2.5s);
 }
 
 @keyframes crystal-float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes ring-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes spark-pulse {
+  0%, 100% { opacity: 0.3; transform: rotate(var(--a)) translateY(calc(-1 * var(--d))) rotate(calc(-1 * var(--a))) scale(0.7); }
+  50% { opacity: 1; transform: rotate(var(--a)) translateY(calc(-1 * var(--d))) rotate(calc(-1 * var(--a))) scale(1.3); }
 }
 
 .top-header {
   text-align: center;
-  padding: 48px 24px 32px;
+  padding: 28px 24px 32px;
   position: relative;
   z-index: 1;
 }
@@ -330,7 +397,7 @@ img, svg {
   font-size: 16px;
   color: var(--main-vivid);
   letter-spacing: 0.5em;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   display: block;
   opacity: 0.85;
   filter: drop-shadow(0 0 6px rgba(156, 92, 255, 0.3));
@@ -338,18 +405,33 @@ img, svg {
 
 .top-title {
   font-family: 'Shippori Mincho', serif;
-  font-size: 28px;
-  font-weight: 600;
-  line-height: 1.6;
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1.55;
   margin-bottom: 16px;
-  color: #fff;
-  text-shadow: 0 0 30px rgba(179, 136, 255, 0.7), 0 0 60px rgba(156, 92, 255, 0.4), 0 2px 4px rgba(0,0,0,0.15);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.5) 0%,
+    #fff 15%,
+    #E9D5FF 35%,
+    #fff 50%,
+    #E9D5FF 65%,
+    #fff 85%,
+    rgba(255,255,255,0.5) 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: title-shine 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 24px rgba(179, 136, 255, 0.5)) drop-shadow(0 0 48px rgba(156, 92, 255, 0.3));
+  position: relative;
 }
 
-@keyframes shimmer-text {
-  0% { background-position: 0% center; }
-  100% { background-position: 200% center; }
+@keyframes title-shine {
+  0%   { background-position: 100% center; }
+  100% { background-position: -100% center; }
 }
 
 .top-subtitle {
@@ -408,11 +490,12 @@ img, svg {
 }
 
 .menu-card-title {
-  font-family: var(--font-heading);
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--text);
+  font-family: 'Shippori Mincho', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
   margin-bottom: 4px;
+  letter-spacing: 0.06em;
 }
 
 .menu-card-desc {
@@ -428,8 +511,8 @@ img, svg {
   font-weight: 700;
   margin-top: 6px;
   letter-spacing: 0.06em;
-  color: #FFD700;
-  text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+  color: #E0B0FF;
+  text-shadow: 0 0 12px rgba(249, 168, 212, 0.4);
 }
 
 .menu-card-arrow {
@@ -1319,13 +1402,9 @@ img, svg {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sparkle-star,
   .loading-crystal-emoji,
   .loading-text,
-  .typing-dot,
-  .hero-crystal,
-  .glow-card,
-  .top-title {
+  .typing-dot {
     animation: none;
   }
 }

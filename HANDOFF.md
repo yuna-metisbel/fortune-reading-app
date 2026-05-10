@@ -1,7 +1,7 @@
-# セッション引き継ぎ — 占いリーディングWebアプリ（セッション3後）
+# セッション引き継ぎ — 占いリーディングWebアプリ（セッション4後）
 
 ## プロジェクト概要
-生年月日等から6つの占術体系（西洋占星術・数秘術・九星気学・六星占術・四柱推命・タロット）を統合した実用型リーディングを生成するWebアプリ。Stripe課金システム実装済み（審査待ち）。
+生年月日等から6つの占術体系（西洋占星術・数秘術・九星気学・六星占術・四柱推命・タロット）を統合した実用型リーディングを生成するWebアプリ。Y2Kデザインにリニューアル中。
 
 ## 所在地
 - ローカル: `/Users/kousuke/fortune-app/`
@@ -10,7 +10,7 @@
 - Render: 有料プラン
 
 ## 技術スタック
-FastAPI + Jinja2 + SQLite(aiosqlite) + Claude API(Sonnet) + DALL-E 3 + Stripe
+FastAPI + Jinja2 + SQLite(aiosqlite) + Claude API(Sonnet) + DALL-E 3 + Stripe/PayPal
 Python 3.11 on Render
 
 ## ディレクトリ構成
@@ -21,11 +21,50 @@ fortune-app/
 │   ├── routers/ (pages, profiles, readings, chat, payment)
 │   ├── services/ (claude_client, prompts, rokusei, shichusuimei, numerology, image_generator)
 │   ├── templates/ (base, index, reading_form, compatibility_form, reading_result, chat, reading_generate, sample, payment_success, payment_cancel)
-│   └── static/ (css/style.css, js/reading.js, js/chat.js)
+│   └── static/ (css/style.css, js/reading.js, js/chat.js, images/posters/)
 ├── tests/
-├── docs/superpowers/specs/ (stripe-billing-design.md)
+├── docs/superpowers/specs/ (stripe-billing-design.md, y2k-design-overhaul.md)
+├── docs/superpowers/plans/ (y2k-design-overhaul.md)
 └── requirements.txt, Procfile, render.yaml, .env
 ```
+
+## 現在のデザイン状態（セッション4で変更）
+
+### 完了・動作しているもの
+- **トップページ**: Y2Kデザイン適用済み（パープルグラデーション背景、星の瞬き、グローカード、🔮+4層リング、Shippori Minchoタイトル）
+- **フォームページ**: デフォルト値クリア済み、生年月日・出生時刻がテキスト入力式に変更
+- **DALL-E並行生成**: ストリーミング中にasyncio.create_taskで裏でテキストなし画像生成、ローカル保存
+- **OGPメタタグ**: base.htmlにデフォルト設定、結果ページにog:image設定
+- **決済**: 一時的に外してストリーミング直接呼び出し（reading.js）。価格表示は「FREE」
+
+### ★ 結果ページが破綻している（最優先修正）
+- DALL-E画像をフルスクリーン背景にしてHTMLテキストをオーバーレイする構造にしたが、**画像が情報量多すぎてテキストが読めない**
+- カードがはみ出して画面に収まっていない
+- Claude生成テキストに絵文字が含まれて世界観崩壊
+- **次のセッションで根本的にやり直す必要がある**
+
+### 結果ページ修正の方針案
+1. **DALL-E画像はヒーローバナーのみ**（上部に表示、テキスト重ねない）→ その下にカード配置
+2. **DALL-E画像をやめてCSS onlyでデザイン**
+3. **DALL-E画像を上半分だけクロップして使う**
+
+## デザイン方針（ユーザー確定済み）
+- ターゲット: 20代女性、SNS映え、Instagram ストーリーでシェアしたくなる
+- 背景: ダーク寄りパープルグラデーション（#A78BFA → #A855F7）
+- キラキラ: ✦✧· の白い星が瞬くアニメーション（丸ドット禁止）
+- フォント: Shippori Mincho（タイトル）、Noto Sans JP（本文）、Quicksand（英字）
+- 絵文字: UIでは🌙のみ許可、それ以外は英字ラベル
+- 枠: 角ばり（border-radius 8px以下）
+- 色: オレンジ味・暖色系は排除。パープル×ラベンダー×モーヴピンク(#E0B0FF)で統一
+- 改行: デザインとして意味の区切りで折る
+- 2層構造: ビジュアル重視のファーストビュー → 「もっと詳しく」で詳細アコーディオン
+
+## ユーザー（ゆうな）のデザインフィードバック傾向
+- 「ちゃちい」「安っぽい」に敏感 → 丸ゴシック、絵文字多用、カーブの多い枠はNG
+- オレンジ・暖色系を嫌う → ゴールド(#FFD700)もNG、ピンクはモーヴ系ならOK
+- 文字のふにゃつきが嫌い → 丸ゴシック(Zen Maru Gothic)は見出しから除外済み
+- 実機（スマホ）確認を重視 → 必ずスマホでの見え方を確認すること
+- 参照画像（ChatGPTで生成したポスター）のクオリティを求めている
 
 ## 占術計算モジュール（Pythonで正確に計算）
 - `rokusei.py`: 六星占術（運命星+陰陽+霊合星人+12年周期+大殺界判定）
@@ -39,28 +78,13 @@ fortune-app/
 ## APIキー
 - Anthropic: .env + Render環境変数に設定済み
 - OpenAI: .env + Render環境変数に設定済み
-- Stripe: テストキー(sk_test_...)をRenderに設定済み。ライブキー(sk_live_...)は審査待ち
-
-## Stripe課金システム（実装済み・審査待ち）
-- 個人鑑定 ¥2,000 / 相性鑑定 ¥3,000
-- Stripe Checkout Session方式
-- **現在は無料モード**: reading.jsのフォーム送信先が直接ストリーミングAPIを呼んでいる
-- **有料化の切替手順**:
-  1. `app/static/js/reading.js` の2箇所の `TODO` コメントを探す
-  2. `/api/readings/personal/stream` → `/api/payment/create-checkout` に変更（JSON bodyも `{reading_type:'personal', form_data: formData}` に）
-  3. `/api/readings/compatibility/stream` → `/api/payment/create-checkout` に変更（同様）
-  4. `app/templates/index.html` の「無料体験中」を「¥2,000」「¥3,000」に戻す
-  5. Render環境変数 `STRIPE_SECRET_KEY` をライブキーに変更
+- Stripe: テストキー設定済み。ライブキー審査待ち
+- PayPal: REST API設定済み（payment.pyに実装あり）
 
 ## SSEストリーミング
 - スペースチャンク消失バグ修正済み（.trim() → .slice()）
 - 改行エスケープ修正済み（サーバー側で⏎にエスケープ、クライアントで復元）
-- chat.js, reading.js, payment_success.html の3ファイルが対象
-
-## 鑑定中アニメーション
-- テキストストリーミング表示を廃止
-- 回転リング＋水晶＋星の瞬き＋フェーズテキスト切替＋プログレスバー
-- 完了後に結果ページへ自動遷移
+- DALL-E画像生成がストリーミング中に並行実行される
 
 ## チャットプロンプトの制約
 - ユーザーの行動についてアドバイス・正論・説教をしない
@@ -70,30 +94,25 @@ fortune-app/
 ## 未完了・次にやるべきこと
 
 ### 最優先
-1. **DALL-E画像の動作確認** — URL不一致バグは修正済み（9821ad6）だが、実際にスマホで画像が表示されるか未確認
-2. **Render Diskの手動追加** — Renderダッシュボードで/dataに1GBディスク追加が必要。やらないとデプロイのたびにDBが消える
-3. **DALL-E画像の品質確認** — プロンプトを改善したが、生成結果が参照画像レベルか未検証
+1. **結果ページのデザイン根本的やり直し** — DALL-E背景+テキストオーバーレイが破綻。上記の方針案から選んで再実装。**ui-ux-pro-max スキルを使うこと**
+2. **Claude AI生成テキストから絵文字排除** — `app/services/prompts.py` のシステムプロンプトに「絵文字を使わない」指示を追加
+3. **未pushの変更をpush** — ローカルに決済外し・デザイン修正が溜まっている
 
-### Stripe関連
-4. **Stripe本人確認の審査完了待ち** — 完了したら上記の有料化切替手順を実行
-5. **Stripeセキュリティチェックリストの委託先設定** — 「委託先企業」が誤選択された可能性、「従業員」に修正が必要かも
+### インフラ
+4. **Render Diskの手動追加** — /dataに1GBディスク追加が必要。やらないとデプロイのたびにDBが消える
+
+### 決済関連
+5. **決済の再導入** — 現在は一時的に外してFREE状態。Stripe/PayPal審査完了後に再導入
+6. **有料化の切替手順**: reading.jsの送信先を `/api/payment/create-checkout` に戻す、価格表示を戻す
 
 ### デザイン改善
-6. **ポスターカードのデザイン品質** — HTML/CSSポスターは参照画像とまだ差がある。DALL-E画像がメインビジュアルとして機能すれば解決
-7. **フォームのデフォルト値** — 現在Yunaの情報がプリセットされている。本番公開前に空に戻す必要あり
+7. **フォームのデザイン整え** — Y2Kスタイルは適用済みだが微調整が必要かも
+8. **チャットページのデザイン確認** — Y2Kパレットに更新済みだが実機未確認
 
-### 機能改善
-8. **相性リーディングのテスト**
-9. **画像保存ボタン（html2canvas）のテスト**
-10. **チャット機能のテスト** — 正論禁止のプロンプト変更後の動作確認
-
-## ユーザー（ゆうな）の要望の温度感
-- デザインへのこだわりが強い（参照画像レベルを求める）
-- 占術の正確性を重視（自分の結果を知っていて間違いを指摘してくる）
-- 文章アレルギーの人への配慮（箇条書き・太字ポイント・キャッチコピー重視）
-- 画像保存＆共有を重要視
-- **鑑定師チャットで正論・アドバイスを言われたくない**（味方でいてほしい）
-- アクションプラン（/Users/kousuke/Documents/action-plan-may15.html）に基づく課金化を推進中
+### 機能テスト
+9. **相性リーディングのテスト**
+10. **画像保存ボタン（html2canvas）のテスト** — 結果ページ修正後
+11. **チャット機能のテスト**
 
 ## 参照画像
 `/Users/kousuke/fortune-app/HHpHDDyasAAy_E6.jpeg` — ChatGPTで生成されたパステルラベンダー×クリスタルのスピリチュアル鑑定ポスター
@@ -102,5 +121,8 @@ fortune-app/
 - 作業ログ1: `/Users/kousuke/Documents/readings/作業ログ_20260509_占いアプリ開発.md`
 - 作業ログ2: `/Users/kousuke/Documents/readings/作業ログ_20260509_占いアプリ改善.md`
 - 作業ログ3: `/Users/kousuke/Documents/readings/作業ログ_20260510_占いアプリ課金化.md`
+- 作業ログ4: `/Users/kousuke/Documents/readings/作業ログ_20260510_占いアプリY2Kデザイン.md`
 - アクションプラン: `/Users/kousuke/Documents/action-plan-may15.html`
-- 設計書: `/Users/kousuke/fortune-app/docs/superpowers/specs/2026-05-09-stripe-billing-design.md`
+- 設計書: `/Users/kousuke/fortune-app/docs/superpowers/specs/2026-05-10-y2k-design-overhaul.md`
+- 実装計画: `/Users/kousuke/fortune-app/docs/superpowers/plans/2026-05-10-y2k-design-overhaul.md`
+- 承認済みモックアップ: 削除済み（mockup-overlay.html）。CSSの `.poster-card-wrap` 等にスタイル残存
