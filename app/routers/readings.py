@@ -438,7 +438,8 @@ async def reading_result(
             for line in body.split('\n'):
                 line = line.strip()
                 if line.startswith('- ') or line.startswith('* '):
-                    key_points.append(line[2:])
+                    point = line[2:].replace('**', '')
+                    key_points.append(point)
                 elif line.startswith('**') and line.endswith('**'):
                     key_points.append(line.strip('*'))
             sections.append({
