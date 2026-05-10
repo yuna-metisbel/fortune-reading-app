@@ -405,7 +405,7 @@ async function loadPosterImage() {
   if (!area) return;
 
   try {
-    var resp = await fetch('/api/readings/{{ reading.id }}/image', { method: 'POST' });
+    var resp = await fetch('/api/readings/{{ reading.id }}/generate-image', { method: 'POST' });
     var data = await resp.json();
 
     if (data.image_url) {
