@@ -104,8 +104,9 @@ img, svg {
 }
 
 @keyframes twinkle {
-  0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
-  50% { opacity: 1; transform: scale(1.2) rotate(20deg); }
+  0%   { opacity: 0; transform: scale(0.5) rotate(0deg) translateY(0); }
+  50%  { opacity: 1; transform: scale(1.2) rotate(20deg) translateY(-15px); }
+  100% { opacity: 0; transform: scale(0.5) rotate(40deg) translateY(-30px); }
 }
 
 /* ── Glass Card ── */
@@ -336,14 +337,14 @@ img, svg {
 }
 
 .top-title {
-  font-family: var(--font-heading);
+  font-family: 'Shippori Mincho', serif;
   font-size: 28px;
-  font-weight: 700;
-  line-height: 1.5;
+  font-weight: 600;
+  line-height: 1.6;
   margin-bottom: 16px;
   color: #fff;
   text-shadow: 0 0 30px rgba(179, 136, 255, 0.7), 0 0 60px rgba(156, 92, 255, 0.4), 0 2px 4px rgba(0,0,0,0.15);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
 }
 
 @keyframes shimmer-text {
