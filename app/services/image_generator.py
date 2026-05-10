@@ -1,40 +1,55 @@
 """DALL-E 3 を使用して鑑定結果ポスター画像を生成するモジュール。"""
 
+import uuid
+from pathlib import Path
+
+import httpx
 import openai
 
 from app.config import settings
 
+IMAGES_DIR = Path(__file__).resolve().parent.parent / "static" / "images" / "posters"
 
-async def generate_reading_image(nickname: str, sections_summary: str) -> str | None:
-    """DALL-E 3 でスピリチュアル鑑定ポスター画像を生成する。"""
+
+async def generate_reading_image(
+    nickname: str,
+    soul_theme: str = "",
+    keywords: list[str] | None = None,
+) -> str | None:
+    """DALL-E 3 でスピリチュアル鑑定ポスター画像を生成する。
+
+    画像にはビジュアル装飾のみ（テキストなし）。
+    テキストはHTML側でオーバーレイ表示する。
+    生成画像をローカルに保存し、静的ファイルパスを返す。
+    """
     if not settings.openai_api_key:
         return None
 
     client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
 
     prompt = (
-        "Create a Japanese spiritual astrology reading poster (占い鑑定ポスター). "
-        "Style: pastel lavender, soft purple, silver, white watercolor illustration. "
-        "NOT photorealistic — soft dreamy watercolor/digital illustration style. "
-        "\n\n"
-        "LAYOUT (vertical poster, top to bottom):\n"
-        "- TOP: Night sky with crescent moon and stars. Title: 'あなたの魂が描く、人生の星図' in elegant Japanese serif font.\n"
-        f"- Subtitle: '{nickname} さんの星図'\n"
-        "- CENTER: Large circular mandala/star chart with a glowing crystal ball in the middle. "
-        "Around the mandala, 6 labels: 直感, 知性, 行動, 再生, 感性, 共感.\n"
-        "- LEFT/RIGHT of mandala: Two frosted glass cards — '魂のテーマ' and '自然な性格' with small bullet points.\n"
-        "- MIDDLE ROWS: 2-column frosted glass cards for '強み', '弱点・課題' with crystal gem decorations between them.\n"
-        "- 3-column row: '恋愛傾向', '人間関係の特徴', '仕事の向いている方向' with small gem icons.\n"
-        "- 3-column row: '運気を高める習慣', 'おすすめアイテム' (with crystal illustrations: amethyst, moonstone, rose quartz), '避けたいもの・注意点'.\n"
-        "- TIMELINE: '人生のサイクルとテーマ' horizontal timeline with dots.\n"
-        "- BOTTOM: 'あなたへのメッセージ' section with decorative frame, 'With Love & Light ✦'.\n"
-        "\n"
-        "DECORATIONS throughout: glowing crystals, butterflies, hanging moon ornaments, "
-        "small flowers, light particles, stars. Each section has frosted glass background "
-        "with subtle gradient borders. "
-        "Amethyst, moonstone, selenite, rose quartz crystal illustrations scattered between sections. "
-        "Color palette: #c8a2e0, #e8d5f5, #f8f3ff, #e8b4c8, white, silver. "
-        "Japanese text must be clearly readable. Elegant, feminine, mystical mood."
+        "Create a vertical spiritual poster background illustration. "
+        "Style: dreamy pastel watercolor, soft purple/lavender/pink palette. "
+        "NOT photorealistic — ethereal watercolor/digital art.\n\n"
+        "LAYOUT (vertical, 9:16 ratio):\n"
+        "- TOP AREA: Dreamy night-to-dawn sky with crescent moon, scattered stars, "
+        "and aurora-like light.\n"
+        "- CENTER: A large glowing crystal ball surrounded by a mandala circle. "
+        "Soft light particles emanating from the crystal ball.\n"
+        "- DECORATIONS: Beautiful crystal gem illustrations (amethyst, moonstone, "
+        "rose quartz, selenite) arranged at bottom corners. Hanging crescent moon "
+        "ornaments. Small butterflies. Light particles and star sparkles throughout.\n"
+        "- Semi-transparent frosted card areas for text overlay (leave blank, "
+        "no text inside).\n\n"
+        "ABSOLUTELY NO TEXT, NO LETTERS, NO WORDS, NO CHARACTERS OF ANY LANGUAGE "
+        "IN THE IMAGE. The image must be purely visual with zero text elements.\n\n"
+        "IMPORTANT STYLE NOTES:\n"
+        "- Color palette: lavender #c8a2e0, soft pink #e8b4c8, white, silver, "
+        "pale purple #e8d5f5\n"
+        "- Frosted glass effect on card areas\n"
+        "- Overall mood: elegant, feminine, mystical, dreamy — like a premium "
+        "astrology service\n"
+        "- High detail illustration quality, suitable for Instagram story sharing"
     )
 
     try:
@@ -45,6 +60,18 @@ async def generate_reading_image(nickname: str, sections_summary: str) -> str | 
             quality="hd",
             n=1,
         )
-        return response.data[0].url
+        dalle_url = response.data[0].url
+
+        # Download the image and save locally
+        IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+        filename = f"{uuid.uuid4()}.png"
+        filepath = IMAGES_DIR / filename
+
+        async with httpx.AsyncClient() as http_client:
+            img_response = await http_client.get(dalle_url, timeout=60.0)
+            img_response.raise_for_status()
+            filepath.write_bytes(img_response.content)
+
+        return f"/static/images/posters/{filename}"
     except Exception:
         return None

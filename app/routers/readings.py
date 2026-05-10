@@ -1,3 +1,4 @@
+import asyncio
 import re
 from datetime import date, time
 from pathlib import Path
@@ -175,6 +176,20 @@ async def personal_stream(
     await db.refresh(reading)
     reading_id = reading.id
 
+    async def _generate_bg_image(rid: int, nick: str):
+        try:
+            url = await generate_reading_image(nickname=nick)
+            if url:
+                async with async_session() as save_db:
+                    r = await save_db.get(Reading, rid)
+                    if r:
+                        r.image_url = url
+                        await save_db.commit()
+        except Exception:
+            pass
+
+    bg_task = asyncio.create_task(_generate_bg_image(reading_id, body.nickname))
+
     async def event_stream() -> AsyncIterator[str]:
         chunks: list[str] = []
         async for chunk in stream_message(SYSTEM_PROMPT_PERSONAL, user_prompt):
@@ -187,6 +202,11 @@ async def personal_stream(
             r = await save_db.get(Reading, reading_id)
             r.content = content
             await save_db.commit()
+
+        try:
+            await asyncio.wait_for(asyncio.shield(bg_task), timeout=5.0)
+        except (asyncio.TimeoutError, Exception):
+            pass
 
         yield f"event: done\ndata: {reading_id}\n\n"
 
@@ -275,6 +295,20 @@ async def compatibility_stream(
     await db.refresh(reading)
     reading_id = reading.id
 
+    async def _generate_bg_image(rid: int, nick: str):
+        try:
+            url = await generate_reading_image(nickname=nick)
+            if url:
+                async with async_session() as save_db:
+                    r = await save_db.get(Reading, rid)
+                    if r:
+                        r.image_url = url
+                        await save_db.commit()
+        except Exception:
+            pass
+
+    bg_task = asyncio.create_task(_generate_bg_image(reading_id, body.person1_nickname))
+
     async def event_stream() -> AsyncIterator[str]:
         chunks: list[str] = []
         async for chunk in stream_message(SYSTEM_PROMPT_COMPATIBILITY, user_prompt):
@@ -287,6 +321,11 @@ async def compatibility_stream(
             r = await save_db.get(Reading, reading_id)
             r.content = content
             await save_db.commit()
+
+        try:
+            await asyncio.wait_for(asyncio.shield(bg_task), timeout=5.0)
+        except (asyncio.TimeoutError, Exception):
+            pass
 
         yield f"event: done\ndata: {reading_id}\n\n"
 
@@ -489,9 +528,32 @@ async def generate_image(
         return JSONResponse({"image_url": reading.image_url})
 
     nickname = reading.profile.nickname if reading.profile else "あなた"
+
+    soul_theme = ""
+    keywords = []
+    if reading.content:
+        parts = re.split(r'^## ', reading.content, flags=re.MULTILINE)
+        for part in parts[1:]:
+            lines = part.strip().split('\n', 1)
+            title = lines[0].strip()
+            body = lines[1].strip() if len(lines) > 1 else ""
+            if not soul_theme:
+                for line in body.split('\n'):
+                    line = line.strip()
+                    if line.startswith('**') and line.endswith('**'):
+                        soul_theme = line.strip('*')
+                        break
+            for line in body.split('\n'):
+                line = line.strip()
+                if (line.startswith('- ') or line.startswith('* ')) and len(keywords) < 6:
+                    kw = line[2:].replace('**', '').strip()
+                    if len(kw) <= 12:
+                        keywords.append(kw)
+
     image_url = await generate_reading_image(
         nickname=nickname,
-        sections_summary="",
+        soul_theme=soul_theme,
+        keywords=keywords,
     )
 
     if image_url:
