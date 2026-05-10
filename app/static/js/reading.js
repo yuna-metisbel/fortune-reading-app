@@ -110,7 +110,7 @@ async function handleStream(resp) {
           isEventDone = false;
         } else {
           // Regular text chunk
-          rawText += data;
+          rawText += data.replace(/⏎/g, '\n');
 
           if (firstChunk) {
             firstChunk = false;

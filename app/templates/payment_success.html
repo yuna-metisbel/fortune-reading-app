@@ -114,7 +114,7 @@ async function startGeneration() {
             return;
           }
         } else {
-          rawText += data;
+          rawText += data.replace(/⏎/g, '\n');
           if (firstChunk) {
             firstChunk = false;
             loadingEl.style.display = 'none';

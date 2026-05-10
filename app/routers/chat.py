@@ -115,7 +115,7 @@ async def chat_send(
         chunks: list[str] = []
         async for chunk in stream_message(system_prompt, body.message, messages=api_messages):
             chunks.append(chunk)
-            yield f"data: {chunk}\n\n"
+            yield f"data: {chunk.replace(chr(10), '⏎')}\n\n"
 
         content = "".join(chunks)
 

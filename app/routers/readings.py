@@ -179,7 +179,7 @@ async def personal_stream(
         chunks: list[str] = []
         async for chunk in stream_message(SYSTEM_PROMPT_PERSONAL, user_prompt):
             chunks.append(chunk)
-            yield f"data: {chunk}\n\n"
+            yield f"data: {chunk.replace(chr(10), '⏎')}\n\n"
 
         content = "".join(chunks)
 
@@ -279,7 +279,7 @@ async def compatibility_stream(
         chunks: list[str] = []
         async for chunk in stream_message(SYSTEM_PROMPT_COMPATIBILITY, user_prompt):
             chunks.append(chunk)
-            yield f"data: {chunk}\n\n"
+            yield f"data: {chunk.replace(chr(10), '⏎')}\n\n"
 
         content = "".join(chunks)
 
@@ -396,7 +396,7 @@ async def generate_paid_reading(
         chunks: list[str] = []
         async for chunk in stream_message(system_prompt, user_prompt):
             chunks.append(chunk)
-            yield f"data: {chunk}\n\n"
+            yield f"data: {chunk.replace(chr(10), '⏎')}\n\n"
         content = "".join(chunks)
         async with async_session() as save_db:
             r = await save_db.get(Reading, reading_id)

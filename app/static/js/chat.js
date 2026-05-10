@@ -167,7 +167,7 @@ async function sendMessage() {
           var data = line.charAt(5) === ' ' ? line.slice(6) : line.slice(5);
           if (data === 'ok') continue;
 
-          rawText += data;
+          rawText += data.replace(/⏎/g, '\n');
           bodyEl.innerHTML = renderChatMarkdown(rawText);
           scrollToBottom();
         }
