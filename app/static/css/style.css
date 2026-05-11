@@ -460,11 +460,15 @@ img, svg { max-width: 100%; height: auto; }
   font-family: var(--font-heading);
   font-size: 18px; font-weight: 700;
   letter-spacing: 1px; margin-bottom: 6px;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 .menu-desc {
   font-family: var(--font-body);
   font-size: 12px; font-weight: 400;
   color: var(--text-secondary); line-height: 1.8;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 .menu-badge {
   font-family: var(--font-label);
@@ -534,12 +538,16 @@ img, svg { max-width: 100%; height: auto; }
   font-size: 22px; font-weight: 700;
   letter-spacing: 2px; color: var(--highlight);
   margin-bottom: 12px;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 .loading-sub {
   font-family: var(--font-body);
   font-size: 13px; font-weight: 500;
   color: var(--text-secondary); line-height: 2;
   margin-bottom: 40px;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 .phases { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 300px; }
 .phase {
@@ -620,7 +628,8 @@ img, svg { max-width: 100%; height: auto; }
   line-height: 1.5; letter-spacing: 3px;
   color: var(--highlight);
   position: relative; z-index: 1;
-  word-break: auto-phrase;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
   text-shadow: 0 0 24px rgba(216,180,254,.4);
 }
 .poster-sub {
@@ -658,7 +667,8 @@ img, svg { max-width: 100%; height: auto; }
   font-family: var(--font-emphasis);
   font-size: 13px; font-weight: 700;
   line-height: 1.7; color: var(--text-primary);
-  word-break: auto-phrase;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .poster-message {
@@ -819,7 +829,8 @@ img, svg { max-width: 100%; height: auto; }
   border-left: 3px solid var(--accent-pink);
   background: rgba(255,255,255,.05);
   border-radius: 0 10px 10px 0;
-  word-break: auto-phrase;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 .section-point {
   display: flex; align-items: baseline; gap: 8px;
