@@ -11,11 +11,36 @@
 
 {% block content %}
 <!-- ===== POSTER ===== -->
-<div class="poster" id="poster-capture">
+<div class="poster {% if is_compat %}poster--compat{% endif %}" id="poster-capture">
   {% if reading.image_url %}
   <div class="poster-dalle" style="background-image:url('{{ reading.image_url }}')"></div>
   {% endif %}
   <div class="poster-content">
+
+  {% if is_compat %}
+    <div class="poster-label" style="animation:glowPulse 4s ease-in-out infinite">COMPATIBILITY READING</div>
+    <div class="poster-meta">
+      <div class="poster-name">{{ reading.theme | replace('の相性リーディング','') }}</div>
+    </div>
+    <div class="tarot-mandala">
+      <svg viewBox="0 0 200 200" fill="none">
+        <circle cx="70" cy="100" r="50" stroke="rgba(240,171,252,.2)" stroke-width="1" fill="none"/>
+        <circle cx="130" cy="100" r="50" stroke="rgba(167,139,250,.2)" stroke-width="1" fill="none"/>
+        <ellipse cx="100" cy="100" rx="20" ry="45" fill="rgba(216,180,254,.08)" stroke="rgba(216,180,254,.15)" stroke-width=".8"/>
+      </svg>
+      <div class="tarot-center">✦</div>
+    </div>
+    {% if sections %}
+    {% set s0 = sections[0] if sections|length > 0 else none %}
+    <div class="title-glass">
+      <div class="poster-title">{% if s0 and s0.key_points %}{{ s0.key_points[0] | replace('「','') | replace('」','') }}{% else %}二人の星図{% endif %}</div>
+    </div>
+    {% set last = sections[-1] if sections else none %}
+    <div class="poster-message sparkle-message">
+      <p class="poster-message-text">{% if last and last.key_points %}{{ last.key_points[0] | replace('「','') | replace('」','') }}{% endif %}</p>
+    </div>
+    {% endif %}
+  {% else %}
     <div class="poster-label" style="animation:glowPulse 4s ease-in-out infinite">SOUL READING</div>
     <div class="poster-meta">
       <div class="poster-name">{{ (reading.profile.nickname if reading.profile else 'あなた') | upper }}</div>
@@ -31,15 +56,12 @@
       </svg>
       <div class="tarot-center">🌙</div>
     </div>
-
     {% if sections %}
     {% set s0 = sections[0] if sections|length > 0 else none %}
     <div class="title-glass">
       <div class="poster-title">{% if s0 and s0.key_points %}{{ s0.key_points[0] | replace('「','') | replace('」','') }}{% else %}あなたの魂の星図{% endif %}</div>
     </div>
-
     <div class="divider" style="margin:0 auto 24px;"><span class="divider-stars">✧ ✦ ✧</span></div>
-
     <div class="highlights">
       {% set card_config = [
         {'idx': 1, 'label': 'PERSONALITY'},
@@ -55,12 +77,12 @@
         </div>
       {% endfor %}
     </div>
-
     {% set last = sections[-1] if sections else none %}
     <div class="poster-message sparkle-message">
       <p class="poster-message-text">{% if last and last.key_points %}{{ last.key_points[0] | replace('「','') | replace('」','') }}{% endif %}</p>
     </div>
     {% endif %}
+  {% endif %}
 
     <button class="save-image-btn" onclick="savePoster()">✦ 占いの結果を保存する</button>
     <button class="share-link-btn" onclick="copyLink()">✧ LINK をコピー</button>

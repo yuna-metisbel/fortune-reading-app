@@ -761,6 +761,10 @@ img, svg { max-width: 100%; height: auto; }
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
+.poster--compat + .detail-section .detail-grid {
+  grid-template-columns: 1fr;
+}
+.poster--compat .highlights { display: none; }
 .reading-section {
   background: var(--card-bg);
   border: 1px solid var(--card-border);

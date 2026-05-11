@@ -557,12 +557,30 @@ async def reading_result(
     # Remove yearly theme section if it references wrong year (e.g. 2025)
     sections = [s for s in sections if not ("今年" in s["title"] and "2025" in s["title"])]
 
+    is_compat = reading.type == "compatibility"
+
+    if is_compat:
+        compat_themes = [
+            {"slug": "overview",  "color": "#c084fc", "bg": "rgba(192,132,252,.12)"},
+            {"slug": "essence",   "color": "#a78bfa", "bg": "rgba(167,139,250,.12)"},
+            {"slug": "chemistry", "color": "#f0abfc", "bg": "rgba(240,171,252,.12)"},
+            {"slug": "challenge", "color": "#f472b6", "bg": "rgba(244,114,182,.12)"},
+            {"slug": "love",      "color": "#e9d5ff", "bg": "rgba(233,213,255,.15)"},
+            {"slug": "timeline",  "color": "#60a5fa", "bg": "rgba(96,165,250,.12)"},
+            {"slug": "action",    "color": "#fbbf24", "bg": "rgba(251,191,36,.12)"},
+            {"slug": "message",   "color": "#34d399", "bg": "rgba(52,211,153,.12)"},
+        ]
+        for i, section in enumerate(sections):
+            theme = compat_themes[i] if i < len(compat_themes) else compat_themes[0]
+            section["theme"] = theme
+
     return templates.TemplateResponse(
         "reading_result.html", {
             "request": request,
             "reading": reading,
             "sections": sections,
             "monthly_data": monthly_data,
+            "is_compat": is_compat,
         }
     )
 
