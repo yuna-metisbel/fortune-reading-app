@@ -97,10 +97,10 @@ async function handleStream(resp) {
     var barEl = document.getElementById('ritual-bar');
     var phaseEl = document.getElementById('ritual-phase');
     if (barEl) barEl.style.width = '100%';
-    if (phaseEl) phaseEl.textContent = '鑑定が完了しました';
+    if (phaseEl) phaseEl.textContent = '✦ 鑑定が完了しました';
     setTimeout(function() {
       window.location.href = '/reading/' + finishedReadingId;
-    }, 800);
+    }, 1000);
   }
 }
 
@@ -162,31 +162,20 @@ function initPersonalForm() {
 }
 
 function _showStreamingView() {
-  var formPage = document.querySelector('.form-page');
-  if (!formPage) return;
+  var container = document.querySelector('.container');
+  if (!container) return;
 
-  formPage.innerHTML = [
-    '<div class="generate-page" style="padding-top:40px">',
-    '  <div class="ritual-animation fade-in">',
-    '    <div class="ritual-orb">',
-    '      <div class="ritual-ring ritual-ring--1"></div>',
-    '      <div class="ritual-ring ritual-ring--2"></div>',
-    '      <div class="ritual-ring ritual-ring--3"></div>',
-    '      <div class="ritual-core">🔮</div>',
-    '    </div>',
-    '    <div class="ritual-stars">',
-    '      <span class="ritual-star" style="--d:0s;--x:-60px;--y:-80px">✦</span>',
-    '      <span class="ritual-star" style="--d:0.4s;--x:70px;--y:-50px">✧</span>',
-    '      <span class="ritual-star" style="--d:0.8s;--x:-40px;--y:60px">✦</span>',
-    '      <span class="ritual-star" style="--d:1.2s;--x:55px;--y:70px">✧</span>',
-    '      <span class="ritual-star" style="--d:1.6s;--x:0px;--y:-100px">☽</span>',
-    '    </div>',
-    '    <h2 class="ritual-title">星の配置を読み解いています</h2>',
-    '    <p class="ritual-phase" id="ritual-phase">西洋占星術の星座を確認中</p>',
-    '    <div class="ritual-progress"><div class="ritual-bar" id="ritual-bar"></div></div>',
+  container.innerHTML = [
+    '<div class="loading-page" style="min-height:80vh; padding-top:60px;">',
+    '  <div class="ritual-orb">',
+    '    <div class="ritual-ring ritual-ring--1"></div>',
+    '    <div class="ritual-ring ritual-ring--2"></div>',
+    '    <div class="ritual-ring ritual-ring--3"></div>',
+    '    <div class="ritual-core">🔮</div>',
     '  </div>',
-    '  <div id="streaming-area" class="streaming-area" style="display:none"></div>',
-    '  <div id="streaming-content" style="display:none"></div>',
+    '  <h2 class="loading-title" style="margin-top:32px;">星の配置を読み解いています</h2>',
+    '  <p class="loading-sub" id="ritual-phase">西洋占星術の星座を確認中</p>',
+    '  <div class="ritual-progress"><div class="ritual-bar" id="ritual-bar"></div></div>',
     '</div>',
   ].join('');
 
@@ -343,25 +332,42 @@ function _fillFields(prefix, opt) {
 
 // ── Generate page SSE auto-start ─────────────────────────────
 function initGeneratePage() {
-  // Check if we're on the generate page AND the form was submitted to this URL
-  // The generate page is served at /reading/generate/{id} but we want to stream
-  // from the stored reading. The generate page just shows a loading state —
-  // in this app the actual streaming is done inline on the form page.
-  // If readingId is defined (injected by the template), we could fetch the result.
-  // For this implementation: if readingId is set but there's no pending stream,
-  // redirect to the saved result page.
-  if (typeof readingId !== 'undefined' && readingId) {
-    // On the standalone generate page we auto-redirect to result
-    // (In the current flow, the stream is handled inline on the form page)
-    var streamArea = document.getElementById('streaming-area');
-    var loadingEl  = document.getElementById('loading-crystal');
-    if (streamArea && loadingEl && !streamArea.classList.contains('visible')) {
-      // Redirect to saved result after a brief pause
-      setTimeout(function () {
-        window.location.href = '/reading/' + readingId;
-      }, 1200);
-    }
+  if (typeof readingId === 'undefined' || !readingId) return;
+
+  var loadingView = document.getElementById('loading-view');
+  var phases = document.querySelectorAll('.phase');
+  var actions = document.getElementById('generate-actions');
+
+  if (!loadingView) {
+    // Not on generate page
+    return;
   }
+
+  // Animate phases
+  var phaseIdx = 0;
+  var phaseInterval = setInterval(function() {
+    if (phaseIdx < phases.length) {
+      if (phaseIdx > 0) {
+        phases[phaseIdx - 1].classList.remove('active');
+        phases[phaseIdx - 1].classList.add('done');
+      }
+      phases[phaseIdx].classList.add('active');
+      phaseIdx++;
+    }
+    if (phaseIdx >= phases.length) {
+      clearInterval(phaseInterval);
+      // All phases done, redirect to result
+      setTimeout(function() {
+        window.location.href = '/reading/' + readingId;
+      }, 1500);
+    }
+  }, 3000);
+
+  // Set result and chat links
+  var resultLink = document.getElementById('result-link');
+  var chatLink = document.getElementById('chat-link');
+  if (resultLink) resultLink.href = '/reading/' + readingId;
+  if (chatLink) chatLink.href = '/chat/' + readingId;
 }
 
 // ── Auto-fill latest profile into compatibility form ────────

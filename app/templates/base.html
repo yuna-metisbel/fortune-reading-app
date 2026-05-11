@@ -2,10 +2,11 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>{% block title %}星図リーディング{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Sans+JP:wght@300;400;500&family=Quicksand:wght@400;500;600;700&family=Shippori+Mincho:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700;800;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Kaisei+Decol:wght@400;700&family=Shippori+Mincho:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
     <meta property="og:site_name" content="星図リーディング">
     <meta property="og:type" content="website">
@@ -13,27 +14,30 @@
     {% block head %}{% endblock %}
 </head>
 <body>
-    <div class="app-container">
-        <div class="sparkles" id="sparkles" aria-hidden="true"></div>
-        <script>
-(function() {
-  var c = document.getElementById('sparkles');
-  var chars = ['✦', '✧', '·'];
-  var colors = ['rgba(255,255,255,0.85)','rgba(255,220,255,0.75)','rgba(220,200,255,0.8)','rgba(255,255,255,0.7)'];
-  for (var i = 0; i < 18; i++) {
-    var s = document.createElement('span');
-    s.className = 'sparkle-star';
-    s.textContent = chars[Math.floor(Math.random() * chars.length)];
-    s.style.left = Math.random() * 100 + '%';
-    s.style.top = Math.random() * 100 + '%';
-    s.style.color = colors[Math.floor(Math.random() * colors.length)];
-    s.style.fontSize = (Math.random() * 10 + 8) + 'px';
-    s.style.animationDuration = (Math.random() * 4 + 3) + 's';
-    s.style.animationDelay = (Math.random() * 6) + 's';
-    c.appendChild(s);
-  }
-})();
-</script>
+    <div class="bg-layer"></div>
+    <div class="glow-orb a"></div>
+    <div class="glow-orb b"></div>
+    <div class="glow-orb c"></div>
+    <div class="glow-orb d"></div>
+    <script>
+    (function(){
+      var sp=[{chars:['✦','✧'],cls:'star',n:14},{chars:['✦','·'],cls:'lavender',n:8},{chars:['✧','·'],cls:'pink',n:6}];
+      sp.forEach(function(g){
+        for(var i=0;i<g.n;i++){
+          var s=document.createElement('div');
+          s.className='sparkle '+g.cls;
+          s.textContent=g.chars[i%g.chars.length];
+          s.style.left=Math.random()*100+'%';
+          s.style.top=Math.random()*100+'%';
+          s.style.setProperty('--dur',(2+Math.random()*5)+'s');
+          s.style.setProperty('--del',(Math.random()*6)+'s');
+          s.style.fontSize=(7+Math.random()*9)+'px';
+          document.body.appendChild(s);
+        }
+      });
+    })();
+    </script>
+    <div class="container">
         {% block content %}{% endblock %}
     </div>
     {% block scripts %}{% endblock %}

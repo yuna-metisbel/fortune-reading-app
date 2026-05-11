@@ -2,37 +2,38 @@
 {% block title %}チャット — {{ reading.theme[:20] }}{% endblock %}
 
 {% block content %}
-<div class="chat-container">
+<div class="chat-page">
 
   <!-- Header -->
-  <header class="chat-header">
-    <a href="/reading/{{ reading.id }}" class="chat-header-back" aria-label="リーディング結果に戻る">←</a>
-    <span class="chat-header-icon">🔮</span>
-    <div class="chat-header-body">
-      <div class="chat-header-title">スピリチュアル鑑定師</div>
-      <div class="chat-header-sub">{{ reading.theme[:30] }}{% if reading.theme|length > 30 %}...{% endif %}</div>
+  <div class="chat-header">
+    <a href="/reading/{{ reading.id }}" class="chat-back">← 戻る</a>
+    <span class="chat-header-icon">🌙</span>
+    <div class="chat-header-info">
+      <div class="chat-header-title">鑑定師に相談</div>
+      <div class="chat-header-sub">SOUL READING</div>
     </div>
-  </header>
+  </div>
 
   <!-- Messages -->
   <div class="chat-messages" id="chat-messages">
 
     {% if not messages %}
     <div class="chat-welcome">
-      <span class="chat-welcome-icon">🌙</span>
-      <p class="chat-welcome-text">
+      <div class="chat-welcome-icon">✦</div>
+      <div class="chat-welcome-text">
         リーディング結果についてご質問があれば<br>
-        何でもお聞きください。
-      </p>
+        何でもお聞きください。<br>
+        星の配置から、あなたの状況を照らします。
+      </div>
     </div>
     {% endif %}
 
     {% for msg in messages %}
-    <div class="chat-bubble {{ msg.role }}">
-      <div class="chat-bubble-sender">
-        {% if msg.role == 'assistant' %}✦ 鑑定師{% else %}あなた{% endif %}
-      </div>
-      <div class="chat-bubble-body">{{ msg.content }}</div>
+    <div class="bubble {{ msg.role }}">
+      {% if msg.role == 'assistant' %}
+      <div class="bubble-label">✦ 鑑定師</div>
+      {% endif %}
+      <div>{{ msg.content }}</div>
     </div>
     {% endfor %}
 
@@ -40,18 +41,14 @@
 
   <!-- Input Area -->
   <div class="chat-input-area">
-    <div class="chat-input-row">
-      <textarea
-        id="chat-input"
-        class="chat-input"
-        placeholder="メッセージを入力..."
-        rows="1"
-        aria-label="メッセージ入力"
-      ></textarea>
-      <button id="chat-send-btn" class="chat-send-btn" aria-label="送信">
-        ↑
-      </button>
-    </div>
+    <textarea
+      id="chat-input"
+      class="chat-textarea"
+      placeholder="メッセージを入力..."
+      rows="1"
+      aria-label="メッセージ入力"
+    ></textarea>
+    <button id="chat-send-btn" class="chat-send" aria-label="送信">↑</button>
   </div>
 
 </div>

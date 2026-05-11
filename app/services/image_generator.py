@@ -1,7 +1,8 @@
-"""DALL-E 3 を使用して鑑定結果ポスター画像を生成するモジュール。"""
+"""DALL-E 3 / GPT Image API を使用して鑑定結果ポスター画像を生成するモジュール。"""
 
 import uuid
 from pathlib import Path
+from typing import Optional
 
 import httpx
 import openai
@@ -74,4 +75,73 @@ async def generate_reading_image(
 
         return f"/static/images/posters/{filename}"
     except Exception:
+        return None
+
+
+async def generate_poster_image(
+    nickname: str,
+    birth_date: str,
+    catch_copy: str,
+    personality: str = "",
+    strength: str = "",
+    love: str = "",
+    career: str = "",
+    yearly_theme: str = "",
+    message: str = "",
+) -> Optional[str]:
+    """GPT Image APIで鑑定ポスター画像を生成する。"""
+    if not settings.openai_api_key:
+        return None
+
+    client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
+
+    prompt = f"""パステルラベンダー × クリスタルのスピリチュアル鑑定ポスター。
+淡いラベンダー、パステルパープル、シルバー、白を基調にした、
+幻想的で透明感のあるスピリチュアル鑑定ポスター。
+
+全体は柔らかい雲、月、星、クリスタル、光の粒、繊細な装飾フレームで構成し、
+女性向けの優しく神秘的な雰囲気にする。
+
+タイトル: 「{catch_copy}」
+名前: {nickname}
+生年月日: {birth_date}
+
+セクション配置:
+- 魂のテーマ: {catch_copy}
+- 性格: {personality}
+- 強み: {strength}
+- 恋愛傾向: {love}
+- 仕事の方向: {career}
+- 今年のテーマ: {yearly_theme}
+- あなたへのメッセージ: {message}
+
+装飾にはムーンストーン、アメジスト、ローズクォーツ、蝶、月のモチーフ、
+吊り下げオーナメント、花、光のエフェクトを使用する。
+
+日本語テキストで、優雅で可愛く、柔らかい読みやすいレイアウトの
+1枚完結の鑑定シートにしてください。"""
+
+    try:
+        response = await client.images.generate(
+            model="gpt-image-1",
+            prompt=prompt,
+            size="1024x1792",
+            quality="high",
+            n=1,
+        )
+
+        image_url = response.data[0].url
+
+        IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+        filename = f"poster_{uuid.uuid4().hex[:12]}.png"
+        filepath = IMAGES_DIR / filename
+
+        async with httpx.AsyncClient() as http_client:
+            img_response = await http_client.get(image_url, timeout=120.0)
+            img_response.raise_for_status()
+            filepath.write_bytes(img_response.content)
+
+        return f"/static/images/posters/{filename}"
+    except Exception as e:
+        print(f"Poster generation failed: {e}")
         return None

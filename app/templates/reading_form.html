@@ -2,19 +2,73 @@
 {% block title %}魂のリーディング — 星図リーディング{% endblock %}
 
 {% block content %}
-<div class="form-page">
-  <a href="/" class="back-link">トップに戻る</a>
+<div class="page-header" style="padding-top:32px;">
+  <a href="/" class="back-link">← TOP</a>
+  <h1 class="page-title">魂のリーディング</h1>
+  <p class="page-sub">あなたの星図を読み解きます</p>
+</div>
 
-  <div class="form-header">
-    <h1 class="form-title">魂のリーディング</h1>
-    <p class="form-subtitle">あなたの情報を入力してください</p>
-  </div>
+<div class="tarot-illust">
+  <svg width="160" height="220" viewBox="0 0 180 240" fill="none">
+    <rect x="2" y="2" width="176" height="236" rx="10" stroke="rgba(192,132,252,.45)" stroke-width="1.5" fill="rgba(147,51,234,.06)"/>
+    <rect x="10" y="10" width="160" height="220" rx="6" stroke="rgba(216,180,254,.25)" stroke-width=".8" fill="rgba(216,180,254,.03)"/>
+    <text x="18" y="24" font-size="8" fill="rgba(240,171,252,.35)">✦</text>
+    <text x="160" y="24" font-size="8" fill="rgba(240,171,252,.35)">✦</text>
+    <text x="18" y="226" font-size="8" fill="rgba(240,171,252,.35)">✧</text>
+    <text x="160" y="226" font-size="8" fill="rgba(240,171,252,.35)">✧</text>
+    <text x="90" y="28" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" font-weight="700" letter-spacing="3" fill="rgba(233,213,255,.6)">II</text>
+    <path d="M78 48 Q68 42 72 52 Q68 62 78 56 Q82 52 78 48Z" fill="rgba(192,132,252,.25)" stroke="rgba(216,180,254,.5)" stroke-width="1"/>
+    <circle cx="90" cy="44" r="7" fill="rgba(240,171,252,.15)" stroke="rgba(240,171,252,.4)" stroke-width="1.2"/>
+    <circle cx="90" cy="44" r="3" fill="rgba(255,255,255,.1)"/>
+    <path d="M102 48 Q112 42 108 52 Q112 62 102 56 Q98 52 102 48Z" fill="rgba(192,132,252,.25)" stroke="rgba(216,180,254,.5)" stroke-width="1"/>
+    <ellipse cx="90" cy="65" rx="12" ry="14" fill="rgba(192,132,252,.1)" stroke="rgba(192,132,252,.3)" stroke-width="1.2"/>
+    <path d="M70 58 Q90 50 110 58 Q112 80 110 100 Q100 95 90 98 Q80 95 70 100 Q68 80 70 58Z" fill="rgba(216,180,254,.08)" stroke="rgba(216,180,254,.25)" stroke-width="1"/>
+    <path d="M72 100 Q90 95 108 100 L115 170 Q90 165 65 170Z" fill="rgba(167,139,250,.1)" stroke="rgba(167,139,250,.25)" stroke-width="1"/>
+    <path d="M80 105 Q90 102 100 105 L105 155 Q90 152 75 155Z" fill="rgba(192,132,252,.05)" stroke="none"/>
+    <rect x="79" y="107" width="22" height="30" rx="2" fill="rgba(233,213,255,.1)" stroke="rgba(216,180,254,.35)" stroke-width="1"/>
+    <text x="90" y="120" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="6" font-weight="600" fill="rgba(233,213,255,.45)">TORA</text>
+    <line x1="83" y1="125" x2="97" y2="125" stroke="rgba(216,180,254,.2)" stroke-width=".6"/>
+    <line x1="83" y1="129" x2="95" y2="129" stroke="rgba(216,180,254,.15)" stroke-width=".6"/>
+    <rect x="20" y="44" width="16" height="132" rx="4" fill="rgba(30,20,60,.4)" stroke="rgba(167,139,250,.3)" stroke-width="1.2"/>
+    <text x="28" y="62" text-anchor="middle" font-size="10" font-weight="700" fill="rgba(167,139,250,.5)">B</text>
+    <circle cx="28" cy="80" r="2" fill="rgba(167,139,250,.15)"/>
+    <circle cx="28" cy="100" r="1.5" fill="rgba(167,139,250,.1)"/>
+    <circle cx="28" cy="120" r="2" fill="rgba(167,139,250,.15)"/>
+    <rect x="144" y="44" width="16" height="132" rx="4" fill="rgba(255,255,255,.06)" stroke="rgba(216,180,254,.3)" stroke-width="1.2"/>
+    <text x="152" y="62" text-anchor="middle" font-size="10" font-weight="700" fill="rgba(233,213,255,.5)">J</text>
+    <circle cx="152" cy="80" r="2" fill="rgba(216,180,254,.15)"/>
+    <circle cx="152" cy="100" r="1.5" fill="rgba(216,180,254,.1)"/>
+    <circle cx="152" cy="120" r="2" fill="rgba(216,180,254,.15)"/>
+    <line x1="90" y1="94" x2="90" y2="107" stroke="rgba(240,171,252,.35)" stroke-width="1.2"/>
+    <line x1="84" y1="99" x2="96" y2="99" stroke="rgba(240,171,252,.35)" stroke-width="1.2"/>
+    <circle cx="28" cy="140" r="3.5" fill="rgba(240,171,252,.12)" stroke="rgba(240,171,252,.25)" stroke-width=".8"/>
+    <circle cx="26" cy="155" r="3" fill="rgba(240,171,252,.1)" stroke="rgba(240,171,252,.2)" stroke-width=".6"/>
+    <circle cx="30" cy="168" r="3.5" fill="rgba(240,171,252,.12)" stroke="rgba(240,171,252,.25)" stroke-width=".8"/>
+    <circle cx="152" cy="140" r="3.5" fill="rgba(240,171,252,.12)" stroke="rgba(240,171,252,.25)" stroke-width=".8"/>
+    <circle cx="154" cy="155" r="3" fill="rgba(240,171,252,.1)" stroke="rgba(240,171,252,.2)" stroke-width=".6"/>
+    <circle cx="150" cy="168" r="3.5" fill="rgba(240,171,252,.12)" stroke="rgba(240,171,252,.25)" stroke-width=".8"/>
+    <path d="M45 175 Q65 168 90 175 Q115 168 135 175 Q115 182 90 179 Q65 182 45 175Z" fill="rgba(167,139,250,.12)" stroke="rgba(167,139,250,.2)" stroke-width=".8"/>
+    <path d="M50 183 Q70 178 90 183 Q110 178 130 183" stroke="rgba(167,139,250,.15)" stroke-width=".6" fill="none"/>
+    <path d="M55 188 Q75 184 90 188 Q105 184 125 188" stroke="rgba(167,139,250,.1)" stroke-width=".5" fill="none"/>
+    <path d="M80 192 Q74 186 80 180 Q86 186 80 192Z" fill="rgba(216,180,254,.2)" stroke="rgba(216,180,254,.3)" stroke-width=".6"/>
+    <circle cx="90" cy="186" r="6" fill="rgba(233,213,255,.08)" stroke="rgba(233,213,255,.25)" stroke-width=".8"/>
+    <circle cx="90" cy="186" r="2.5" fill="rgba(255,255,255,.08)"/>
+    <path d="M100 192 Q106 186 100 180 Q94 186 100 192Z" fill="rgba(216,180,254,.2)" stroke="rgba(216,180,254,.3)" stroke-width=".6"/>
+    <text x="42" y="50" font-size="7" fill="rgba(233,213,255,.4)">✦</text>
+    <text x="138" y="48" font-size="6" fill="rgba(240,171,252,.35)">✧</text>
+    <text x="50" y="202" font-size="6" fill="rgba(233,213,255,.3)">✦</text>
+    <text x="128" y="200" font-size="7" fill="rgba(240,171,252,.3)">✧</text>
+    <text x="90" y="216" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" font-weight="700" letter-spacing="2" fill="rgba(233,213,255,.55)">THE HIGH PRIESTESS</text>
+    <text x="90" y="228" text-anchor="middle" font-family="Noto Sans JP,sans-serif" font-size="8" font-weight="500" fill="rgba(216,180,254,.45)">女教皇</text>
+  </svg>
+</div>
 
+<form id="reading-form" novalidate>
   {% if profiles %}
-  <div class="saved-profile-bar">
-    <label for="saved-profile">保存済み</label>
-    <select id="saved-profile">
-      <option value="">プロフィールを選択...</option>
+  <div class="form-card">
+    <div class="form-section-title">SAVED PROFILE</div>
+    <select id="saved-profile" class="profile-select">
+      <option value="">保存済みプロフィールを選択</option>
       {% for profile in profiles %}
       <option value="{{ profile.id }}"
         data-nickname="{{ profile.nickname }}"
@@ -30,85 +84,71 @@
   </div>
   {% endif %}
 
-  <form id="reading-form" novalidate>
-    <div class="form-section">
-      <h2 class="form-section-title">基本情報</h2>
+  <div class="form-card">
+    <div class="form-section-title">BASIC INFO</div>
 
-      <div class="form-group">
-        <label for="nickname">ニックネーム</label>
-        <input type="text" id="nickname" name="nickname" placeholder="例：さくら" required autocomplete="off">
-      </div>
+    <div class="input-group">
+      <label class="input-label" for="nickname">ニックネーム</label>
+      <input type="text" id="nickname" name="nickname" class="text-input" placeholder="呼ばれたい名前" required autocomplete="off">
+    </div>
 
-      <div class="form-row form-row--3col">
-        <div class="form-group">
-          <label for="birth_year">生年</label>
-          <input type="text" id="birth_year" name="birth_year" placeholder="1995" inputmode="numeric" maxlength="4" required autocomplete="off">
-        </div>
-        <div class="form-group">
-          <label for="birth_month">月</label>
-          <input type="text" id="birth_month" name="birth_month" placeholder="6" inputmode="numeric" maxlength="2" required autocomplete="off">
-        </div>
-        <div class="form-group">
-          <label for="birth_day">日</label>
-          <input type="text" id="birth_day" name="birth_day" placeholder="26" inputmode="numeric" maxlength="2" required autocomplete="off">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="birth_hour">出生時刻（任意）</label>
-          <div class="form-time-row">
-            <input type="text" id="birth_hour" name="birth_hour" placeholder="14" inputmode="numeric" maxlength="2" autocomplete="off">
-            <span class="form-time-sep">:</span>
-            <input type="text" id="birth_minute" name="birth_minute" placeholder="30" inputmode="numeric" maxlength="2" autocomplete="off">
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="birth_place">出生地（任意）</label>
-        <input type="text" id="birth_place" name="birth_place" placeholder="例：東京都渋谷区" autocomplete="off">
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="gender">性別（任意）</label>
-          <select id="gender" name="gender">
-            <option value="">選択してください</option>
-            <option value="女性">女性</option>
-            <option value="男性">男性</option>
-            <option value="その他">その他</option>
-            <option value="無回答">無回答</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="blood_type">血液型（任意）</label>
-          <select id="blood_type" name="blood_type">
-            <option value="">選択してください</option>
-            <option value="A">A型</option>
-            <option value="B">B型</option>
-            <option value="O">O型</option>
-            <option value="AB">AB型</option>
-          </select>
-        </div>
+    <div class="input-group">
+      <label class="input-label">生年月日</label>
+      <div class="date-row">
+        <input type="text" id="birth_year" name="birth_year" class="text-input" placeholder="1995" inputmode="numeric" maxlength="4" required autocomplete="off">
+        <input type="text" id="birth_month" name="birth_month" class="text-input" placeholder="6" inputmode="numeric" maxlength="2" required autocomplete="off">
+        <input type="text" id="birth_day" name="birth_day" class="text-input" placeholder="26" inputmode="numeric" maxlength="2" required autocomplete="off">
       </div>
     </div>
 
-    <div class="form-section">
-      <h2 class="form-section-title">リーディングのテーマ</h2>
-      <div class="form-group">
-        <label for="theme">今、どんなことが気になっていますか？</label>
-        <textarea id="theme" name="theme" placeholder="例：仕事の転職を考えているが、自分に合った道が分からない。恋愛面でも悩みがある。" required></textarea>
+    <div class="input-group">
+      <label class="input-label" for="birth_hour">出生時刻 <span class="optional">OPTIONAL</span></label>
+      <div class="date-row" style="grid-template-columns: 1fr 1fr;">
+        <input type="text" id="birth_hour" name="birth_hour" class="text-input" placeholder="14" inputmode="numeric" maxlength="2" autocomplete="off">
+        <input type="text" id="birth_minute" name="birth_minute" class="text-input" placeholder="30" inputmode="numeric" maxlength="2" autocomplete="off">
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary btn-full">
-      星図を読み解く
-    </button>
-  </form>
-</div>
+    <div class="input-group">
+      <label class="input-label" for="birth_place">出生地 <span class="optional">OPTIONAL</span></label>
+      <input type="text" id="birth_place" name="birth_place" class="text-input" placeholder="東京都" autocomplete="off">
+    </div>
+
+    <div class="input-group">
+      <label class="input-label" for="gender">性別</label>
+      <select id="gender" name="gender" class="select-input">
+        <option value="">選択してください</option>
+        <option value="女性">女性</option>
+        <option value="男性">男性</option>
+        <option value="その他">その他</option>
+        <option value="無回答">回答しない</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label" for="blood_type">血液型 <span class="optional">OPTIONAL</span></label>
+      <select id="blood_type" name="blood_type" class="select-input">
+        <option value="">選択してください</option>
+        <option value="A">A型</option>
+        <option value="B">B型</option>
+        <option value="O">O型</option>
+        <option value="AB">AB型</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-section-title">READING THEME</div>
+    <div class="input-group" style="margin-bottom:0">
+      <label class="input-label" for="theme">今気になっていること</label>
+      <textarea id="theme" name="theme" class="textarea-input" placeholder="恋愛、仕事、人間関係など&#10;何でも自由に書いてください" required></textarea>
+    </div>
+  </div>
+
+  <button type="submit" class="submit-btn">✦ 星図を読み解く</button>
+</form>
 {% endblock %}
 
 {% block scripts %}
-<script src="/static/js/reading.js"></script>
+<script src="/static/js/reading.js?v=2"></script>
 {% endblock %}

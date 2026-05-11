@@ -16,7 +16,7 @@ from sqlalchemy.orm import selectinload
 from app.database import async_session, get_db
 from app.models import Profile, Reading, User
 from app.services.claude_client import stream_message
-from app.services.image_generator import generate_reading_image
+from app.services.image_generator import generate_poster_image, generate_reading_image
 from app.services.prompts import (
     SYSTEM_PROMPT_COMPATIBILITY,
     SYSTEM_PROMPT_PERSONAL,
@@ -466,45 +466,101 @@ async def reading_result(
     # Parse markdown into sections
     sections = []
     if reading.content:
-        # Split by ## headers
         parts = re.split(r'^## ', reading.content, flags=re.MULTILINE)
-        for part in parts[1:]:  # skip the first empty/intro part
+        for part in parts[1:]:
             lines = part.strip().split('\n', 1)
             title = lines[0].strip()
             body = lines[1].strip() if len(lines) > 1 else ""
-            # Extract key points (lines starting with - or *)
             key_points = []
             for line in body.split('\n'):
                 line = line.strip()
                 if line.startswith('- ') or line.startswith('* '):
-                    point = line[2:].replace('**', '')
+                    point = line[2:].replace('**', '').strip('「」')
                     key_points.append(point)
                 elif line.startswith('**') and line.endswith('**'):
-                    key_points.append(line.strip('*'))
+                    key_points.append(line.strip('*').strip('「」'))
+            clean_title = re.sub(r'^[①②③④⑤⑥⑦⑧⑨⑩]\s*', '', title)
+
+            body_lines = body.split('\n')
+            summary_paragraphs = []
+            for bl in body_lines:
+                bl_s = bl.strip()
+                if not bl_s:
+                    continue
+                if bl_s.startswith('- ') or bl_s.startswith('* '):
+                    continue
+                # Keep tarot card lines (e.g. **1枚目：...**)
+                if bl_s.startswith('**') and bl_s.endswith('**') and '枚目' not in bl_s:
+                    continue
+                if bl_s.startswith('---'):
+                    continue
+                if bl_s.startswith('|'):
+                    continue
+                summary_paragraphs.append(bl_s)
+
             sections.append({
-                "title": title,
+                "title": clean_title,
                 "body": body,
-                "key_points": key_points[:5],  # top 5 points for summary
+                "detail_body": '\n'.join(summary_paragraphs),
+                "key_points": key_points[:5],
             })
 
-    # Map section titles to icons and short labels for summary card
-    section_icons = {
-        "全体要約": "🔮", "性格": "🌙", "才能": "✨", "強み": "✨",
-        "注意": "⚡", "課題": "⚡", "仕事": "💼", "お金": "💰",
-        "恋愛": "💕", "人間関係": "🤝", "今年": "📅", "月別": "🗓️",
-        "今すぐ": "⭐", "メッセージ": "💌",
-    }
+    # Section theme config: slug, color, icon SVG
+    section_themes = [
+        {"slug": "summary",  "color": "#a78bfa", "bg": "rgba(167,139,250,.12)"},
+        {"slug": "personality", "color": "#c084fc", "bg": "rgba(192,132,252,.12)"},
+        {"slug": "strength", "color": "#818cf8", "bg": "rgba(129,140,248,.12)"},
+        {"slug": "caution",  "color": "#f472b6", "bg": "rgba(244,114,182,.12)"},
+        {"slug": "career",   "color": "#34d399", "bg": "rgba(52,211,153,.12)"},
+        {"slug": "love",     "color": "#f0abfc", "bg": "rgba(240,171,252,.12)"},
+        {"slug": "yearly",   "color": "#60a5fa", "bg": "rgba(96,165,250,.12)"},
+        {"slug": "monthly",  "color": "#a78bfa", "bg": "rgba(167,139,250,.12)"},
+        {"slug": "action",   "color": "#fbbf24", "bg": "rgba(251,191,36,.12)"},
+        {"slug": "message",  "color": "#e9d5ff", "bg": "rgba(233,213,255,.15)"},
+    ]
 
-    for section in sections:
-        icon = "✦"
-        for keyword, emoji in section_icons.items():
-            if keyword in section["title"]:
-                icon = emoji
-                break
-        section["icon"] = icon
+    for i, section in enumerate(sections):
+        theme = section_themes[i] if i < len(section_themes) else section_themes[0]
+        section["theme"] = theme
+        # Clean key_points: remove 「」, strip numbers like "5つ" "3つ"
+        cleaned = []
+        for kp in section.get("key_points", []):
+            kp = kp.strip('「」')
+            kp = re.sub(r'\s*\d+つ$', '', kp)
+            cleaned.append(kp)
+        section["key_points"] = cleaned
+
+    # Parse monthly data from 月別 section
+    monthly_data = []
+    monthly_section_idx = None
+    for i, section in enumerate(sections):
+        if "月別" in section["title"]:
+            monthly_section_idx = i
+            for line in section["body"].split('\n'):
+                m = re.match(r'\|\s*(\d{1,2})月\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|', line)
+                if m:
+                    monthly_data.append({
+                        "num": m.group(1),
+                        "keyword": m.group(2).strip().replace('**', ''),
+                        "action": m.group(3).strip().replace('**', ''),
+                        "note": m.group(4).strip().replace('**', ''),
+                    })
+            break
+
+    # Remove monthly section from accordion if we have grid data
+    if monthly_data and monthly_section_idx is not None:
+        sections.pop(monthly_section_idx)
+
+    # Remove yearly theme section if it references wrong year (e.g. 2025)
+    sections = [s for s in sections if not ("今年" in s["title"] and "2025" in s["title"])]
 
     return templates.TemplateResponse(
-        "reading_result.html", {"request": request, "reading": reading, "sections": sections}
+        "reading_result.html", {
+            "request": request,
+            "reading": reading,
+            "sections": sections,
+            "monthly_data": monthly_data,
+        }
     )
 
 
@@ -561,3 +617,61 @@ async def generate_image(
         await db.commit()
 
     return JSONResponse({"image_url": image_url})
+
+
+# ---------------------------------------------------------------------------
+# POST /api/readings/{reading_id}/generate-poster
+# ---------------------------------------------------------------------------
+
+@router.post("/api/readings/{reading_id}/generate-poster")
+async def generate_poster(
+    reading_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Reading).where(Reading.id == reading_id).options(selectinload(Reading.profile))
+    )
+    reading = result.scalar_one_or_none()
+    if reading is None:
+        return JSONResponse({"error": "Reading not found"}, status_code=404)
+
+    nickname = reading.profile.nickname if reading.profile else "あなた"
+    birth_date = str(reading.profile.birth_date) if reading.profile and reading.profile.birth_date else ""
+
+    section_data = {}
+    if reading.content:
+        parts = re.split(r'^## ', reading.content, flags=re.MULTILINE)
+        for part in parts[1:]:
+            lines = part.strip().split('\n', 1)
+            title = lines[0].strip()
+            body = lines[1].strip() if len(lines) > 1 else ""
+            catchcopy = ""
+            for line in body.split('\n'):
+                line = line.strip()
+                if line.startswith('**') and line.endswith('**'):
+                    catchcopy = line.strip('*')
+                    break
+            section_data[title] = {"catchcopy": catchcopy, "body": body}
+
+    def _find(keywords):
+        for k in keywords:
+            for title, data in section_data.items():
+                if k in title:
+                    return data.get("catchcopy", "")
+        return ""
+
+    image_url = await generate_poster_image(
+        nickname=nickname,
+        birth_date=birth_date,
+        catch_copy=_find(["全体要約", "全体"]),
+        personality=_find(["性格", "本質"]),
+        strength=_find(["才能", "強み"]),
+        love=_find(["恋愛", "人間関係"]),
+        career=_find(["仕事", "お金"]),
+        yearly_theme=_find(["今年"]),
+        message=_find(["メッセージ"]),
+    )
+
+    if image_url:
+        return JSONResponse({"image_url": image_url})
+    return JSONResponse({"error": "Generation failed"}, status_code=500)

@@ -58,16 +58,18 @@ function scrollToBottom() {
 // ── Create a new bubble element ──────────────────────────────
 function createBubble(role, senderLabel) {
   var bubble = document.createElement('div');
-  bubble.className = 'chat-bubble ' + role;
+  bubble.className = 'bubble ' + role;
 
-  var sender = document.createElement('div');
-  sender.className = 'chat-bubble-sender';
-  sender.textContent = senderLabel;
+  if (role === 'assistant') {
+    var sender = document.createElement('div');
+    sender.className = 'bubble-label';
+    sender.textContent = senderLabel;
+    bubble.appendChild(sender);
+  }
 
   var body = document.createElement('div');
-  body.className = 'chat-bubble-body';
+  body.className = 'bubble-body';
 
-  bubble.appendChild(sender);
   bubble.appendChild(body);
   return bubble;
 }
@@ -75,7 +77,7 @@ function createBubble(role, senderLabel) {
 // ── Create typing indicator ──────────────────────────────────
 function createTypingIndicator() {
   var el = document.createElement('div');
-  el.className = 'typing-indicator';
+  el.className = 'typing';
   el.id = 'typing-indicator';
   for (var i = 0; i < 3; i++) {
     var dot = document.createElement('div');
@@ -108,8 +110,8 @@ async function sendMessage() {
   if (welcome) welcome.remove();
 
   // Append user bubble
-  var userBubble = createBubble('user', 'あなた');
-  userBubble.querySelector('.chat-bubble-body').textContent = text;
+  var userBubble = createBubble('user', '');
+  userBubble.querySelector('.bubble-body').textContent = text;
   messages.appendChild(userBubble);
   scrollToBottom();
 
@@ -130,7 +132,7 @@ async function sendMessage() {
 
     if (!resp.ok) {
       var errBubble = createBubble('assistant', '✦ 鑑定師');
-      errBubble.querySelector('.chat-bubble-body').textContent = 'エラーが発生しました。もう一度お試しください。';
+      errBubble.querySelector('.bubble-body').textContent = 'エラーが発生しました。もう一度お試しください。';
       messages.appendChild(errBubble);
       scrollToBottom();
       return;
@@ -138,7 +140,7 @@ async function sendMessage() {
 
     // Create assistant bubble
     var asstBubble = createBubble('assistant', '✦ 鑑定師');
-    var bodyEl = asstBubble.querySelector('.chat-bubble-body');
+    var bodyEl = asstBubble.querySelector('.bubble-body');
     bodyEl.innerHTML = '';
     messages.appendChild(asstBubble);
     scrollToBottom();
@@ -178,7 +180,7 @@ async function sendMessage() {
     console.error(err);
     typingEl.remove();
     var errBubble2 = createBubble('assistant', '✦ 鑑定師');
-    errBubble2.querySelector('.chat-bubble-body').textContent = '通信エラーが発生しました。';
+    errBubble2.querySelector('.bubble-body').textContent = '通信エラーが発生しました。';
     messages.appendChild(errBubble2);
     scrollToBottom();
   } finally {

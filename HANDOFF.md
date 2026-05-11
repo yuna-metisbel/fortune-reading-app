@@ -1,7 +1,7 @@
-# セッション引き継ぎ — 占いリーディングWebアプリ（セッション5後）
+# セッション引き継ぎ — 占いリーディングWebアプリ（セッション6後）
 
 ## プロジェクト概要
-生年月日等から6つの占術体系（西洋占星術・数秘術・九星気学・六星占術・四柱推命・タロット）を統合した実用型リーディングを生成するWebアプリ。Aura/Etherealデザインにリニューアル中。
+生年月日等から6つの占術体系（西洋占星術・数秘術・九星気学・六星占術・四柱推命・タロット）を統合した実用型リーディングを生成するWebアプリ。セッション6でAura/Etherealデザインの実装が完了し、結果ページの改行・フォント・装飾の最終調整中。
 
 ## 所在地
 - ローカル: `/Users/kousuke/fortune-app/`
@@ -21,149 +21,158 @@ fortune-app/
 │   ├── routers/ (pages, profiles, readings, chat, payment)
 │   ├── services/ (claude_client, prompts, rokusei, shichusuimei, numerology, image_generator)
 │   ├── templates/ (base, index, reading_form, compatibility_form, reading_result, chat, reading_generate, sample, payment_success, payment_cancel)
-│   └── static/ (css/style.css, js/reading.js, js/chat.js, images/posters/)
+│   └── static/ (css/style.css, js/reading.js, js/chat.js, images/posters/, images/tab-illustrations.css)
 ├── tests/
-├── docs/superpowers/specs/ (stripe-billing-design.md, y2k-design-overhaul.md, aura-redesign.md)
-├── docs/superpowers/plans/ (y2k-design-overhaul.md, aura-redesign.md)
+├── docs/superpowers/specs/
+├── docs/superpowers/plans/
+├── docs/reflections/2026-05-11.md
 └── requirements.txt, Procfile, render.yaml, .env
 ```
 
-## デザイン方針（Aura/Ethereal — セッション5で確定）
+## フォント体系（セッション6で確定）
 
-### コンセプト
-- ターゲット: 20代女性、SNS映え、Instagramストーリーでシェアしたくなる
-- トーン: Aura/Ethereal — すりガラス、光のグロー、パステルラベンダー、クリスタル
-- 2層構造: ビジュアル重視のファーストビュー（ポスター風） → 「更に詳しく」で詳細アコーディオン
-- 絵文字: UIでは🌙のみ許可、Claude生成テキストから絵文字排除
-
-### ページ別デザイン
-- **トップ**: マンダラ+🌙ヒーロー、Glass Cardメニュー
-- **フォーム**: タロットカード（女教皇）SVG挿絵、明るい背景、キラキラ33個
-- **ローディング**: マンダラ回転+8フェーズ進行表示
-- **結果**: ファーストビュー（ポスター風）+ タブ切替 + アコーディオン詳細 + 月別グリッド
-- **チャット**: Auraトーンのバブルデザイン
-
-### DALL-E画像の扱い
-- 背景として `opacity: 0.18` で配置（読みやすさ優先）
-- シェア用ポスター: GPT Image APIで新規生成（html2canvasスクショではない）
-
-## フォント体系（セッション5で確定）
-
-| 用途 | フォント | Weight |
+| 用途 | フォント | 適用先 |
 |------|----------|--------|
-| 見出し | Rajdhani | 700 |
-| 強調 | Inter | 800 |
-| ラベル | JetBrains Mono | 600 |
-| 本文 | Noto Sans JP | 500 |
+| 見出し・キャッチコピー | Zen Kaku Gothic New (A) | タイトル、セクションキャッチ、強調テキスト |
+| タブ名・ボタン | Shippori Mincho (C) | セクションタブ名、「占いの結果を画像にする」「LINKをコピー」 |
+| 「更に詳しく」中身 | Kaisei Decol (E) | read-more-content |
+| 本文 | Noto Sans JP (G) | 一般テキスト、ラベル |
+| ラベル（英字） | JetBrains Mono | PERSONALITY, SOUL READING 等 |
 
-## カラーパレット（セッション5で確定）
+## カラーパレット
 
-- 背景: #352466 〜 #4a3590（これ以上暗くしない）
-- すりガラス: `rgba(255,255,255,0.08)` + `backdrop-filter: blur(16px)`
-- テキスト: #F3EAFF（メイン）、#C4B5FD（サブ）
-- アクセント: #E0B0FF（モーヴピンク）、#A78BFA（ラベンダー）、#A855F7（バイオレット）
-- グロー: `box-shadow: 0 0 40px rgba(168,85,247,0.3)`
-- キラキラ: ✦✧· 白い星のアニメーション（丸ドット禁止）
+- 背景: #352466 〜 #4a3590
+- テキスト: #F5F0FF（メイン）、#D8B4FE（サブ）
+- アクセント: #E9D5FF（モーヴ）、#F0ABFC（ピンク）、#A78BFA（ラベンダー）
 - 禁止色: オレンジ・暖色系・ゴールド(#FFD700)
+
+## セクションテーマカラー（10色）
+
+| セクション | slug | 色 |
+|-----------|------|-----|
+| 全体要約 | summary | #a78bfa |
+| 性格・本質 | personality | #c084fc |
+| 才能・強み | strength | #818cf8 |
+| 注意点・課題 | caution | #f472b6 |
+| 仕事・お金 | career | #34d399 |
+| 恋愛・人間関係 | love | #f0abfc |
+| 今年のテーマ | yearly | #60a5fa |
+| 月別の流れ | monthly | #a78bfa |
+| 今すぐやること | action | #fbbf24 |
+| 最後のメッセージ | message | #e9d5ff |
+
+## 改行ルール（セッション6で設計、実装途中）
+
+### 3つの関数に分離
+
+| 関数 | 使う場所 | `、` | `。` | `：` `／` ` — ` `）` |
+|------|----------|------|------|------|
+| `breakShort` | キャッチコピー、ハイライトカード、ラベルなしKP | **改行** | **改行(末尾削除)** | **改行** |
+| `breakLabeled` | ラベル付きKP(ライフパス：等)の値部分 | そのまま | そのまま | **改行** |
+| `breakBody` | 「更に詳しく」本文 | そのまま | **改行** | **改行** |
+
+### 文末ルール
+- 文末の`、`や`。`は**削除**する（改行に変換しない）
+
+### 太字差別化ルール
+- **単語**（助詞なし＆8文字以下）→ サイズ大 + 背景ハイライト（`kw-word`）
+- **フレーズ**（助詞あり or 9文字以上）→ 下線 + テーマカラー、サイズ変えない（`kw-phrase`）
+- 助詞判定: `を|が|に|で|は|の|と|も|から|まで|して|ている|ない|やすい|すぎ|よう`
 
 ## ユーザーのデザインフィードバック傾向
 
-- **「暗い」に敏感** → 背景は#352466/#4a3590くらいが限界、グロー強めにする
-- **「シンプルすぎ」に敏感** → キラキラ・挿絵・装飾は多めが好み
-- **「読みにくい」** → line-height 2.4、改行多め、短文化
-- **文章を読むのは好き** → 「更に詳しく」で長文を展開できる2層構造が◎
-- **タロットカードのイラストが好き** → SVGで各所に配置
-- **パステルラベンダー x クリスタルの参照画像**（ChatGPT生成ポスター）が品質基準
-- **「画像にする」= GPT Image APIで新規ポスター生成**（html2canvasスクショではない）
-- **ファイル作ったら自動で開け！** — 何度か怒られた。必ずopenすること
-- **デザイン比較では差が大きくないとわからない**
+- 改行ルールに厳格。コンテキストごとに異なるルールを期待。一律適用は絶対NG
 - 「ちゃちい」「安っぽい」に敏感 → 丸ゴシック、絵文字多用、カーブの多い枠はNG
-- オレンジ・暖色系を嫌う → ゴールド(#FFD700)もNG、ピンクはモーヴ系ならOK
-- 実機（スマホ）確認を重視 → 必ずスマホでの見え方を確認すること
+- 太字だけでなく、サイズ差・下線・色変えなどメリハリを求める
+- 均等なグリッドは「ダサい」 → リズムのあるレイアウトが好み
+- AskUserQuestionの選択肢UIは好まない → モックHTMLを見せて選んでもらう方が速い
+- 「ファイル作ったら開け」を忘れると怒られる
+- 実機（スマホ）確認を重視
+- 「見せて」と言われたら `open` コマンドでブラウザに出す
+- デザインの変更はまとめて実装してから見せること（途中で出すと混乱する）
+- **現在は2026年5月**。年の間違いに厳しい
 
-## 占術計算モジュール（Pythonで正確に計算）
-- `rokusei.py`: 六星占術（運命星+陰陽+霊合星人+12年周期+大殺界判定）
-- `shichusuimei.py`: 四柱推命（年柱の天干地支+五行+陰陽）
-- `numerology.py`: 数秘術（ライフパスナンバー、マスターナンバー11/22/33保持）
+## 今回やったこと
 
-## 検証済みの計算結果
-- ゆうな(1995/6/26): 火星人マイナス(-), LP11/2(マスターナンバー), 2026年=健弱
-- 彼(1999/5/7): LP4
+### デザイン実装（Task 1-7完了）
+- CSS全面書き直し（Aura/Etherealパレット、フォント、すりガラス、グローオーブ、スパークル）
+- base.html（新フォント、bg-layer、glow-orb、28スパークル）
+- 全テンプレート書き直し（top/form/compat/loading/result/chat/sample/payment_cancel）
+- chat.js クラス名更新（bubble/bubble-label/typing）
 
-## APIキー
-- Anthropic: .env + Render環境変数に設定済み
-- OpenAI: .env + Render環境変数に設定済み（DALL-E 3 + GPT Image API）
-- Stripe: テストキー設定済み。ライブキー審査待ち
-- PayPal: REST API設定済み（payment.pyに実装あり）
+### バックエンド（Task 8完了）
+- prompts.py: 絵文字排除指示、2026年5月指定、九星気学を出力順1番目に、「仕事・お金」（発信削除）
+- image_generator.py: GPT Image APIポスター生成関数追加
+- readings.py: ポスター生成APIエンドポイント、セクションテーマカラー、月別データパース、「今年(2025)」セクション除外、「月別」タブ除外（グリッドに統合）、detail_body（重複除去済み本文）
 
-## SSEストリーミング
-- スペースチャンク消失バグ修正済み（.trim() → .slice()）
-- 改行エスケープ修正済み（サーバー側で⏎にエスケープ、クライアントで復元）
-- DALL-E画像生成がストリーミング中に並行実行される
+### 結果ページ改善
+- ポスタータイトル・カード・メッセージの「」削除
+- ハイライト4カード
+- メッセージのキラキラグロー演出
+- 2列アコーディオングリッド
+- 10色テーマカラー
+- キャッチコピーの行サイズ調整
+- キーポイントカードの`：`分離表示
+- 「更に詳しく」重複除去（detail_bodyに変更）
+- 月別3列グリッド（5月ハイライト、タップ展開）
+- タロットカードSVGイラスト（女教皇・星・ワンドの8）+ ふわふわアニメ
+- タブにパステルSVGイラスト背景
+- 白シマー（shimmer）全削除
+- 背景 `bg-layer` に `pointer-events: none` 追加
 
-## チャットプロンプトの制約
-- ユーザーの行動についてアドバイス・正論・説教をしない
-- 星の配置から状況を照らすことに徹する
-- ユーザーの味方であり続ける
+### フォント変更
+- 見出し → Zen Kaku Gothic New
+- タブ名・ボタン → Shippori Mincho
+- 「更に詳しく」中身 → Kaisei Decol 太字
+- 本文 → Noto Sans JP (font-weight: 500)
 
-## モックアップファイル一覧（セッション5で作成）
+## 現在の状態
 
-| ファイル | 内容 |
-|----------|------|
-| `.superpowers/brainstorm/result-page-mockup.html` | 結果ページ（v1〜v7の最終版） |
-| `.superpowers/brainstorm/top-page-mockup.html` | トップページ |
-| `.superpowers/brainstorm/form-page-mockup.html` | フォームページ |
-| `.superpowers/brainstorm/loading-chat-mockup.html` | ローディング+チャット |
+- **サーバー**: `localhost:8000` で動作中
+- **結果ページ**: 改行・太字のJS処理は3関数に分離済み（breakShort/breakLabeled/breakBody）だが、**実際の表示がユーザーの期待通りか最終確認が必要**
+- **既存データ**: reading/9 は旧プロンプト（2025年）で生成されたデータ。新プロンプトで再生成していない
+- **未コミット**: 全変更がgit未コミット
 
-## 設計書・実装計画への参照
+## 未完了・次にやること
 
-- **設計書**: `docs/superpowers/specs/2026-05-10-aura-redesign.md`
-- **実装計画**: `docs/superpowers/plans/2026-05-10-aura-redesign.md`（全9タスク）
-- 旧Y2K設計書: `docs/superpowers/specs/2026-05-10-y2k-design-overhaul.md`（参考用）
+### 最優先: 結果ページの改行・装飾の最終調整
+1. **改行ルールの表示確認** — breakShort/breakLabeled/breakBodyが正しく動いているか、reading/9を開いて全セクション目視確認
+2. **新規リーディングで再テスト** — 新プロンプト（2026年、九星気学先頭、絵文字排除）でリーディングを生成し、出力を確認
+3. **仕事・お金のタイトル** — 既存データは「仕事・お金・発信」のまま。新規生成で「仕事・お金」になるか確認
 
-## 未完了・次にやるべきこと
-
-### 実装計画（9タスク — `docs/superpowers/plans/2026-05-10-aura-redesign.md` 参照）
-
-推奨: subagent-driven-development で並列実行
-
-1. **Task 1: CSS全面書き直し**（最優先、全ページの基盤）
-   - `app/static/css/style.css` をAura/Etherealパレット・フォント・すりガラスで再構築
-2. **Task 2: トップページテンプレート**
-   - `app/templates/index.html` — マンダラ+🌙ヒーロー、Glass Cardメニュー
-3. **Task 3: フォームページテンプレート**
-   - `app/templates/reading_form.html` — タロットカードSVG、キラキラ33個
-4. **Task 4: ローディングページテンプレート**
-   - `app/templates/reading_generate.html` — マンダラ回転+8フェーズ
-5. **Task 5: 結果ページテンプレート**
-   - `app/templates/reading_result.html` — ポスター+タブ+アコーディオン+月別グリッド
-6. **Task 6: チャットページテンプレート**
-   - `app/templates/chat.html` — Auraトーンバブル
-7. **Task 7: 相性フォームテンプレート**
-   - `app/templates/compatibility_form.html` — Auraトーン適用
-8. **Task 8: バックエンド修正**
-   - `app/services/prompts.py` — Claude生成テキストから絵文字排除
-   - GPT Image APIでシェア用ポスター生成エンドポイント追加
-9. **Task 9: 統合テスト**
-   - 全ページの表示確認、ストリーミング動作、ポスター生成
+### デザイン調整
+4. **タブのアニメーション追加** — fadeSlideUp + delay は入れたが、ユーザーが「もっと工夫」を求めていた
+5. **スマホ実機確認** — 全ページをスマホで確認
 
 ### インフラ
-10. **Render Diskの手動追加** — /dataに1GBディスク追加が必要。やらないとデプロイのたびにDBが消える
+6. **コミット＆プッシュ** — 全変更をまとめてコミット
+7. **Render Diskの手動追加** — /dataに1GBディスク追加が必要（デプロイのたびにDBが消える）
 
-### 決済関連
-11. **決済の再導入** — 現在は一時的に外してFREE状態。Stripe/PayPal審査完了後に再導入
-12. **有料化の切替手順**: reading.jsの送信先を `/api/payment/create-checkout` に戻す、価格表示を戻す
+### 決済
+8. **決済の再導入** — 現在はFREE状態。Stripe/PayPal審査完了後に再導入
 
-## 参照画像
-`/Users/kousuke/fortune-app/HHpHDDyasAAy_E6.jpeg` — ChatGPTで生成されたパステルラベンダー x クリスタルのスピリチュアル鑑定ポスター（品質基準）
+## 注意点・ハマりポイント
 
-## 関連ファイル
-- 作業ログ1: `/Users/kousuke/Documents/readings/作業ログ_20260509_占いアプリ開発.md`
-- 作業ログ2: `/Users/kousuke/Documents/readings/作業ログ_20260509_占いアプリ改善.md`
-- 作業ログ3: `/Users/kousuke/Documents/readings/作業ログ_20260510_占いアプリ課金化.md`
-- 作業ログ4: `/Users/kousuke/Documents/readings/作業ログ_20260510_占いアプリY2Kデザイン.md`
-- 作業ログ5: `/Users/kousuke/Documents/readings/作業ログ_20260510_占いアプリAuraリデザイン.md`
-- アクションプラン: `/Users/kousuke/Documents/action-plan-may15.html`
-- 設計書(Aura): `/Users/kousuke/fortune-app/docs/superpowers/specs/2026-05-10-aura-redesign.md`
-- 実装計画(Aura): `/Users/kousuke/fortune-app/docs/superpowers/plans/2026-05-10-aura-redesign.md`
-- 旧設計書(Y2K): `/Users/kousuke/fortune-app/docs/superpowers/specs/2026-05-10-y2k-design-overhaul.md`
+- **reading.jsのキャッシュ**: JSを変更したら `?v=N` をテンプレートのscriptタグで更新するか、Cmd+Shift+Rでハードリフレッシュ。ユーザーが変わってないと言ったらまずキャッシュを疑う
+- **`_showStreamingView()`**: フォーム送信時のローディングUI。`.container` をquerySelectorで探す。テンプレートのクラス名を変えたらここも追従必須
+- **改行ルールは文脈依存**: キャッチコピーと本文で`、`の扱いが真逆。一律適用は破綻する
+- **太字の判定**: 助詞を含む→フレーズ→下線、含まない＆短い→単語→サイズ大。「相手の感情を先読みして」の「して」は助詞→フレーズ扱い
+- **section_themes配列のインデックス**: セクションをpopすると後続のテーマカラーがズレる可能性あり。テーマ割り当ては `for i, section` のインデックスベース
+- **bg-layerにpointer-events: none必須**: ないとスクロールやクリックが奪われる
+- **ユーザーの年指定**: 現在は2026年5月。2025年のデータが出ると怒られる
+- **AskUserQuestion**: このユーザーにはモック見せる方式の方が合う
+
+## 参照ファイル
+- 設計書(Aura): `docs/superpowers/specs/2026-05-10-aura-redesign.md`
+- 実装計画(Aura): `docs/superpowers/plans/2026-05-10-aura-redesign.md`
+- 反省ログ: `docs/reflections/2026-05-11.md`
+- フォント比較モック: `.superpowers/brainstorm/font-comparison-aura.html`
+- タブイラストCSS: `app/static/images/tab-illustrations.css`
+- 参照画像: `/Users/kousuke/fortune-app/HHpHDDyasAAy_E6.jpeg`
+
+## 次回の開き方
+
+```
+handoff.mdを見て占いアプリの続きをして。
+結果ページの改行と装飾の最終調整から。reading/9を開いてまず現状確認して。
+```

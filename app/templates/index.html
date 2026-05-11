@@ -2,98 +2,88 @@
 {% block title %}星図リーディング{% endblock %}
 
 {% block content %}
-<div class="top-header fade-in">
-  <div class="hero-orb">
-    <div class="hero-ring hero-ring--1"></div>
-    <div class="hero-ring hero-ring--2"></div>
-    <div class="hero-ring hero-ring--3"></div>
-    <div class="hero-ring hero-ring--4"></div>
-    <span class="hero-crystal">🔮</span>
-    <span class="hero-spark" style="--a:0deg;--d:80px">✦</span>
-    <span class="hero-spark" style="--a:60deg;--d:84px">✧</span>
-    <span class="hero-spark" style="--a:120deg;--d:80px">✦</span>
-    <span class="hero-spark" style="--a:180deg;--d:84px">✧</span>
-    <span class="hero-spark" style="--a:240deg;--d:80px">✦</span>
-    <span class="hero-spark" style="--a:300deg;--d:84px">✧</span>
+<div class="hero">
+  <div class="hero-mandala">
+    <svg viewBox="0 0 200 200" fill="none">
+      <circle cx="100" cy="100" r="90" stroke="rgba(216,180,254,.12)" stroke-width=".5"/>
+      <circle cx="100" cy="100" r="70" stroke="rgba(192,132,252,.1)" stroke-width=".5"/>
+      <circle cx="100" cy="100" r="50" stroke="rgba(167,139,250,.18)" stroke-width="1"/>
+      <circle cx="100" cy="100" r="30" stroke="rgba(216,180,254,.22)" stroke-width="1"/>
+      <polygon points="100,15 110,80 160,40 115,90 185,100 115,110 160,160 110,120 100,185 90,120 40,160 85,110 15,100 85,90 40,40 90,80" stroke="rgba(216,180,254,.12)" stroke-width=".8" fill="none"/>
+      <circle cx="100" cy="10" r="3" fill="rgba(216,180,254,.25)"/>
+      <circle cx="190" cy="100" r="2.5" fill="rgba(240,171,252,.2)"/>
+      <circle cx="100" cy="190" r="2.5" fill="rgba(167,139,250,.2)"/>
+      <circle cx="10" cy="100" r="3" fill="rgba(192,132,252,.25)"/>
+    </svg>
+    <div class="hero-moon">🌙</div>
   </div>
-  <span class="top-ornament">☽ · ✦ · ☽</span>
-  <h1 class="top-title">あなたの魂が描く<br>人生の星図</h1>
-  <p class="top-subtitle">本来のあなたを思い出し、調和の流れに乗る<br>スピリチュアルリーディング</p>
-  <div class="fortune-systems">
-    <span class="system-tag">西洋占星術</span>
-    <span class="system-tag">数秘術</span>
-    <span class="system-tag">九星気学</span>
-    <span class="system-tag">六星占術</span>
-    <span class="system-tag">四柱推命</span>
-    <span class="system-tag">タロット</span>
+
+  <h1 class="hero-title">あなたの魂が描く<br>人生の星図</h1>
+  <p class="hero-sub">6つの占術体系を統合した<br>実用型スピリチュアルリーディング</p>
+
+  <div class="tags">
+    <span class="tag">西洋占星術</span>
+    <span class="tag">数秘術</span>
+    <span class="tag">九星気学</span>
+    <span class="tag">六星占術</span>
+    <span class="tag">四柱推命</span>
+    <span class="tag">タロット</span>
   </div>
 </div>
 
-<div class="menu-cards fade-in">
-  <a href="/reading/new" class="menu-card">
-    <div class="glow-card">
-      <div class="glow-card-inner menu-card-row">
-        <span class="menu-card-icon">🌙</span>
-        <div class="menu-card-body">
-          <div class="menu-card-title">魂のリーディング</div>
-          <div class="menu-card-desc">生年月日と星の配置から、あなたの本質と<br>今の流れを読み解きます</div>
-          <div class="menu-card-price">FREE</div>
-        </div>
-        <span class="menu-card-arrow">›</span>
-      </div>
+<div class="divider"><span class="divider-stars">✧ ✦ ✧</span></div>
+
+<div class="menu-cards">
+  <a href="/reading/new" class="menu-card" style="animation:fadeSlideUp .6s ease-out both;">
+    <div class="menu-icon personal">🌙</div>
+    <div class="menu-text">
+      <div class="menu-title">魂のリーディング</div>
+      <div class="menu-desc">あなただけの星図を読み解く</div>
     </div>
+    <span class="menu-badge">FREE</span>
+    <span class="menu-arrow">→</span>
   </a>
 
-  <a href="/compatibility/new" class="menu-card">
-    <div class="glow-card">
-      <div class="glow-card-inner menu-card-row">
-        <span class="menu-card-icon">✨</span>
-        <div class="menu-card-body">
-          <div class="menu-card-title">相性リーディング</div>
-          <div class="menu-card-desc">二人の魂のつながりと、関係の流れを<br>星から読み解きます</div>
-          <div class="menu-card-price">FREE</div>
-        </div>
-        <span class="menu-card-arrow">›</span>
-      </div>
+  <a href="/compatibility/new" class="menu-card" style="animation:fadeSlideUp .6s ease-out .1s both;">
+    <div class="menu-icon compat">✨</div>
+    <div class="menu-text">
+      <div class="menu-title">相性リーディング</div>
+      <div class="menu-desc">二人の星図を重ね合わせる</div>
     </div>
+    <span class="menu-badge">FREE</span>
+    <span class="menu-arrow">→</span>
   </a>
 
-  <a href="/sample" class="menu-card">
-    <div class="glow-card">
-      <div class="glow-card-inner menu-card-row">
-        <span class="menu-card-icon">📖</span>
-        <div class="menu-card-body">
-          <div class="menu-card-title">サンプル鑑定を見る</div>
-          <div class="menu-card-desc">実際のリーディング結果をご覧ください<br>（無料）</div>
-        </div>
-        <span class="menu-card-arrow">›</span>
-      </div>
+  <a href="/sample" class="menu-card" style="animation:fadeSlideUp .6s ease-out .2s both;">
+    <div class="menu-icon sample">✦</div>
+    <div class="menu-text">
+      <div class="menu-title">サンプル鑑定を見る</div>
+      <div class="menu-desc">鑑定の雰囲気を体験</div>
     </div>
+    <span class="menu-arrow">→</span>
   </a>
 </div>
 
 {% if readings %}
-<div class="section-header fade-in">
-  <div class="section-title">過去のリーディング</div>
-</div>
-
-<div class="reading-list fade-in">
+<div class="recent-header">✧ RECENT READINGS</div>
+<div class="recent-list">
   {% for reading in readings %}
-  <a href="/reading/{{ reading.id }}" class="reading-item">
-    <span class="reading-item-icon">{% if reading.type == 'compatibility' %}✨{% else %}🌙{% endif %}</span>
-    <div class="reading-item-body">
-      <div class="reading-item-theme">{{ reading.theme }}</div>
-      <div class="reading-item-date">{{ reading.created_at.strftime('%Y年%m月%d日') }}</div>
+  <a href="/reading/{{ reading.id }}" class="recent-card">
+    <span class="recent-card-icon">{% if reading.type == 'compatibility' %}✨{% else %}🌙{% endif %}</span>
+    <div class="recent-card-info">
+      <div class="recent-card-name">{{ reading.theme }}</div>
+      <div class="recent-card-date">{{ reading.created_at.strftime('%Y.%m.%d') }}</div>
     </div>
-    <span class="reading-item-type">{% if reading.type == 'compatibility' %}相性{% else %}個人{% endif %}</span>
   </a>
   {% endfor %}
 </div>
-
 {% else %}
-<div class="empty-state fade-in">
-  <div class="empty-state-icon">🌙</div>
-  <p>まだリーディングの記録がありません。<br>上のメニューから始めてみましょう。</p>
+<div class="recent-header">✧ RECENT READINGS</div>
+<div class="recent-empty">
+  <div class="recent-empty-icon">🌙</div>
+  <div class="recent-empty-text">まだ鑑定履歴がありません<br>最初のリーディングを体験してみましょう</div>
 </div>
 {% endif %}
+
+<div class="footer"><div class="footer-text">✧ FORTUNE READING ✧ 2026</div></div>
 {% endblock %}

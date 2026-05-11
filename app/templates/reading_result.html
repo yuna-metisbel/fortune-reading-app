@@ -4,237 +4,336 @@
 {% block head %}
 <meta property="og:title" content="{{ reading.profile.nickname if reading.profile else 'あなた' }}の星図リーディング">
 <meta property="og:description" content="6つの占術を統合したスピリチュアルリーディング">
-{% if reading.image_url %}
-<meta property="og:image" content="{{ reading.image_url }}">
-{% endif %}
+{% if reading.image_url %}<meta property="og:image" content="{{ reading.image_url }}">{% endif %}
 <meta property="og:type" content="article">
 <meta name="twitter:card" content="summary_large_image">
 {% endblock %}
 
 {% block content %}
-<div class="result-page">
-  <a href="/" class="back-link">トップに戻る</a>
-
-  <!-- POSTER CARD with DALL-E background overlay -->
-  <div class="poster-card-wrap" id="poster-card">
-    {% if reading.image_url %}
-    <img class="poster-bg" src="{{ reading.image_url }}" alt="">
-    {% else %}
-    <div class="poster-bg poster-bg--fallback"></div>
-    {% endif %}
-
-    <div class="poster-overlay">
-      <!-- Header -->
-      <div class="p-header">
-        <span class="p-ornament">☽ · ✦ · ☽</span>
-        <h1 class="p-title">あなたの魂が描く<br>人生の星図</h1>
-        <p class="p-name">{{ reading.profile.nickname if reading.profile else 'あなた' }}'s reading</p>
-      </div>
-
-      <!-- Soul Theme -->
-      {% if sections %}
-      {% set s0 = sections[0] if sections|length > 0 else none %}
-      <div class="p-soul">
-        <div class="p-soul-label">— soul theme —</div>
-        <div class="p-soul-text">{% if s0 and s0.key_points %}{{ s0.key_points[0] }}{% endif %}</div>
-      </div>
-
-      <!-- 4-card grid -->
-      <div class="p-grid">
-        {% set card_config = [
-          {'idx': 1, 'label': 'personality', 'title': '自然な性格'},
-          {'idx': 2, 'label': 'strength', 'title': '強み'},
-          {'idx': 5, 'label': 'love', 'title': '恋愛傾向'},
-          {'idx': 4, 'label': 'career', 'title': '仕事の方向'}
-        ] %}
-        {% for card in card_config %}
-          {% set sec = sections[card.idx] if sections|length > card.idx else none %}
-          <div class="p-card">
-            <div class="p-card-label">{{ card.label }}</div>
-            <div class="p-card-title">{{ card.title }}</div>
-            {% if sec and sec.key_points %}
-            <div class="p-card-catch">{{ sec.key_points[0] }}</div>
-            <div class="p-keywords">
-              {% for kp in sec.key_points[1:4] %}
-              <span class="p-kw">{{ kp }}</span>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </div>
-        {% endfor %}
-      </div>
-
-      <!-- Message -->
-      {% set last = sections[-1] if sections else none %}
-      <div class="p-message">
-        <div class="p-msg-title">🌙 あなたへのメッセージ 🌙</div>
-        <p class="p-msg-body">{% if last and last.key_points %}{{ last.key_points[0] }}{% endif %}</p>
-        <p class="p-msg-sign">With Love & Light</p>
-      </div>
-      {% endif %}
-
-      <div class="p-footer">fortune-reading-app.onrender.com</div>
+<!-- ===== POSTER ===== -->
+<div class="poster" id="poster-capture">
+  {% if reading.image_url %}
+  <div class="poster-dalle" style="background-image:url('{{ reading.image_url }}')"></div>
+  {% endif %}
+  <div class="poster-content">
+    <div class="poster-label" style="animation:glowPulse 4s ease-in-out infinite">SOUL READING</div>
+    <div class="poster-meta">
+      <div class="poster-name">{{ (reading.profile.nickname if reading.profile else 'あなた') | upper }}</div>
+      <div class="poster-date">{{ reading.profile.birth_date.strftime('%Y.%m.%d') if reading.profile and reading.profile.birth_date else '' }}</div>
     </div>
-  </div>
+    <div class="tarot-mandala">
+      <svg viewBox="0 0 200 200" fill="none">
+        <circle cx="100" cy="100" r="90" stroke="rgba(216,180,254,.12)" stroke-width=".5"/>
+        <circle cx="100" cy="100" r="70" stroke="rgba(192,132,252,.1)" stroke-width=".5"/>
+        <circle cx="100" cy="100" r="50" stroke="rgba(167,139,250,.18)" stroke-width="1"/>
+        <circle cx="100" cy="100" r="30" stroke="rgba(216,180,254,.22)" stroke-width="1"/>
+        <polygon points="100,15 110,80 160,40 115,90 185,100 115,110 160,160 110,120 100,185 90,120 40,160 85,110 15,100 85,90 40,40 90,80" stroke="rgba(216,180,254,.12)" stroke-width=".8" fill="none"/>
+      </svg>
+      <div class="tarot-center">🌙</div>
+    </div>
 
-  <!-- Share -->
-  <div class="share-bar">
-    <button class="share-btn share-btn--save" id="save-poster-btn" onclick="savePoster()">ストーリーに保存</button>
-    <button class="share-btn share-btn--link" onclick="copyLink()">リンクをコピー</button>
-  </div>
-
-  <!-- More Detail Toggle -->
-  <button class="more-detail-btn" id="more-detail-btn" onclick="toggleDetail()">
-    もっと詳しく読む（6つの占術の詳細）
-  </button>
-
-  <!-- Accordion (hidden by default) -->
-  <div class="accordion-container" id="detail-area" style="display:none;">
     {% if sections %}
-    {% for section in sections %}
-    <div class="accordion-item">
-      <button class="accordion-trigger" onclick="toggleAccordion(this)">
-        <span class="accordion-title">{{ section.title }}</span>
-        <span class="accordion-arrow">▸</span>
-      </button>
-      <div class="accordion-content">
-        <div class="reading-body" data-raw="{{ section.body | e }}"></div>
-      </div>
+    {% set s0 = sections[0] if sections|length > 0 else none %}
+    <div class="title-glass">
+      <div class="poster-title">{% if s0 and s0.key_points %}{{ s0.key_points[0] | replace('「','') | replace('」','') }}{% else %}あなたの魂の星図{% endif %}</div>
     </div>
-    {% endfor %}
-    {% endif %}
-  </div>
 
-  <!-- Action buttons -->
-  <div class="result-actions">
-    <a href="/chat/{{ reading.id }}" class="btn btn-primary">鑑定師に相談する</a>
-    <a href="/" class="btn btn-secondary">トップに戻る</a>
+    <div class="divider" style="margin:0 auto 24px;"><span class="divider-stars">✧ ✦ ✧</span></div>
+
+    <div class="highlights">
+      {% set card_config = [
+        {'idx': 1, 'label': 'PERSONALITY'},
+        {'idx': 2, 'label': 'STRENGTH'},
+        {'idx': 5, 'label': 'LOVE'},
+        {'idx': 4, 'label': 'CAREER'}
+      ] %}
+      {% for card in card_config %}
+        {% set sec = sections[card.idx] if sections|length > card.idx else none %}
+        <div class="highlight-card">
+          <div class="highlight-label">{{ card.label }}</div>
+          <div class="highlight-value">{% if sec and sec.key_points %}{{ sec.key_points[0] | replace('「','') | replace('」','') }}{% endif %}</div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% set last = sections[-1] if sections else none %}
+    <div class="poster-message sparkle-message">
+      <p class="poster-message-text">{% if last and last.key_points %}{{ last.key_points[0] | replace('「','') | replace('」','') }}{% endif %}</p>
+    </div>
+    {% endif %}
+
+    <button class="save-image-btn" onclick="generatePoster({{ reading.id }})">✦ 占いの結果を画像にする</button>
+    <button class="share-link-btn" onclick="copyLink()">✧ LINK をコピー</button>
+
+    <div class="scroll-prompt">
+      <div class="scroll-prompt-text">SCROLL FOR DETAIL</div>
+      <div class="scroll-prompt-arrow">▼</div>
+    </div>
   </div>
 </div>
+
+<!-- ===== DETAIL ===== -->
+{% if sections %}
+<div class="detail-section">
+  <div class="detail-header">✧ DETAILED READING ✧</div>
+  <div class="detail-grid">
+  {% for section in sections %}
+  {% set theme = section.theme %}
+  <div class="reading-section" data-theme="{{ theme.slug }}">
+    <button class="section-trigger" onclick="toggleSection(this)">
+      <div class="section-icon-wrap" style="background:{{ theme.bg }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="{{ theme.color }}" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><text x="12" y="16" text-anchor="middle" font-size="10" fill="{{ theme.color }}" stroke="none">✦</text></svg>
+      </div>
+      <span class="section-title" style="color:{{ theme.color }}">{{ section.title }}</span>
+      <span class="section-arrow">▾</span>
+    </button>
+    <div class="section-body">
+      <div class="section-content">
+        {% if section.key_points %}
+        <div class="section-catchcopy" style="border-left-color:{{ theme.color }}">
+          {{ section.key_points[0] | replace('「','') | replace('」','') }}
+        </div>
+        {% for kp in section.key_points[1:] %}
+        <div class="section-kp-card" style="border-color:{{ theme.color }}30">
+          <span class="point-marker" style="color:{{ theme.color }}">✦</span>
+          <span class="kp-text" data-color="{{ theme.color }}">{{ kp }}</span>
+        </div>
+        {% endfor %}
+        {% endif %}
+        <button class="read-more-toggle" onclick="toggleMore(this)" style="border-color:{{ theme.color }}40; color:{{ theme.color }}">✧ 更に詳しく</button>
+        <div class="read-more-body">
+          <div class="read-more-content" data-raw="{{ section.detail_body | e }}" data-color="{{ theme.color }}" data-slug="{{ theme.slug }}"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  </div>
+
+  {% if monthly_data %}
+  <div class="yearly-section">
+    <div class="yearly-header">
+      <div class="yearly-header-icon"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(167,139,250,.6)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><text x="12" y="16" text-anchor="middle" font-size="10" fill="rgba(167,139,250,.6)" stroke="none">✦</text></svg></div>
+      <span class="yearly-header-text">月別の流れ</span>
+    </div>
+    <div class="month-grid">
+      {% for m in monthly_data %}
+      <div class="month-card {% if m.num == '5' %}current{% endif %}" onclick="toggleMonth(this)">
+        <div class="month-num">{{ m.num }}月</div>
+        <div class="month-keyword">{{ m.keyword }}</div>
+        <div class="month-detail">
+          <div class="month-detail-content">
+            <p>{{ m.action }}</p>
+            <p style="color:var(--accent-pink);font-size:12px;margin-top:8px;">⚠ {{ m.note }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="cta-section">
+  <a href="/chat/{{ reading.id }}" class="cta-btn">✦ 鑑定師に相談する</a>
+  <a href="/" class="cta-back">← TOP</a>
+</div>
+<div class="footer"><div class="footer-text">✧ FORTUNE READING ✧ 2026</div></div>
+<div class="toast" id="toast"></div>
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-function toggleAccordion(btn) {
-  var item = btn.parentElement;
-  var content = item.querySelector('.accordion-content');
-  var arrow = btn.querySelector('.accordion-arrow');
-  var isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
-
-  if (isOpen) {
-    content.style.maxHeight = null;
-    arrow.textContent = '▸';
-    item.classList.remove('open');
-  } else {
-    content.style.maxHeight = content.scrollHeight + 'px';
-    arrow.textContent = '▾';
-    item.classList.add('open');
-  }
+function toggleSection(el){el.closest('.reading-section').classList.toggle('open');}
+function toggleMore(btn){var b=btn.nextElementSibling;b.classList.toggle('open');btn.textContent=b.classList.contains('open')?'✧ 閉じる':'✧ 更に詳しく';}
+function toggleMonth(el){var w=el.classList.contains('expanded');document.querySelectorAll('.month-card.expanded').forEach(function(c){c.classList.remove('expanded');});if(!w)el.classList.add('expanded');}
+function copyLink(){navigator.clipboard.writeText(location.href).then(function(){showToast('✧ リンクをコピーしました');});}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
+function generatePoster(id){
+  var btn=document.querySelector('.save-image-btn');btn.classList.add('saving');btn.textContent='✦ ポスター生成中...';
+  fetch('/api/readings/'+id+'/generate-poster',{method:'POST'}).then(function(r){return r.json();}).then(function(d){
+    if(d.image_url){var a=document.createElement('a');a.href=d.image_url;a.download='fortune-poster.png';a.click();showToast('✧ 保存しました');}
+    else showToast('生成に失敗しました');btn.classList.remove('saving');btn.textContent='✦ 占いの結果を画像にする';
+  }).catch(function(){btn.classList.remove('saving');btn.textContent='✦ 占いの結果を画像にする';showToast('生成に失敗しました');});
 }
 
-function toggleDetail() {
-  var area = document.getElementById('detail-area');
-  var btn = document.getElementById('more-detail-btn');
-  if (area.style.display === 'none') {
-    area.style.display = 'block';
-    btn.textContent = '詳細を閉じる';
-    btn.classList.add('more-detail-btn--open');
-  } else {
-    area.style.display = 'none';
-    btn.textContent = 'もっと詳しく読む（6つの占術の詳細）';
-    btn.classList.remove('more-detail-btn--open');
-  }
+/* --- Tarot card SVG templates --- */
+var tarotSVGs = {
+  'default': '<svg class="tarot-float" width="80" height="120" viewBox="0 0 80 120" fill="none"><rect x="2" y="2" width="76" height="116" rx="6" stroke="rgba(216,180,254,.4)" stroke-width="1" fill="rgba(147,51,234,.06)"/><text x="40" y="55" text-anchor="middle" font-size="24" fill="rgba(216,180,254,.4)">✦</text><text x="40" y="75" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" font-weight="600" fill="rgba(216,180,254,.4)" letter-spacing="1">TAROT</text></svg>',
+  'priestess': '<svg class="tarot-float" width="80" height="120" viewBox="0 0 80 120" fill="none"><rect x="2" y="2" width="76" height="116" rx="6" stroke="rgba(192,132,252,.45)" stroke-width="1" fill="rgba(147,51,234,.06)"/><text x="40" y="16" text-anchor="middle" font-family="JetBrains Mono" font-size="7" font-weight="700" fill="rgba(233,213,255,.5)">II</text><circle cx="40" cy="35" r="8" fill="rgba(240,171,252,.15)" stroke="rgba(240,171,252,.4)" stroke-width="1"/><path d="M30 45 Q40 40 50 45 Q52 65 50 80 Q45 78 40 79 Q35 78 30 80 Q28 65 30 45Z" fill="rgba(216,180,254,.08)" stroke="rgba(216,180,254,.25)" stroke-width=".8"/><rect x="10" y="30" width="8" height="55" rx="2" fill="rgba(30,20,60,.3)" stroke="rgba(167,139,250,.3)" stroke-width=".8"/><rect x="62" y="30" width="8" height="55" rx="2" fill="rgba(255,255,255,.04)" stroke="rgba(216,180,254,.3)" stroke-width=".8"/><text x="40" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="5" font-weight="600" fill="rgba(233,213,255,.45)" letter-spacing="1">HIGH PRIESTESS</text><text x="40" y="110" text-anchor="middle" font-family="Noto Sans JP" font-size="7" fill="rgba(216,180,254,.4)">女教皇</text></svg>',
+  'star': '<svg class="tarot-float" width="80" height="120" viewBox="0 0 80 120" fill="none"><rect x="2" y="2" width="76" height="116" rx="6" stroke="rgba(96,165,250,.4)" stroke-width="1" fill="rgba(59,130,246,.06)"/><text x="40" y="16" text-anchor="middle" font-family="JetBrains Mono" font-size="7" font-weight="700" fill="rgba(191,219,254,.5)">XVII</text><polygon points="40,25 43,35 53,35 45,42 48,52 40,46 32,52 35,42 27,35 37,35" fill="rgba(251,191,36,.2)" stroke="rgba(251,191,36,.4)" stroke-width=".8"/><circle cx="28" cy="60" r="3" fill="rgba(96,165,250,.15)" stroke="rgba(96,165,250,.3)" stroke-width=".6"/><circle cx="52" cy="58" r="2.5" fill="rgba(96,165,250,.12)" stroke="rgba(96,165,250,.25)" stroke-width=".6"/><circle cx="35" cy="72" r="2" fill="rgba(147,197,253,.1)" stroke="rgba(147,197,253,.2)" stroke-width=".5"/><path d="M25 80 Q40 75 55 80 Q55 90 40 88 Q25 90 25 80Z" fill="rgba(96,165,250,.1)" stroke="rgba(96,165,250,.2)" stroke-width=".6"/><text x="40" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="5" font-weight="600" fill="rgba(191,219,254,.45)" letter-spacing="1">THE STAR</text><text x="40" y="110" text-anchor="middle" font-family="Noto Sans JP" font-size="7" fill="rgba(147,197,253,.4)">星</text></svg>',
+  'wands8': '<svg class="tarot-float" width="80" height="120" viewBox="0 0 80 120" fill="none"><rect x="2" y="2" width="76" height="116" rx="6" stroke="rgba(251,191,36,.4)" stroke-width="1" fill="rgba(251,191,36,.04)"/><text x="40" y="16" text-anchor="middle" font-family="JetBrains Mono" font-size="7" font-weight="700" fill="rgba(253,224,71,.5)">VIII</text><line x1="15" y1="35" x2="65" y2="55" stroke="rgba(251,191,36,.3)" stroke-width="1.5"/><line x1="15" y1="42" x2="65" y2="62" stroke="rgba(251,191,36,.25)" stroke-width="1.5"/><line x1="15" y1="49" x2="65" y2="69" stroke="rgba(251,191,36,.3)" stroke-width="1.5"/><line x1="15" y1="56" x2="65" y2="76" stroke="rgba(251,191,36,.25)" stroke-width="1.5"/><line x1="18" y1="30" x2="68" y2="50" stroke="rgba(253,224,71,.2)" stroke-width="1.2"/><line x1="18" y1="63" x2="68" y2="83" stroke="rgba(253,224,71,.2)" stroke-width="1.2"/><line x1="20" y1="25" x2="70" y2="45" stroke="rgba(253,224,71,.15)" stroke-width="1"/><line x1="20" y1="68" x2="70" y2="88" stroke="rgba(253,224,71,.15)" stroke-width="1"/><text x="40" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="5" font-weight="600" fill="rgba(253,224,71,.45)" letter-spacing="1">8 OF WANDS</text><text x="40" y="110" text-anchor="middle" font-family="Noto Sans JP" font-size="7" fill="rgba(251,191,36,.4)">ワンドの8</text></svg>'
+};
+
+function getTarotKey(name) {
+  if (/女教皇|Priestess/i.test(name)) return 'priestess';
+  if (/星|Star/i.test(name)) return 'star';
+  if (/ワンド.*8|Eight.*Wand|8.*Wand/i.test(name)) return 'wands8';
+  return 'default';
 }
 
+// ===== 改行・太字ルール =====
+var PARTICLES = /を|が|に|で|は|の|と|も|から|まで|して|ている|ない|やすい|すぎ|よう|く$|ながら|つつ|ずつ|たび|ほど|だけ|ばかり/;
+
+// キャッチコピー・ハイライト・ラベルなしKP: 、。で改行、末尾、。削除
+function breakShort(s) {
+  s = s.replace(/ — /g, '<br>');
+  s = s.replace(/）(?=.)/g, '）<br>');
+  s = s.replace(/／/g, '<br>');
+  s = s.replace(/：/g, '<br>');
+  s = s.replace(/、/g, '<br>');
+  s = s.replace(/。(?=.)/g, '<br>');
+  s = s.replace(/[、。]+$/, '');
+  s = s.replace(/(<br>)+$/, '');
+  return s;
+}
+
+// ラベル付きKPの値部分: ：／）—で改行、、。はそのまま
+function breakLabeled(s) {
+  s = s.replace(/ — /g, '<br>');
+  s = s.replace(/）(?=.)/g, '）<br>');
+  s = s.replace(/／/g, '<br>');
+  s = s.replace(/：/g, '<br>');
+  return s;
+}
+
+// 本文(更に詳しく): 。で改行、、はそのまま、：／）—で改行
+function breakBody(s) {
+  s = s.replace(/ — /g, '<br>');
+  s = s.replace(/）(?=.)/g, '）<br>');
+  s = s.replace(/／/g, '<br>');
+  s = s.replace(/：/g, '<br>');
+  s = s.replace(/。(?=.)/g, '。<br>');
+  return s;
+}
+
+// **太字** → 単語(≤8文字+助詞なし)=サイズ大+背景、フレーズ=下線+色
+function styleBold(html, C) {
+  return html.replace(/\*\*([^*\n]+)\*\*/g, function(m, p1) {
+    var isWord = p1.length <= 8 && !PARTICLES.test(p1);
+    var cls = isWord ? 'kw-hl kw-word' : 'kw-hl kw-phrase';
+    return '<strong class="'+cls+'" style="color:'+C+'">'+p1+'</strong>';
+  }).replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+}
+
+// 短い行は大きく、長い行は小さく
+function sizeLines(html) {
+  var parts = html.split('<br>');
+  return parts.map(function(p) {
+    var clean = p.replace(/<[^>]*>/g,'').trim();
+    if (!clean) return '';
+    var len = clean.length;
+    var sz = len<=6?20 : len<=10?17 : len<=16?15 : 13;
+    var w = len<=10 ? 700 : 500;
+    return '<span class="sized-line" style="font-size:'+sz+'px;font-weight:'+w+'">'+p.trim()+'</span>';
+  }).filter(Boolean).join('<br>');
+}
+
+// ===== 「更に詳しく」レンダラー（本文ルール: 。で改行、、はそのまま） =====
 function renderMarkdownBody(el) {
   var raw = el.dataset.raw || '';
+  var C = el.dataset.color || '#d8b4fe';
+  var slug = el.dataset.slug || '';
   if (!raw) return;
 
-  function esc(s) {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-
-  var lines = raw.split('\n');
-  var html = '';
-  var inList = false;
-
+  var lines = raw.split('\n'), html = '', inList = false;
   for (var i = 0; i < lines.length; i++) {
-    var line = lines[i];
+    var t = lines[i].trim();
+    if (!t || /^---$/.test(t) || /^\|/.test(t)) { if(inList){html+='</ul>';inList=false;} continue; }
+    t = t.replace(/(行動|開運行動|やめた方がいい行動)\s*\d+つ/g,'$1');
 
-    if (/^### (.+)/.test(line)) {
-      if (inList) { html += '</ul>'; inList = false; }
-      html += '<h4>' + esc(line.replace(/^### /, '')) + '</h4>';
-    } else if (/^[-*] (.+)/.test(line)) {
-      if (!inList) { html += '<ul>'; inList = true; }
-      html += '<li>' + esc(line.replace(/^[-*] /, '')) + '</li>';
-    } else if (/^\d+\. (.+)/.test(line)) {
-      if (inList) { html += '</ul>'; inList = false; }
-      html += '<li>' + esc(line.replace(/^\d+\. /, '')) + '</li>';
-    } else if (line.trim() === '') {
-      if (inList) { html += '</ul>'; inList = false; }
+    if (/^### (.+)/.test(t)) {
+      if(inList){html+='</ul>';inList=false;}
+      html += '<h4 class="rm-h4" style="color:'+C+'">'+t.replace(/^### /,'')+'</h4>';
+    } else if (/^[-*] (.+)/.test(t)) {
+      if(!inList){html+='<ul class="rm-list">';inList=true;}
+      var li = t.replace(/^[-*] /,'');
+      if(li.indexOf('：')!==-1){
+        var p=li.split('：'), lbl=p[0], val=p.slice(1).join('：');
+        val = breakLabeled(val);
+        li = '<span class="rm-lbl" style="color:'+C+'">'+lbl+'</span><br><span class="rm-val">'+val+'</span>';
+      } else {
+        li = breakBody(li);
+      }
+      html += '<li>'+li+'</li>';
     } else {
-      if (inList) { html += '</ul>'; inList = false; }
-      html += '<p>' + esc(line) + '</p>';
+      if(inList){html+='</ul>';inList=false;}
+      var pt = t.replace(/\*\*/g,'');
+      if (/^(今の|が自分|あなたの|準備は|人生テーマ)/.test(pt)) {
+        html += '<div class="reading-callout"><p>'+breakBody(t)+'</p></div>';
+      } else if (slug==='message' && /^\*\*\d+枚目/.test(t)) {
+        var cn = t.replace(/\*\*/g,'');
+        html += '<div class="tarot-card-row"><p class="tarot-card-name" style="color:'+C+'">'+t+'</p>';
+        html += '<div class="tarot-card-illust">'+(tarotSVGs[getTarotKey(cn)]||tarotSVGs['default'])+'</div></div>';
+      } else if (/^✦/.test(pt)) {
+        html += '<p class="rm-subhead" style="color:'+C+'">'+t+'</p>';
+      } else {
+        html += '<p>'+breakBody(t)+'</p>';
+      }
     }
   }
-  if (inList) html += '</ul>';
-
-  html = html.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
-
+  if(inList) html+='</ul>';
+  html = styleBold(html, C);
   el.innerHTML = html;
 }
 
-async function savePoster() {
-  var btn = document.getElementById('save-poster-btn');
-  btn.disabled = true;
-  btn.textContent = '画像を生成中...';
-
-  try {
-    var card = document.getElementById('poster-card');
-    var canvas = await html2canvas(card, {
-      scale: 2,
-      backgroundColor: null,
-      useCORS: true,
-    });
-    var link = document.createElement('a');
-    link.download = '星図リーディング.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    btn.textContent = 'ストーリーに保存';
-    btn.disabled = false;
-  } catch (e) {
-    btn.textContent = '画像保存に失敗しました';
-    btn.disabled = false;
-    setTimeout(function() { btn.textContent = 'ストーリーに保存'; }, 3000);
-  }
-}
-
-function copyLink() {
-  var url = window.location.href;
-  navigator.clipboard.writeText(url).then(function() {
-    var btn = document.querySelector('.share-btn--link');
-    var orig = btn.textContent;
-    btn.textContent = 'コピーしました';
-    setTimeout(function() { btn.textContent = orig; }, 2000);
-  }).catch(function() {
-    // Fallback for older browsers
-    var input = document.createElement('input');
-    input.value = url;
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('copy');
-    document.body.removeChild(input);
-    var btn = document.querySelector('.share-btn--link');
-    var orig = btn.textContent;
-    btn.textContent = 'コピーしました';
-    setTimeout(function() { btn.textContent = orig; }, 2000);
+// ===== KPカード（ラベルあり→値は／）—で改行、ラベルなし→、。で改行） =====
+function formatKeyPoints() {
+  document.querySelectorAll('.kp-text').forEach(function(el) {
+    var text = el.textContent, color = el.dataset.color || '#d8b4fe';
+    if (text.indexOf('：') !== -1) {
+      var p = text.split('：'), lbl = p[0], rest = p.slice(1).join('：');
+      rest = breakLabeled(rest);
+      rest = sizeLines(rest);
+      el.innerHTML = '<span class="kp-label" style="color:'+color+'">'+lbl+'</span><br>'+rest;
+    } else {
+      var html = breakShort(text);
+      html = sizeLines(html);
+      el.innerHTML = html;
+    }
   });
 }
 
+// ===== キャッチコピー（、。で改行、末尾削除、行ごとにサイズ調整） =====
+function formatCatchcopies() {
+  document.querySelectorAll('.section-catchcopy').forEach(function(el) {
+    var raw = el.textContent.trim();
+    var broken = breakShort(raw);
+    var parts = broken.split('<br>');
+    el.innerHTML = parts.map(function(p) {
+      var clean = p.trim();
+      if (!clean) return '';
+      var len = clean.length;
+      var sz = len<=8?24 : len<=14?20 : 17;
+      return '<span style="display:block;font-size:'+sz+'px;line-height:1.5">'+clean+'</span>';
+    }).filter(Boolean).join('');
+  });
+}
+
+// ===== ポスター要素（poster-title, highlight-value, poster-message） =====
+function formatPosterElements() {
+  var title = document.querySelector('.poster-title');
+  if (title) {
+    var raw = title.textContent.trim();
+    title.innerHTML = breakShort(raw);
+  }
+  document.querySelectorAll('.highlight-value').forEach(function(el) {
+    var raw = el.textContent.trim();
+    if (raw) el.innerHTML = breakShort(raw);
+  });
+  var msg = document.querySelector('.poster-message-text');
+  if (msg) {
+    var raw = msg.textContent.trim();
+    if (raw) msg.innerHTML = breakShort(raw);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.reading-body').forEach(renderMarkdownBody);
+  formatPosterElements();
+  document.querySelectorAll('.read-more-content').forEach(renderMarkdownBody);
+  formatKeyPoints();
+  formatCatchcopies();
 });
 </script>
 {% endblock %}

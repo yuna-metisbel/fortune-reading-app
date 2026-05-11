@@ -2,31 +2,71 @@
 {% block title %}リーディング中... — 星図リーディング{% endblock %}
 
 {% block content %}
-<div class="generate-page">
-
-  <!-- Loading State -->
-  <div id="loading-crystal" class="loading-crystal fade-in">
-    <span class="loading-crystal-emoji">🔮</span>
-    <h2 class="loading-title">星の配置を読み解いています</h2>
-    <p class="loading-text">少々お待ちください<span class="loading-dots"></span></p>
+<div class="loading-page" id="loading-view">
+  <div class="loading-mandala">
+    <svg viewBox="0 0 200 200" fill="none">
+      <circle cx="100" cy="100" r="90" stroke="rgba(216,180,254,.12)" stroke-width=".5"/>
+      <circle cx="100" cy="100" r="70" stroke="rgba(192,132,252,.15)" stroke-width=".5"/>
+      <circle cx="100" cy="100" r="50" stroke="rgba(167,139,250,.2)" stroke-width="1"/>
+      <circle cx="100" cy="100" r="30" stroke="rgba(216,180,254,.25)" stroke-width="1"/>
+      <polygon points="100,15 110,80 160,40 115,90 185,100 115,110 160,160 110,120 100,185 90,120 40,160 85,110 15,100 85,90 40,40 90,80" stroke="rgba(216,180,254,.15)" stroke-width=".8" fill="none"/>
+      <circle cx="100" cy="10" r="3" fill="rgba(216,180,254,.3)"/>
+      <circle cx="190" cy="100" r="2.5" fill="rgba(240,171,252,.25)"/>
+      <circle cx="100" cy="190" r="2.5" fill="rgba(167,139,250,.25)"/>
+      <circle cx="10" cy="100" r="3" fill="rgba(192,132,252,.3)"/>
+    </svg>
+    <div class="loading-moon">🌙</div>
   </div>
 
-  <!-- Streaming Area (hidden initially) -->
-  <div id="streaming-area" class="streaming-area" role="region" aria-live="polite" aria-label="リーディング結果">
-    <div class="streaming-header">✦ &nbsp;あなたへのメッセージ&nbsp; ✦</div>
-    <div id="streaming-content" class="streaming-content"></div>
-  </div>
+  <h2 class="loading-title">星の配置を読み解いています</h2>
+  <p class="loading-sub">6つの占術が導くあなたの物語</p>
 
-  <!-- Action Buttons (hidden initially) -->
-  <div id="generate-actions" class="generate-actions">
-    <a id="chat-link" href="#" class="btn btn-primary">
-      💬 鑑定師に相談する
-    </a>
-    <a href="/" class="btn btn-secondary">
-      ← トップに戻る
-    </a>
+  <div class="phases" id="phases">
+    <div class="phase active" data-phase="0">
+      <div class="phase-dot"></div>
+      <span class="phase-text">西洋占星術のチャートを計算中</span>
+    </div>
+    <div class="phase" data-phase="1">
+      <div class="phase-dot"></div>
+      <span class="phase-text">数秘術のライフパスを算出中</span>
+    </div>
+    <div class="phase" data-phase="2">
+      <div class="phase-dot"></div>
+      <span class="phase-text">九星気学の本命星を特定中</span>
+    </div>
+    <div class="phase" data-phase="3">
+      <div class="phase-dot"></div>
+      <span class="phase-text">六星占術の運命星を照合中</span>
+    </div>
+    <div class="phase" data-phase="4">
+      <div class="phase-dot"></div>
+      <span class="phase-text">四柱推命の命式を解読中</span>
+    </div>
+    <div class="phase" data-phase="5">
+      <div class="phase-dot"></div>
+      <span class="phase-text">タロットカードを展開中</span>
+    </div>
+    <div class="phase" data-phase="6">
+      <div class="phase-dot"></div>
+      <span class="phase-text">6つの占術を統合中</span>
+    </div>
+    <div class="phase" data-phase="7">
+      <div class="phase-dot"></div>
+      <span class="phase-text">あなたへのメッセージを紡いでいます</span>
+    </div>
   </div>
+</div>
 
+<!-- Streaming Area (hidden initially) -->
+<div id="streaming-area" class="streaming-area" role="region" aria-live="polite" aria-label="リーディング結果">
+  <div id="streaming-content"></div>
+</div>
+
+<!-- Action Buttons (hidden initially) -->
+<div id="generate-actions" style="display:none; text-align:center; margin-top:40px;">
+  <a id="result-link" href="#" class="btn-primary" style="margin-bottom:16px;">✦ 結果を見る</a>
+  <br>
+  <a id="chat-link" href="#" class="btn-secondary" style="margin-top:12px;">鑑定師に相談する</a>
 </div>
 {% endblock %}
 
