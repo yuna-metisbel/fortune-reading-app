@@ -1,5 +1,6 @@
 """DALL-E 3 / GPT Image API を使用して鑑定結果ポスター画像を生成するモジュール。"""
 
+import base64
 import uuid
 from pathlib import Path
 from typing import Optional
@@ -95,6 +96,14 @@ async def generate_poster_image(
 
     client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
 
+    cc = catch_copy.strip('「」')
+    pr = personality.strip('「」')
+    st = strength.strip('「」')
+    lv = love.strip('「」')
+    cr = career.strip('「」')
+    yt = yearly_theme.strip('「」')
+    ms = message.strip('「」')
+
     prompt = f"""パステルラベンダー × クリスタルのスピリチュアル鑑定ポスター。
 淡いラベンダー、パステルパープル、シルバー、白を基調にした、
 幻想的で透明感のあるスピリチュアル鑑定ポスター。
@@ -102,44 +111,51 @@ async def generate_poster_image(
 全体は柔らかい雲、月、星、クリスタル、光の粒、繊細な装飾フレームで構成し、
 女性向けの優しく神秘的な雰囲気にする。
 
-タイトル: 「{catch_copy}」
+一番上にごく小さく: あなたの魂が描く、人生の星図
 名前: {nickname}
 生年月日: {birth_date}
 
+タイトル（大きく）: {cc}
+
 セクション配置:
-- 魂のテーマ: {catch_copy}
-- 性格: {personality}
-- 強み: {strength}
-- 恋愛傾向: {love}
-- 仕事の方向: {career}
-- 今年のテーマ: {yearly_theme}
-- あなたへのメッセージ: {message}
+- 魂のテーマ: {cc}
+- 性格: {pr}
+- 強み: {st}
+- 恋愛傾向: {lv}
+- 仕事の方向: {cr}
+- 今年のテーマ: {yt}
+- あなたへのメッセージ: {ms}
 
 装飾にはムーンストーン、アメジスト、ローズクォーツ、蝶、月のモチーフ、
 吊り下げオーナメント、花、光のエフェクトを使用する。
 
-日本語テキストで、優雅で可愛く、柔らかい読みやすいレイアウトの
-1枚完結の鑑定シートにしてください。"""
+日本語テキストは白文字で太めに、はっきり読めるように描くこと。
+括弧「」は使わない。
+優雅で可愛く、柔らかい読みやすいレイアウトの1枚完結の鑑定シートにしてください。"""
 
     try:
         response = await client.images.generate(
             model="gpt-image-1",
             prompt=prompt,
-            size="1024x1792",
+            size="1024x1536",
             quality="high",
             n=1,
         )
 
-        image_url = response.data[0].url
-
+        image_data = response.data[0]
         IMAGES_DIR.mkdir(parents=True, exist_ok=True)
         filename = f"poster_{uuid.uuid4().hex[:12]}.png"
         filepath = IMAGES_DIR / filename
 
-        async with httpx.AsyncClient() as http_client:
-            img_response = await http_client.get(image_url, timeout=120.0)
-            img_response.raise_for_status()
-            filepath.write_bytes(img_response.content)
+        if image_data.b64_json:
+            filepath.write_bytes(base64.b64decode(image_data.b64_json))
+        elif image_data.url:
+            async with httpx.AsyncClient() as http_client:
+                img_response = await http_client.get(image_data.url, timeout=120.0)
+                img_response.raise_for_status()
+                filepath.write_bytes(img_response.content)
+        else:
+            return None
 
         return f"/static/images/posters/{filename}"
     except Exception as e:

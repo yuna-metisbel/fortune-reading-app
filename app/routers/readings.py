@@ -16,7 +16,7 @@ from sqlalchemy.orm import selectinload
 from app.database import async_session, get_db
 from app.models import Profile, Reading, User
 from app.services.claude_client import stream_message
-from app.services.image_generator import generate_poster_image, generate_reading_image
+from app.services.image_generator import generate_reading_image
 from app.services.prompts import (
     SYSTEM_PROMPT_COMPATIBILITY,
     SYSTEM_PROMPT_PERSONAL,
@@ -480,6 +480,9 @@ async def reading_result(
                 elif line.startswith('**') and line.endswith('**'):
                     key_points.append(line.strip('*').strip('「」'))
             clean_title = re.sub(r'^[①②③④⑤⑥⑦⑧⑨⑩]\s*', '', title)
+            clean_title = clean_title.replace('・発信', '').replace('・発信力', '')
+            if '最後のメッセージ' in clean_title:
+                clean_title = '魂のメッセージ'
 
             body_lines = body.split('\n')
             summary_paragraphs = []
@@ -636,42 +639,11 @@ async def generate_poster(
         return JSONResponse({"error": "Reading not found"}, status_code=404)
 
     nickname = reading.profile.nickname if reading.profile else "あなた"
-    birth_date = str(reading.profile.birth_date) if reading.profile and reading.profile.birth_date else ""
 
-    section_data = {}
-    if reading.content:
-        parts = re.split(r'^## ', reading.content, flags=re.MULTILINE)
-        for part in parts[1:]:
-            lines = part.strip().split('\n', 1)
-            title = lines[0].strip()
-            body = lines[1].strip() if len(lines) > 1 else ""
-            catchcopy = ""
-            for line in body.split('\n'):
-                line = line.strip()
-                if line.startswith('**') and line.endswith('**'):
-                    catchcopy = line.strip('*')
-                    break
-            section_data[title] = {"catchcopy": catchcopy, "body": body}
-
-    def _find(keywords):
-        for k in keywords:
-            for title, data in section_data.items():
-                if k in title:
-                    return data.get("catchcopy", "")
-        return ""
-
-    image_url = await generate_poster_image(
-        nickname=nickname,
-        birth_date=birth_date,
-        catch_copy=_find(["全体要約", "全体"]),
-        personality=_find(["性格", "本質"]),
-        strength=_find(["才能", "強み"]),
-        love=_find(["恋愛", "人間関係"]),
-        career=_find(["仕事", "お金"]),
-        yearly_theme=_find(["今年"]),
-        message=_find(["メッセージ"]),
-    )
+    image_url = await generate_reading_image(nickname=nickname)
 
     if image_url:
+        reading.image_url = image_url
+        await db.commit()
         return JSONResponse({"image_url": image_url})
     return JSONResponse({"error": "Generation failed"}, status_code=500)

@@ -62,7 +62,7 @@
     </div>
     {% endif %}
 
-    <button class="save-image-btn" onclick="generatePoster({{ reading.id }})">✦ 占いの結果を画像にする</button>
+    <button class="save-image-btn" onclick="savePoster()">✦ 占いの結果を保存する</button>
     <button class="share-link-btn" onclick="copyLink()">✧ LINK をコピー</button>
 
     <div class="scroll-prompt">
@@ -150,12 +150,21 @@ function toggleMore(btn){var b=btn.nextElementSibling;b.classList.toggle('open')
 function toggleMonth(el){var w=el.classList.contains('expanded');document.querySelectorAll('.month-card.expanded').forEach(function(c){c.classList.remove('expanded');});if(!w)el.classList.add('expanded');}
 function copyLink(){navigator.clipboard.writeText(location.href).then(function(){showToast('✧ リンクをコピーしました');});}
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
-function generatePoster(id){
-  var btn=document.querySelector('.save-image-btn');btn.classList.add('saving');btn.textContent='✦ ポスター生成中...';
-  fetch('/api/readings/'+id+'/generate-poster',{method:'POST'}).then(function(r){return r.json();}).then(function(d){
-    if(d.image_url){var a=document.createElement('a');a.href=d.image_url;a.download='fortune-poster.png';a.click();showToast('✧ 保存しました');}
-    else showToast('生成に失敗しました');btn.classList.remove('saving');btn.textContent='✦ 占いの結果を画像にする';
-  }).catch(function(){btn.classList.remove('saving');btn.textContent='✦ 占いの結果を画像にする';showToast('生成に失敗しました');});
+function savePoster(){
+  var btn=document.querySelector('.save-image-btn');
+  btn.classList.add('saving');btn.textContent='✦ 保存中...';
+  var el=document.getElementById('poster-capture');
+  btn.style.display='none';
+  document.querySelector('.share-link-btn').style.display='none';
+  var sp=document.querySelector('.scroll-prompt');if(sp)sp.style.display='none';
+  html2canvas(el,{useCORS:true,scale:2,backgroundColor:null}).then(function(canvas){
+    var a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download='fortune-reading.png';a.click();
+    showToast('✧ 保存しました');
+  }).catch(function(){showToast('保存に失敗しました');}).finally(function(){
+    btn.style.display='';btn.classList.remove('saving');btn.textContent='✦ 占いの結果を保存する';
+    document.querySelector('.share-link-btn').style.display='';
+    if(sp)sp.style.display='';
+  });
 }
 
 /* --- Tarot card SVG templates --- */
