@@ -460,15 +460,13 @@ img, svg { max-width: 100%; height: auto; }
   font-family: var(--font-heading);
   font-size: 18px; font-weight: 700;
   letter-spacing: 1px; margin-bottom: 6px;
-  word-break: keep-all;
-  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .menu-desc {
   font-family: var(--font-body);
   font-size: 12px; font-weight: 400;
   color: var(--text-secondary); line-height: 1.8;
-  word-break: keep-all;
-  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .menu-badge {
   font-family: var(--font-label);
@@ -538,16 +536,15 @@ img, svg { max-width: 100%; height: auto; }
   font-size: 22px; font-weight: 700;
   letter-spacing: 2px; color: var(--highlight);
   margin-bottom: 12px;
-  word-break: keep-all;
-  overflow-wrap: anywhere;
+  text-wrap: balance;
+  max-width: 320px;
 }
 .loading-sub {
   font-family: var(--font-body);
   font-size: 13px; font-weight: 500;
   color: var(--text-secondary); line-height: 2;
   margin-bottom: 40px;
-  word-break: keep-all;
-  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .phases { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 300px; }
 .phase {
@@ -624,12 +621,11 @@ img, svg { max-width: 100%; height: auto; }
 
 .poster-title {
   font-family: var(--font-heading);
-  font-weight: 700; font-size: 32px;
-  line-height: 1.5; letter-spacing: 3px;
+  font-weight: 700; font-size: 28px;
+  line-height: 1.5; letter-spacing: 2px;
   color: var(--highlight);
   position: relative; z-index: 1;
-  word-break: keep-all;
-  overflow-wrap: anywhere;
+  text-wrap: balance;
   text-shadow: 0 0 24px rgba(216,180,254,.4);
 }
 .poster-sub {
@@ -637,7 +633,7 @@ img, svg { max-width: 100%; height: auto; }
   font-size: 13px; font-weight: 600;
   line-height: 1.8; color: var(--text-secondary);
   margin-top: 12px; position: relative; z-index: 1;
-  word-break: auto-phrase;
+  text-wrap: balance;
 }
 
 .highlights { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-bottom: 24px; }
@@ -667,8 +663,7 @@ img, svg { max-width: 100%; height: auto; }
   font-family: var(--font-emphasis);
   font-size: 13px; font-weight: 700;
   line-height: 1.7; color: var(--text-primary);
-  word-break: keep-all;
-  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .poster-message {
@@ -815,7 +810,7 @@ img, svg { max-width: 100%; height: auto; }
   font-family: var(--font-body);
   font-size: 14px; font-weight: 500;
   line-height: 2.2; letter-spacing: .5px;
-  word-break: auto-phrase;
+  text-wrap: balance;
 }
 .section-content strong { font-family: var(--font-emphasis); color: var(--accent-pink); font-weight: 700; }
 
@@ -829,8 +824,7 @@ img, svg { max-width: 100%; height: auto; }
   border-left: 3px solid var(--accent-pink);
   background: rgba(255,255,255,.05);
   border-radius: 0 10px 10px 0;
-  word-break: keep-all;
-  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .section-point {
   display: flex; align-items: baseline; gap: 8px;
