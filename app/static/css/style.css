@@ -458,9 +458,9 @@ img, svg { max-width: 100%; height: auto; }
 .menu-text { flex: 1; }
 .menu-title {
   font-family: var(--font-heading);
-  font-size: 18px; font-weight: 700;
+  font-size: 15px; font-weight: 700;
   letter-spacing: 1px; margin-bottom: 6px;
-  text-wrap: balance;
+  white-space: nowrap;
 }
 .menu-desc {
   font-family: var(--font-body);

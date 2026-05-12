@@ -20,7 +20,7 @@
   {% if is_compat %}
     <div class="poster-label" style="animation:glowPulse 4s ease-in-out infinite">COMPATIBILITY READING</div>
     <div class="poster-meta">
-      <div class="poster-name">{{ reading.theme | replace('の相性リーディング','') }}</div>
+      <div class="poster-name">{{ reading.profile.nickname if reading.profile else '' }} × {{ reading.profile_2.nickname if reading.profile_2 else '' }}</div>
     </div>
     <div class="tarot-mandala">
       <svg viewBox="0 0 200 200" fill="none">

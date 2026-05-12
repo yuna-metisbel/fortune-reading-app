@@ -457,7 +457,10 @@ async def reading_result(
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
-        select(Reading).where(Reading.id == reading_id).options(selectinload(Reading.profile))
+        select(Reading).where(Reading.id == reading_id).options(
+            selectinload(Reading.profile),
+            selectinload(Reading.profile_2),
+        )
     )
     reading = result.scalar_one_or_none()
     if reading is None:
