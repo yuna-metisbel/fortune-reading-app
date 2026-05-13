@@ -80,7 +80,7 @@ async def _get_or_create_user(db: AsyncSession) -> User:
 def _compute_fortune_data(birth_date_str: str) -> tuple[dict | None, dict | None, dict | None]:
     """生年月日文字列から六星占術・四柱推命・数秘術の計算結果を返す。"""
     try:
-        bd = date.fromisoformat(birth_date_str)
+        bd = date.fromisoformat(_zen_to_han(birth_date_str))
         rokusei_result = calculate_rokusei(bd.year, bd.month, bd.day)
         current_year = date.today().year
         cycle = calculate_cycle_position(bd.year, bd.month, bd.day, current_year)
@@ -97,6 +97,10 @@ def _compute_fortune_data(birth_date_str: str) -> tuple[dict | None, dict | None
         return None, None, None
 
 
+def _zen_to_han(s: str) -> str:
+    return s.translate(str.maketrans('０１２３４５６７８９', '0123456789'))
+
+
 async def _get_or_create_profile(
     db: AsyncSession,
     user_id: int,
@@ -107,11 +111,11 @@ async def _get_or_create_profile(
     gender: str | None,
     blood_type: str | None,
 ) -> Profile:
-    birth_date = date.fromisoformat(birth_date_str)
+    birth_date = date.fromisoformat(_zen_to_han(birth_date_str))
 
     birth_time: time | None = None
     if birth_time_str:
-        birth_time = time.fromisoformat(birth_time_str)
+        birth_time = time.fromisoformat(_zen_to_han(birth_time_str))
 
     profile = Profile(
         user_id=user_id,
@@ -540,7 +544,7 @@ async def reading_result(
     monthly_data = []
     monthly_section_idx = None
     for i, section in enumerate(sections):
-        if "月別" in section["title"]:
+        if "月別" in section["title"] or "タイムライン" in section["title"]:
             monthly_section_idx = i
             for line in section["body"].split('\n'):
                 m = re.match(r'\|\s*(\d{1,2})月\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|', line)
