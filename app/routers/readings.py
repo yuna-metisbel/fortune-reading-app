@@ -509,6 +509,8 @@ async def reading_result(
                 if bl_s.startswith('**') and bl_s.endswith('**'):
                     if '枚目' not in bl_s and 'からのメッセージ' not in bl_s:
                         continue
+                if re.match(r'^.{1,20}へ$', bl_s):
+                    continue
                 if bl_s.startswith('---'):
                     continue
                 if bl_s.startswith('|'):
@@ -526,14 +528,14 @@ async def reading_result(
 
     # Section theme config: slug, color, icon SVG
     section_themes = [
-        {"slug": "summary",  "color": "#a78bfa", "bg": "rgba(167,139,250,.12)"},
-        {"slug": "personality", "color": "#c084fc", "bg": "rgba(192,132,252,.12)"},
-        {"slug": "strength", "color": "#818cf8", "bg": "rgba(129,140,248,.12)"},
-        {"slug": "caution",  "color": "#f472b6", "bg": "rgba(244,114,182,.12)"},
+        {"slug": "summary",  "color": "#c4b5fd", "bg": "rgba(196,181,253,.12)"},
+        {"slug": "personality", "color": "#d4a0ff", "bg": "rgba(212,160,255,.12)"},
+        {"slug": "strength", "color": "#a5b4fc", "bg": "rgba(165,180,252,.12)"},
+        {"slug": "caution",  "color": "#f9a8d4", "bg": "rgba(249,168,212,.12)"},
         {"slug": "career",   "color": "#34d399", "bg": "rgba(52,211,153,.12)"},
-        {"slug": "love",     "color": "#f0abfc", "bg": "rgba(240,171,252,.12)"},
+        {"slug": "love",     "color": "#f5c6ff", "bg": "rgba(245,198,255,.12)"},
         {"slug": "yearly",   "color": "#60a5fa", "bg": "rgba(96,165,250,.12)"},
-        {"slug": "monthly",  "color": "#a78bfa", "bg": "rgba(167,139,250,.12)"},
+        {"slug": "monthly",  "color": "#c4b5fd", "bg": "rgba(196,181,253,.12)"},
         {"slug": "action",   "color": "#fbbf24", "bg": "rgba(251,191,36,.12)"},
         {"slug": "message",  "color": "#e9d5ff", "bg": "rgba(233,213,255,.15)"},
     ]
@@ -577,10 +579,10 @@ async def reading_result(
 
     if is_compat:
         compat_themes = [
-            {"slug": "overview",  "color": "#c084fc", "bg": "rgba(192,132,252,.12)"},
-            {"slug": "essence",   "color": "#a78bfa", "bg": "rgba(167,139,250,.12)"},
-            {"slug": "chemistry", "color": "#f0abfc", "bg": "rgba(240,171,252,.12)"},
-            {"slug": "challenge", "color": "#f472b6", "bg": "rgba(244,114,182,.12)"},
+            {"slug": "overview",  "color": "#d4a0ff", "bg": "rgba(212,160,255,.12)"},
+            {"slug": "essence",   "color": "#c4b5fd", "bg": "rgba(196,181,253,.12)"},
+            {"slug": "chemistry", "color": "#f5c6ff", "bg": "rgba(245,198,255,.12)"},
+            {"slug": "challenge", "color": "#f9a8d4", "bg": "rgba(249,168,212,.12)"},
             {"slug": "love",      "color": "#e9d5ff", "bg": "rgba(233,213,255,.15)"},
             {"slug": "timeline",  "color": "#60a5fa", "bg": "rgba(96,165,250,.12)"},
             {"slug": "action",    "color": "#fbbf24", "bg": "rgba(251,191,36,.12)"},

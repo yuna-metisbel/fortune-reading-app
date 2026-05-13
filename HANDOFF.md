@@ -1,11 +1,11 @@
-# セッション引き継ぎ — 占いリーディングWebアプリ（セッション7後）
+# セッション引き継ぎ — 占いリーディングWebアプリ（セッション9後）
 
 ## プロジェクト概要
-生年月日等から6つの占術体系（西洋占星術・数秘術・九星気学・六星占術・四柱推命・タロット）を統合した実用型リーディングを生成するWebアプリ。セッション7で改行・装飾ルールの最終実装、ポスター生成修正、相性リーディング専用レイアウト、各種UIバグ修正を完了。
+生年月日等から6つの占術体系（西洋占星術・数秘術・九星気学・六星占術・四柱推命・タロット）を統合した実用型リーディングを生成するWebアプリ。セッション9でKP色分け・タロットSVG・テーマ色ズレ・空セクション等8件のバグを一括修正しRenderにデプロイ済み。
 
 ## 所在地
 - ローカル: `/Users/kousuke/fortune-app/`
-- GitHub: `https://github.com/yuna-metisbel/fortune-reading-app` (private)
+- GitHub: `https://github.com/yuna-metisbel/fortune-reading-app` (**public**)
 - 本番: `https://fortune-reading-app.onrender.com`
 - Render: 有料プラン
 
@@ -21,11 +21,12 @@ fortune-app/
 │   ├── routers/ (pages, profiles, readings, chat, payment)
 │   ├── services/ (claude_client, prompts, rokusei, shichusuimei, numerology, image_generator)
 │   ├── templates/ (base, index, reading_form, compatibility_form, reading_result, chat, reading_generate, sample, payment_success, payment_cancel)
-│   └── static/ (css/style.css, js/reading.js, js/chat.js, images/posters/, images/tab-illustrations.css)
+│   └── static/ (css/style.css, js/reading.js, js/chat.js, images/posters/)
 ├── tests/
 ├── docs/superpowers/specs/
 ├── docs/superpowers/plans/
-├── docs/reflections/ (2026-05-11.md, 2026-05-12.md)
+├── docs/reflections/ (2026-05-11.md, 2026-05-12.md, 2026-05-13.md, 2026-05-13_2.md)
+├── figma-make-handoff.md
 └── requirements.txt, Procfile, render.yaml, .env
 ```
 
@@ -74,157 +75,182 @@ fortune-app/
 | 今すぐやること | action | #fbbf24 |
 | 魂のメッセージ | message | #34d399 |
 
-## 改行ルール（セッション7で実装完了）
+※ timelineセクションがpopされた場合、compat_themesからもtimelineを除去してインデックスを揃える処理が入っている（セッション9で修正）
+
+## 改行ルール（セッション8で大幅改修）
+
+### 共通除去・変換（`_clean`関数）
+- `「」『』` → 除去
+- ダッシュ連続（`──` U+2500、`——` U+2014、`ーー` U+30FC、`━━` 等すべて）→ 改行
+- ` — `（半角スペース付きemダッシュ）→ 改行
+- `）`の後に文字が続く場合 → 改行（ただし次が助詞・×なら改行しない）
+- `／` → 改行
 
 ### 3つの関数（reading_result.html内のJS）
 
-| 関数 | 使う場所 | `、` | `。` | `：` `／` ` — ` `）` |
+| 関数 | 使う場所 | `：` | `、` | `。` |
 |------|----------|------|------|------|
-| `breakShort` | キャッチコピー、ハイライトカード、ラベルなしKP、ポスター要素 | **改行** | **改行(末尾削除)** | **改行** |
-| `breakLabeled` | ラベル付きKP(ライフパス：等)の値部分 | そのまま | そのまま | **改行** |
-| `breakBody` | 「更に詳しく」本文 | そのまま | **改行** | **改行** |
+| `breakShort` | キャッチコピー、KPカード、ポスター要素 | **改行** | **改行** | **改行(末尾削除)** |
+| `breakLabeled` | 「更に詳しく」内のラベル付きリスト値 | **改行** | そのまま | そのまま |
+| `breakBody` | 「更に詳しく」本文 | そのまま | そのまま | **改行(。残す)** |
 
-### 全関数共通
-- `「」『』`は全関数の先頭で除去
-- 文末の`、`や`。`は削除（breakShortのみ）
+### 禁則処理（`_fixHead`関数）
+- 改行後に助詞（を、が、に、で、は、の、と、も等）や`×`が来る場合 → 前の行に結合
+- 4文字以下の短い断片 → 前の行に結合（breakShortのみ）
 
-### 太字差別化ルール
-- **単語**（助詞/副詞なし＆8文字以下）→ サイズ大 + 背景ハイライト（`kw-word`）
-- **フレーズ**（助詞/副詞あり or 9文字以上）→ 下線 + テーマカラー（`kw-phrase`）
-- 判定: `を|が|に|で|は|の|と|も|から|まで|して|ている|ない|やすい|すぎ|よう|く$|ながら|つつ|ずつ|たび|ほど|だけ|ばかり`
+### サイズルール
+- 複数行に分かれた場合 → **最長行のサイズに統一（小さい方に合わせる）**
+- ポイント（KPカード） → **色で区別**（文字サイズ差❌）
+- キーワード（太字） → **文字サイズで区別**（色変え❌）
+
+### KPカード色分けルール（セッション9で実装）
+- **技術テキスト** = テーマ色 + alpha `aa`（控えめ） → `.kp-body`
+- **結論（`**...**`部分）** = `#FAF5FF`白（目立つ） → `.kp-point`
+- ラベルとテキストの間に **〰** セパレーター → `.kp-sep`
+- CSS `opacity`は子要素に乗算されるので使わない。色のmutingには8桁hex alpha（`#c084fcaa`）を使用
 
 ### Jinja側の処理
-- Jinjaでは`「」`除去のみ（`| replace('「','') | replace('」','')`）
+- Jinjaでは`「」`除去のみ
 - `| replace('、','<br>')`等はしない（JSと競合するため）
 - `| safe`も不要
+- KPの`**`マーカーはJinja側で除去しない（JSの`kpBold`が`.kp-point`に変換するため）
 
-## 画像生成
+## KPパース（readings.py）のルール（セッション9で改修）
 
-### 背景画像（DALL-E 3）
-- リーディング生成時にバックグラウンドで自動生成
-- テキストなし、背景のみ
-- サイズ: 1024x1792、品質: hd
-- HTMLのテキストがその上にオーバーレイ
+### key_pointsの構築
+- **最初の`**...**`standalone行のみ** → `key_points[0]`（キャッチコピー）
+- 以降の`**...**`standalone行 → **スキップ**（サブヘッダーであり、KPカードにしない）
+- `- `で始まるbullet行 → `key_points[1:]`
+- `key_points[:5]`で最大5件（catchcopy + KP最大4枚）
 
-### 保存ボタン（html2canvas）
-- 「✦ 占いの結果を保存する」ボタン
-- html2canvasでポスター部分をスクリーンショット→PNGダウンロード
-- キャプチャ時にボタン・スクロールプロンプトを一時非表示
+### detail_bodyの構築
+- bullet行（`- `, `* `）→ スキップ（KPカードに表示済み）
+- standalone bold行（`**...**`）→ `枚目`か`からのメッセージ`を含まない限りスキップ
+- **indented行**（`  `や`\t`で始まる）→ スキップ（改善策等の continuation line）
+- `---`行 → スキップ
+- `|`行（テーブル）→ スキップ
+- 空行 → 直前が空行でなければセパレーターとして保持（タロットカード区切り用）
 
-### GPT Image API（gpt-image-1）の注意
-- URLではなくbase64（`b64_json`）で返す。`.url`はNone
-- サポートサイズ: 1024x1024, 1024x1536, 1536x1024, auto のみ
+### compat_themesのインデックス
+- timelineセクションをpopした場合、`compat_themes`からもtimelineを除去
+- これにより⑦=action、⑧=messageが正しく割り当てられる
 
-## タロットカードSVG（5種）
-- default（汎用）、priestess（女教皇）、star（星）、wands8（ワンドの8）、pentacles8（ペンタクルの8）、empress（女帝）
-- `getTarotKey(name)`で名前からマッチング
+## 相性リーディングのポスター
 
-## 相性リーディング専用レイアウト
-- `is_compat`フラグで分岐（`reading.type == "compatibility"`）
-- ポスター: ハイライトカード非表示、ベン図マンダラ、「COMPATIBILITY READING」ラベル
+- `COMPATIBILITY READING`ラベル
 - 名前表示: `profile.nickname × profile_2.nickname`
+- 生年月日表示: `1995.06.26 × 1999.05.07`
+- VennMandala: 3重同心円×2（160px、slowSpin）、中央に8角星
+- 背景画像: 個人リーディングと同じ`poster-dalle`（18%透過、ポスター全体）
+- タイトル: ダッシュで主題/副題に分割、主題=大文字(18-22px)白、副題=小文字(14px)モーヴ
 - セクショングリッド: 1列（個人は2列）
-- テーマカラー: 専用8色
 
-## ユーザーのデザインフィードバック傾向
+## 相性リーディングのプロンプト構造（セッション8で追加）
 
-- 改行ルールに厳格。コンテキストごとに異なるルールを期待。一律適用は絶対NG
-- 「ちゃちい」「安っぽい」に敏感 → 丸ゴシック、絵文字多用、カーブの多い枠はNG
-- 太字だけでなく、サイズ差・下線・色変えなどメリハリを求める
-- AskUserQuestionの選択肢UIは好まない → モックHTMLを見せて選んでもらう方が速い
-- 「ファイル作ったら開け」を忘れると怒られる
-- 実機（スマホ）確認を重視
-- 「見せて」と言われたら `open` コマンドでブラウザに出す
-- デザインの変更はまとめて実装してから見せること（途中で出すと混乱する）
-- **現在は2026年5月**。年の間違いに厳しい
-- ポスター画像生成は「背景のみ生成→HTMLで文字をオーバーレイ」。テキスト入りの画像生成はNG（文字化けする）
-- プロンプト変更は元のものを基準に最小限の差分で。大幅書き換えは嫌がる
+- 各セクション冒頭に**太字キャッチコピー**1行 → **箇条書き3〜5個（40文字以内）** → 短い本文
+- ①全体像: 占術5項目の順序指定、各項目「結果 → **二人にとっての意味（太字）**」
+- ②本質: 1人目と2人目を交互に同数で。小見出し(###)で分けない
+- ⑥タイムライン: 表形式（月|テーマ|アクション|注意点）→ 月別グリッドで表示
+- ⑦今すぐ: 二人でできる行動3つ / 各自の開運行動2つ / やめること3つ
+- スタイルルール追加:
+  - 入力済み情報（生年月日、星座名等）を繰り返さない
+  - 括弧（）は極力使わない
 
-## 今回やったこと
+## タロットカードSVG（セッション9で修復）
 
-### 改行・装飾ルール
-- breakShort/breakLabeled/breakBodyの仕様照合→不足パターン追加（：、／）
-- Jinja/JS競合解消（Jinjaはreplace削除、JSが統一処理）
-- ポスター要素にformatPosterElements()追加
-- 太字判定に副詞パターン追加
-- 全break関数+renderMarkdownBodyで「」『』除去
-- 「具体的にNつ」除去
+### JS側のレンダリングフロー
+1. `renderMarkdownBody`が`slug==='message'`かつ`_isTarotLine(t)`でタロット行を検出
+2. `TAROT_RE`: `/^\*\*(\d+枚目|.+からのメッセージ|女教皇|女帝|...)/` でマッチ
+3. `getTarotKey(name)`: カード名 → SVGテンプレートキー（priestess, empress, star, wands8, pentacles8, default）
+4. カード本文: 次のタロット行 or 空行まで収集。**`。`では改行しない**（`breakBody`を使わず、`「」`除去のみ）
 
-### レイアウト・UI
-- 「最後のメッセージ」タブ全幅→「今すぐやること」横並びに
-- タブSVGイラスト大胆リデザイン（130px、占いモチーフ、高彩度）
-- オーファン文字対策（text-wrap: balance）
-- スタートページメニュータイトル15px+nowrap
+### Python側の保持条件
+- `**女帝からのメッセージ：**` 等は`からのメッセージ`を含むため detail_body に保持
+- `**1枚目：女教皇**` 等は`枚目`を含むため detail_body に保持
+- 空行もセパレーターとして保持（カード間の区切りに必要）
 
-### ポスター・画像
-- gpt-image-1のbase64レスポンス対応
-- 保存方式変更: DALL-E 3背景+html2canvasでスクショ保存
-- 「占いの結果を保存する」ボタンに変更
+## 今回やったこと（セッション9）
 
-### セクション名
-- 「最後のメッセージ」→「魂のメッセージ」（プロンプト+表示）
-- 「発信」除去
+### バグ修正8件（一括）
+1. **KP色分け方向の反転**: `kpBold`が結論をテーマ色にしていた → 結論=白`.kp-point`、本文=テーマ色+alpha`.kp-body`に修正
+2. **タロット行のdetail_body除外**: `**女帝からのメッセージ：**`が`枚目`チェックのみで除外されていた → `からのメッセージ`も保持条件に追加
+3. **compat_themesのズレ**: timeline pop後に⑧がaction slugになっていた → compat_themesからもtimeline除去
+4. **サブヘッダーのKPカード混入**: `**二人でできる行動：3つ**`等がKPカードに → 最初のbold行のみcatchcopy
+5. **空の「更に詳しく」**: detail_bodyが空なのにボタン表示 → Jinja条件で非表示
+6. **改善策のdetail_body漏出**: indented continuation行がorphanedに → `bl.startswith('  ')`でスキップ
+7. **タロット本文の`。`改行**: `breakBody`適用で不自然 → `「」`除去のみに変更
+8. **タロットカードbodyの✦チェック**: 第3カード本文が`✦`で始まる場合にスキップされていた → ✦チェック除去
 
-### 相性リーディング
-- 専用レイアウト（1列、ハイライト非表示、ベン図、専用テーマカラー）
-- profile_2のロード追加
-- ポスター名を「名前 × 名前」表示に
+### CSSデザイン
+- `.kp-point` (結論: 白、太字)、`.kp-body` (本文: テーマ色+alpha)、`.kp-sep` (〰セパレーター) 追加
 
-### タロット
-- ペンタクルの8、女帝のSVG追加
+### デプロイ
+- コミット `6c065b6` → GitHub push → Render自動デプロイ
 
 ## 現在の状態
 
 - **サーバー**: `localhost:8000`で動作中
-- **本番**: Renderにデプロイ済み（最新コミット: fe5aa78以降）
-- **結果ページ**: 改行・太字ルール実装完了、全関数で「」除去済み
-- **相性リーディング**: 専用レイアウト実装済み
-- **未コミット**: docs/reflections/2026-05-12.md、HANDOFF.md
+- **Render**: pushしてデプロイ中（ビルド完了は未確認）
+- **最新の相性リーディング**: reading ID 14（新プロンプトで生成済み）
+- **未コミット変更**: prompts.py（前セッションの変更）、HANDOFF.md
+
+### 確認済み
+- ✅ ①KP色分け（技術テキスト=控えめ、結論=白）
+- ✅ ②人物グルーピング（Yuna/びー分離）
+- ✅ ⑧タロットカードSVG（女帝/星/ペンタクルス表示、本文一行流し）
+- ✅ テーマ色のズレ修正（⑧=message slug）
+- ✅ 空セクションの「更に詳しく」非表示
+- ✅ 〰セパレーター追加
+
+### 未確認
+- ❓ Renderデプロイ完了
+- ❓ 個人リーディング（魂のリーディング）への影響
+- ❓ iPhone実機表示
 
 ## 未完了・次にやること
 
-### 最優先: スマホ実機確認
-1. **iPhone 15での全ページ目視確認** — 改行・オーファン・レイアウトずれ
-2. **相性リーディング全セクション展開** — 1列グリッドの表示確認
-3. **html2canvas保存テスト** — 実機でのスクショ品質・レイアウトずれ
+### 最優先: 確認作業
+1. **Renderデプロイ完了確認** — `fortune-reading-app.onrender.com/reading/14` を確認
+2. **個人リーディングへの影響確認** — KPパース変更（catchcopy_found等）が個人リーディングを壊していないか
+3. **prompts.pyのコミット** — 未コミットの変更がある（前セッション分の可能性）
+
+### デザイン改善
+4. **タロットカードアニメーション** — 紙飛行機のようにくるくる飛んでくるアニメーション（ユーザー要望）
 
 ### リーディング品質
-4. **新規リーディング生成テスト** — 新プロンプト（2026年、九星気学先頭、絵文字排除、魂のメッセージ）の出力確認
-5. **仕事・お金のタイトル確認** — 新規生成で「発信」が出ないか
-
-### デザイン
-6. **タブのアニメーション追加** — ユーザーが「もっと工夫」を求めていた
-
-### インフラ
-7. **Render Diskの手動追加** — /dataに1GBディスク（デプロイのたびにDBが消える）
-8. **コミット** — docs/reflections + HANDOFF.md
-
-### 決済
-9. **決済の再導入** — Stripe/PayPal審査完了後に再導入
+5. **新規相性リーディング生成テスト** — 括弧不使用、入力情報繰り返し禁止が効いているか
+6. **iPhone実機確認** — 改行・レイアウト・タップ操作
 
 ## 注意点・ハマりポイント
 
-- **reading.jsのキャッシュ**: JSを変更したら`?v=N`をテンプレートのscriptタグで更新するか、Cmd+Shift+Rでハードリフレッシュ
+- **U+2500のダッシュ**: Claude APIが生成する`──`はU+2500（BOX DRAWINGS LIGHT HORIZONTAL）。U+2014（EM DASH）ではない。正規表現に必ず含めること
+- **readings.pyのKPパース**: `**`は除去しない。JSの`kpBold`が`**`→`.kp-point`変換に使用。ただし**最初のstandalone bold行のみcatchcopy**、以降はスキップ
+- **JS実行順序**: `groupPersonCards`（DOM再構築）→ `formatKeyPoints`（テキスト整形）の順。逆にするとラベル検出が壊れる
+- **`_clean`に`：`を入れない**: breakBodyで`：`が改行になると本文が断片化する。`：`→改行はbreakShortとbreakLabeledだけ
 - **改行ルールは文脈依存**: キャッチコピーと本文で`、`の扱いが真逆。一律適用は破綻する
-- **Jinja replaceとJS textContentの競合**: Jinjaで`<br>`に変換すると、JSのtextContentで句読点が消える。Jinjaでは「」除去のみ
-- **gpt-image-1はbase64で返す**: `.url`はNone。`b64_json`をデコードして保存。サイズは1024x1536まで
-- **text-wrap: balanceが日本語オーファン対策に有効**: word-break: keep-allは日本語に効かない
-- **相性リーディングのprofile_2**: selectinloadで明示的にロードしないとNone
-- **section_themes配列のインデックス**: セクションをpopすると後続のテーマカラーがズレる。相性は専用テーマ配列を使用
-- **bg-layerにpointer-events: none必須**: ないとスクロールやクリックが奪われる
+- **CSS opacity は子要素に乗算**: `opacity: .7`の親の中で子に`opacity: 1`しても0.7のまま。色のmutingには`color: #c084fcaa`（8桁hex alpha）を使う
+- **compat_themesとtimeline pop**: timeline sectionをpopしたら、compat_themesからもtimeline entryを除去しないと⑦⑧のslugがずれる
+- **タロット行の保持条件**: `**...**`でも`枚目`or`からのメッセージ`を含む行はdetail_bodyに保持。空行もセパレーターとして保持
+- **indented continuation line**: Pythonで`bl.startswith('  ')`（strip前）でチェック。`bl.strip()`するとインデント情報が失われる
+- **サイズ統一ルール**: 複数行に分かれたとき、行ごとにサイズを変えない。最長行のサイズに全行を統一（小さい方に合わせる）
+- **ポイントとキーワードの区別**: KPカード=色で区別（kpBold→.kp-point白）。「更に詳しく」内の太字=サイズで区別（styleBold→.kw-hl）。逆にしない
+- **ブラウザキャッシュ**: JSを変更したら`?v=N`をURLに付けるかCmd+Shift+Rでハードリフレッシュ
+- **fortune-appのサーバー**: ポート8000で別アプリ（dispatch-app）が動いていることがある。`lsof -i :8000`で確認してから起動
 - **ユーザーの年指定**: 現在は2026年5月。2025年のデータが出ると怒られる
+- **ユーザーのデザインフィードバック傾向**: 改行ルールに極めて厳格。「直った」と報告する前に必ず実際のレンダリングを検証すること。場当たり修正を嫌う。問題を複数報告されたら即座に全件把握→一括修正
 
 ## 参照ファイル
+- Figma Make handoff: `figma-make-handoff.md`
+- Figma Make URL: `https://www.figma.com/make/m6t0jZEGUsCa9r2NjOyJnW/Improve-Compatibility-Reading-Design`
+- 反省ログ: `docs/reflections/2026-05-13.md`, `docs/reflections/2026-05-13_2.md`
 - 設計書(Aura): `docs/superpowers/specs/2026-05-10-aura-redesign.md`
 - 実装計画(Aura): `docs/superpowers/plans/2026-05-10-aura-redesign.md`
-- 反省ログ: `docs/reflections/2026-05-11.md`, `docs/reflections/2026-05-12.md`
-- フォント比較モック: `.superpowers/brainstorm/font-comparison-aura.html`
-- タブイラストCSS: `app/static/images/tab-illustrations.css`
-- 参照画像: `/Users/kousuke/fortune-app/HHpHDDyasAAy_E6.jpeg`
 
 ## 次回の開き方
 
 ```
-handoff.mdを見て占いアプリの続きをして。
-スマホ実機で全ページ確認。新規リーディング生成テスト。
+HANDOFF.mdを読んで占いアプリの続きをして。
+まずRenderデプロイが完了しているか確認して、本番の reading/14 を開いて表示確認。
+次に個人リーディング（IDは1〜13のどれか）もブラウザで開いてKPパース変更の影響がないか確認。
+問題なければタロットカードの飛んでくるアニメーションに着手。
 ```

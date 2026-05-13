@@ -25,11 +25,11 @@
     </div>
     <div class="tarot-mandala compat-mandala">
       <svg viewBox="0 0 200 200" fill="none">
-        <circle cx="75" cy="100" r="50" stroke="#c084fc" stroke-width="2" opacity=".6"/>
-        <circle cx="75" cy="100" r="40" stroke="#a78bfa" stroke-width="1.5" opacity=".4"/>
+        <circle cx="75" cy="100" r="50" stroke="#d4a0ff" stroke-width="2" opacity=".6"/>
+        <circle cx="75" cy="100" r="40" stroke="#c4b5fd" stroke-width="1.5" opacity=".4"/>
         <circle cx="75" cy="100" r="30" stroke="#e9d5ff" stroke-width="1" opacity=".3"/>
-        <circle cx="125" cy="100" r="50" stroke="#f0abfc" stroke-width="2" opacity=".6"/>
-        <circle cx="125" cy="100" r="40" stroke="#c084fc" stroke-width="1.5" opacity=".4"/>
+        <circle cx="125" cy="100" r="50" stroke="#f5c6ff" stroke-width="2" opacity=".6"/>
+        <circle cx="125" cy="100" r="40" stroke="#d4a0ff" stroke-width="1.5" opacity=".4"/>
         <circle cx="125" cy="100" r="30" stroke="#e9d5ff" stroke-width="1" opacity=".3"/>
         <path d="M100,90 L102,96 L108,100 L102,104 L100,110 L98,104 L92,100 L98,96 Z" fill="#FAF5FF" opacity=".9"/>
         <circle cx="75" cy="100" r="2" fill="#F5F0FF" opacity=".6"/>
@@ -379,8 +379,8 @@ function renderMarkdownBody(el) {
 }
 
 // ===== KPカード（結論=白/目立つ、技術テキスト=テーマ色/控えめ） =====
-function kpBold(html) {
-  return html.replace(/\*\*([^*\n]+)\*\*/g, '<span class="kp-point">$1</span>');
+function kpBold(html, color) {
+  return html.replace(/\*\*([^*\n]+)\*\*/g, '<span class="kp-point" style="color:'+color+'">$1</span>');
 }
 
 function formatKeyPoints() {
@@ -388,13 +388,14 @@ function formatKeyPoints() {
     var text = el.textContent, color = el.dataset.color || '#d8b4fe';
     if (text.indexOf('：') !== -1) {
       var p = text.split('：'), lbl = p[0], rest = p.slice(1).join('：');
-      rest = kpBold(rest);
+      lbl = lbl.replace(/\*\*/g, '');
+      rest = kpBold(rest, color);
       rest = breakShort(rest);
-      el.innerHTML = '<span class="kp-label" style="color:'+color+'">'+lbl+'</span><span class="kp-sep" style="color:'+color+'">〰</span><span class="kp-body" style="color:'+color+'aa">'+rest+'</span>';
+      el.innerHTML = '<span class="kp-label" style="color:'+color+'">'+lbl+'</span><span class="kp-sep" style="color:'+color+'">〰</span><span class="kp-body" style="color:'+color+'">'+rest+'</span>';
     } else {
-      var html = kpBold(text);
+      var html = kpBold(text, color);
       html = breakShort(html);
-      el.innerHTML = '<span class="kp-body" style="color:'+color+'aa">'+html+'</span>';
+      el.innerHTML = '<span class="kp-body" style="color:'+color+'">'+html+'</span>';
     }
   });
 }
@@ -407,7 +408,7 @@ function formatCatchcopies() {
     var parts = broken.split('<br>');
     var maxLen = 0;
     parts.forEach(function(p){ var c = p.trim(); if(c.length > maxLen) maxLen = c.length; });
-    var sz = maxLen<=8?24 : maxLen<=14?20 : 17;
+    var sz = maxLen<=8?24 : maxLen<=14?20 : 16;
     el.innerHTML = parts.map(function(p) {
       var clean = p.trim();
       if (!clean) return '';
@@ -481,7 +482,7 @@ function groupPersonCards() {
       groups[name].push(card);
     });
     if (order.length !== 2) return;
-    var colors = ['#c084fc', '#f0abfc'];
+    var colors = ['#d4a0ff', '#f5c6ff'];
     var container = cards[0].parentNode;
     cards.forEach(function(c) { c.style.display = 'none'; });
     order.forEach(function(name, gi) {
