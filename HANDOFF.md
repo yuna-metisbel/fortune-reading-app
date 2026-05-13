@@ -1,13 +1,13 @@
-# セッション引き継ぎ — 占いリーディングWebアプリ（セッション9後）
+# セッション引き継ぎ — 占いリーディングWebアプリ（セッション10後）
 
 ## プロジェクト概要
-生年月日等から6つの占術体系（西洋占星術・数秘術・九星気学・六星占術・四柱推命・タロット）を統合した実用型リーディングを生成するWebアプリ。セッション9でKP色分け・タロットSVG・テーマ色ズレ・空セクション等8件のバグを一括修正しRenderにデプロイ済み。
+生年月日等から6つの占術体系（西洋占星術・数秘術・九星気学・六星占術・四柱推命・タロット）を統合した実用型リーディングを生成するWebアプリ。セッション10でKPカード表示改善・テーマ色コントラスト向上・iOS Safari word-break対応等を実施。
 
 ## 所在地
 - ローカル: `/Users/kousuke/fortune-app/`
 - GitHub: `https://github.com/yuna-metisbel/fortune-reading-app` (**public**)
 - 本番: `https://fortune-reading-app.onrender.com`
-- Render: 有料プラン
+- Render: 有料プラン（persistent disk `/data/fortune.db`）
 
 ## 技術スタック
 FastAPI + Jinja2 + SQLite(aiosqlite) + Claude API(Sonnet) + DALL-E 3 + GPT Image API + html2canvas + Stripe/PayPal
@@ -25,7 +25,7 @@ fortune-app/
 ├── tests/
 ├── docs/superpowers/specs/
 ├── docs/superpowers/plans/
-├── docs/reflections/ (2026-05-11.md, 2026-05-12.md, 2026-05-13.md, 2026-05-13_2.md)
+├── docs/reflections/ (2026-05-11.md, 2026-05-12.md, 2026-05-13.md, 2026-05-13_2.md, 2026-05-13_3.md)
 ├── figma-make-handoff.md
 └── requirements.txt, Procfile, render.yaml, .env
 ```
@@ -40,40 +40,40 @@ fortune-app/
 | 本文 | Noto Sans JP (G) | 一般テキスト、ラベル |
 | ラベル（英字） | JetBrains Mono | PERSONALITY, SOUL READING 等 |
 
-## カラーパレット
+## カラーパレット（セッション10で改定）
 
 - 背景: #352466 〜 #4a3590
 - テキスト: #F5F0FF（メイン）、#D8B4FE（サブ）
-- アクセント: #E9D5FF（モーヴ）、#F0ABFC（ピンク）、#A78BFA（ラベンダー）
-- 禁止色: オレンジ・暖色系・ゴールド(#FFD700)
+- アクセント: #E9D5FF（モーヴ）、#F5C6FF（ピンク ← 旧#F0ABFC）、#C4B5FD（ラベンダー ← 旧#A78BFA）
+- 禁止色: オレンジ・暖色系・ゴールド(#FFD700)・純白(#FFFFFF)
 
-## セクションテーマカラー（個人リーディング・10色）
+## セクションテーマカラー（セッション10で明度UP）
 
-| セクション | slug | 色 |
-|-----------|------|-----|
-| 全体要約 | summary | #a78bfa |
-| 性格・本質 | personality | #c084fc |
-| 才能・強み | strength | #818cf8 |
-| 注意点・課題 | caution | #f472b6 |
-| 仕事・お金 | career | #34d399 |
-| 恋愛・人間関係 | love | #f0abfc |
-| 今年のテーマ | yearly | #60a5fa |
-| 月別の流れ | monthly | #a78bfa |
-| 今すぐやること | action | #fbbf24 |
-| 魂のメッセージ | message | #e9d5ff |
+### 個人リーディング（10色）
+| セクション | slug | 色 | 旧色 |
+|-----------|------|-----|------|
+| 全体要約 | summary | #c4b5fd | ~~#a78bfa~~ |
+| 性格・本質 | personality | #d4a0ff | ~~#c084fc~~ |
+| 才能・強み | strength | #a5b4fc | ~~#818cf8~~ |
+| 注意点・課題 | caution | #f9a8d4 | ~~#f472b6~~ |
+| 仕事・お金 | career | #34d399 | (変更なし) |
+| 恋愛・人間関係 | love | #f5c6ff | ~~#f0abfc~~ |
+| 今年のテーマ | yearly | #60a5fa | (変更なし) |
+| 月別の流れ | monthly | #c4b5fd | ~~#a78bfa~~ |
+| 今すぐやること | action | #fbbf24 | (変更なし) |
+| 魂のメッセージ | message | #e9d5ff | (変更なし) |
 
-## セクションテーマカラー（相性リーディング・8色）
-
-| セクション | slug | 色 |
-|-----------|------|-----|
-| 二人の全体像 | overview | #c084fc |
-| それぞれの本質 | essence | #a78bfa |
-| 相性分析 | chemistry | #f0abfc |
-| 関係の課題 | challenge | #f472b6 |
-| 恋愛アドバイス | love | #e9d5ff |
-| 今年のタイムライン | timeline | #60a5fa |
-| 今すぐやること | action | #fbbf24 |
-| 魂のメッセージ | message | #34d399 |
+### 相性リーディング（8色）
+| セクション | slug | 色 | 旧色 |
+|-----------|------|-----|------|
+| 二人の全体像 | overview | #d4a0ff | ~~#c084fc~~ |
+| それぞれの本質 | essence | #c4b5fd | ~~#a78bfa~~ |
+| 相性分析 | chemistry | #f5c6ff | ~~#f0abfc~~ |
+| 関係の課題 | challenge | #f9a8d4 | ~~#f472b6~~ |
+| 恋愛アドバイス | love | #e9d5ff | (変更なし) |
+| 今年のタイムライン | timeline | #60a5fa | (変更なし) |
+| 今すぐやること | action | #fbbf24 | (変更なし) |
+| 魂のメッセージ | message | #34d399 | (変更なし) |
 
 ※ timelineセクションがpopされた場合、compat_themesからもtimelineを除去してインデックスを揃える処理が入っている（セッション9で修正）
 
@@ -102,12 +102,15 @@ fortune-app/
 - 複数行に分かれた場合 → **最長行のサイズに統一（小さい方に合わせる）**
 - ポイント（KPカード） → **色で区別**（文字サイズ差❌）
 - キーワード（太字） → **文字サイズで区別**（色変え❌）
+- キャッチコピーのサイズ閾値: `maxLen<=8→24px、<=14→20px、それ以上→16px`
 
-### KPカード色分けルール（セッション9で実装）
-- **技術テキスト** = テーマ色 + alpha `aa`（控えめ） → `.kp-body`
-- **結論（`**...**`部分）** = `#FAF5FF`白（目立つ） → `.kp-point`
+### KPカード色分けルール（セッション10で改定）
+- **本文テキスト** = テーマ色フル不透明度 → `.kp-body`
+- **結論（`**...**`部分）** = テーマ色フル不透明度 + `font-weight:700` → `.kp-point`
+- **ラベル** = テーマ色 + opacity .8 → `.kp-label`（`**`マーカーはJSで除去）
 - ラベルとテキストの間に **〰** セパレーター → `.kp-sep`
-- CSS `opacity`は子要素に乗算されるので使わない。色のmutingには8桁hex alpha（`#c084fcaa`）を使用
+- `.kp-body`に `text-shadow: 0 0 16px rgba(233,213,255,.18)` でキラキラ感
+- CSS `opacity`は子要素に乗算されるので使わない。色のmutingには8桁hex alphaを使用
 
 ### Jinja側の処理
 - Jinjaでは`「」`除去のみ
@@ -115,7 +118,7 @@ fortune-app/
 - `| safe`も不要
 - KPの`**`マーカーはJinja側で除去しない（JSの`kpBold`が`.kp-point`に変換するため）
 
-## KPパース（readings.py）のルール（セッション9で改修）
+## KPパース（readings.py）のルール（セッション10で追加フィルタ）
 
 ### key_pointsの構築
 - **最初の`**...**`standalone行のみ** → `key_points[0]`（キャッチコピー）
@@ -126,6 +129,7 @@ fortune-app/
 ### detail_bodyの構築
 - bullet行（`- `, `* `）→ スキップ（KPカードに表示済み）
 - standalone bold行（`**...**`）→ `枚目`か`からのメッセージ`を含まない限りスキップ
+- **人物宛ヘッダー**（`^.{1,20}へ$`にマッチする行）→ スキップ（セッション10で追加）
 - **indented行**（`  `や`\t`で始まる）→ スキップ（改善策等の continuation line）
 - `---`行 → スキップ
 - `|`行（テーブル）→ スキップ
@@ -169,62 +173,63 @@ fortune-app/
 - `**1枚目：女教皇**` 等は`枚目`を含むため detail_body に保持
 - 空行もセパレーターとして保持（カード間の区切りに必要）
 
-## 今回やったこと（セッション9）
+## 今回やったこと（セッション10）
 
-### バグ修正8件（一括）
-1. **KP色分け方向の反転**: `kpBold`が結論をテーマ色にしていた → 結論=白`.kp-point`、本文=テーマ色+alpha`.kp-body`に修正
-2. **タロット行のdetail_body除外**: `**女帝からのメッセージ：**`が`枚目`チェックのみで除外されていた → `からのメッセージ`も保持条件に追加
-3. **compat_themesのズレ**: timeline pop後に⑧がaction slugになっていた → compat_themesからもtimeline除去
-4. **サブヘッダーのKPカード混入**: `**二人でできる行動：3つ**`等がKPカードに → 最初のbold行のみcatchcopy
-5. **空の「更に詳しく」**: detail_bodyが空なのにボタン表示 → Jinja条件で非表示
-6. **改善策のdetail_body漏出**: indented continuation行がorphanedに → `bl.startswith('  ')`でスキップ
-7. **タロット本文の`。`改行**: `breakBody`適用で不自然 → `「」`除去のみに変更
-8. **タロットカードbodyの✦チェック**: 第3カード本文が`✦`で始まる場合にスキップされていた → ✦チェック除去
-
-### CSSデザイン
-- `.kp-point` (結論: 白、太字)、`.kp-body` (本文: テーマ色+alpha)、`.kp-sep` (〰セパレーター) 追加
+### バグ修正・UI改善（10件）
+1. **KPラベル`**`マーカー除去**: `formatKeyPoints()`内でラベル部分から`**`をstrip
+2. **KPインライン太字の色変更**: 白(#FAF5FF)→テーマ色フル不透明度に変更。コントラスト過剰を解消
+3. **「○○へ」孤立ラベルフィルタ**: `^.{1,20}へ$`パターンの行をdetail_bodyから除外
+4. **word-break対応**: `auto-phrase`のみ残し（keep-allは日本語でオーバーフローを起こすため削除）
+5. **キャッチコピーフォント**: 長い行の閾値 17→16px
+6. **テーマ色5色をライトパステルに**: コントラスト比3.2-3.5:1 → 4.7-7.0:1に改善
+7. **KP body alpha除去**: テーマ色をフル不透明度で表示（視認性大幅向上）
+8. **KP label opacity**: .6→.8に変更
+9. **KP bodyテキストグロウ**: `text-shadow: 0 0 16px rgba(233,213,255,.18)` でキラキラ感追加
+10. **CSS変数・グラデーション色更新**: --glow-soft, --glow-pink, --accent-pink, ボタングラデーション
 
 ### デプロイ
-- コミット `6c065b6` → GitHub push → Render自動デプロイ
+- コミット `366c15c` + `7230d6a` → GitHub push → Render自動デプロイ
 
 ## 現在の状態
 
 - **サーバー**: `localhost:8000`で動作中
-- **Render**: pushしてデプロイ中（ビルド完了は未確認）
-- **最新の相性リーディング**: reading ID 14（新プロンプトで生成済み）
-- **未コミット変更**: prompts.py（前セッションの変更）、HANDOFF.md
+- **Render**: pushしてデプロイ中（デプロイ直後に全reading 404になっている。要確認）
+- **最新コミット**: `7230d6a` (word-break: keep-all削除)
 
-### 確認済み
-- ✅ ①KP色分け（技術テキスト=控えめ、結論=白）
-- ✅ ②人物グルーピング（Yuna/びー分離）
-- ✅ ⑧タロットカードSVG（女帝/星/ペンタクルス表示、本文一行流し）
-- ✅ テーマ色のズレ修正（⑧=message slug）
-- ✅ 空セクションの「更に詳しく」非表示
-- ✅ 〰セパレーター追加
+### 確認済み（ローカル）
+- ✅ KPラベルの`**`マーカー除去
+- ✅ KPインライン太字がテーマ色で表示
+- ✅ テーマ色5色の明度UP（ローカルで視認性確認済み）
+- ✅ KP bodyフル不透明度 + テキストグロウ
+- ✅ 全リーディング（ID 1-14）正常ロード
+- ✅ 個人リーディングへのKPパース変更の影響なし
 
 ### 未確認
-- ❓ Renderデプロイ完了
-- ❓ 個人リーディング（魂のリーディング）への影響
-- ❓ iPhone実機表示
+- ❓ **Renderデプロイ完了** — デプロイ後に全reading 404。DBパスか再起動の問題の可能性
+- ❓ **本番でのポスター背景画像(poster-dalle)** — ユーザーから「消えた？」と報告あり
+- ❓ **iPhone実機でのword-break** — keep-all削除後の表示
+- ❓ **魂のリーディング（個人）のサイズ** — ユーザーから「サイズミス」報告あり
 
 ## 未完了・次にやること
 
-### 最優先: 確認作業
-1. **Renderデプロイ完了確認** — `fortune-reading-app.onrender.com/reading/14` を確認
-2. **個人リーディングへの影響確認** — KPパース変更（catchcopy_found等）が個人リーディングを壊していないか
-3. **prompts.pyのコミット** — 未コミットの変更がある（前セッション分の可能性）
+### 最優先: Renderデプロイ確認
+1. **Renderダッシュボードでデプロイ状態確認** — ビルドログ・エラー確認
+2. **全reading 404の原因調査** — DBパス、persistent disk、再起動後のDB作成
+3. **ポスター背景画像の確認** — poster-dalleが表示されるか
 
 ### デザイン改善
 4. **タロットカードアニメーション** — 紙飛行機のようにくるくる飛んでくるアニメーション（ユーザー要望）
+5. **魂のリーディングのサイズ調整** — ユーザーから報告あり、具体的な箇所は未特定
 
 ### リーディング品質
-5. **新規相性リーディング生成テスト** — 括弧不使用、入力情報繰り返し禁止が効いているか
-6. **iPhone実機確認** — 改行・レイアウト・タップ操作
+6. **新規相性リーディング生成テスト** — 括弧不使用、入力情報繰り返し禁止が効いているか
+7. **iPhone実機確認** — 改行・レイアウト・タップ操作
 
 ## 注意点・ハマりポイント
 
 - **U+2500のダッシュ**: Claude APIが生成する`──`はU+2500（BOX DRAWINGS LIGHT HORIZONTAL）。U+2014（EM DASH）ではない。正規表現に必ず含めること
 - **readings.pyのKPパース**: `**`は除去しない。JSの`kpBold`が`**`→`.kp-point`変換に使用。ただし**最初のstandalone bold行のみcatchcopy**、以降はスキップ
+- **KPラベルの`**`除去**: `formatKeyPoints()`内でラベル（`：`の前）から`lbl.replace(/\*\*/g,'')`で除去。kpBoldは適用されないため必須
 - **JS実行順序**: `groupPersonCards`（DOM再構築）→ `formatKeyPoints`（テキスト整形）の順。逆にするとラベル検出が壊れる
 - **`_clean`に`：`を入れない**: breakBodyで`：`が改行になると本文が断片化する。`：`→改行はbreakShortとbreakLabeledだけ
 - **改行ルールは文脈依存**: キャッチコピーと本文で`、`の扱いが真逆。一律適用は破綻する
@@ -233,16 +238,19 @@ fortune-app/
 - **タロット行の保持条件**: `**...**`でも`枚目`or`からのメッセージ`を含む行はdetail_bodyに保持。空行もセパレーターとして保持
 - **indented continuation line**: Pythonで`bl.startswith('  ')`（strip前）でチェック。`bl.strip()`するとインデント情報が失われる
 - **サイズ統一ルール**: 複数行に分かれたとき、行ごとにサイズを変えない。最長行のサイズに全行を統一（小さい方に合わせる）
-- **ポイントとキーワードの区別**: KPカード=色で区別（kpBold→.kp-point白）。「更に詳しく」内の太字=サイズで区別（styleBold→.kw-hl）。逆にしない
+- **ポイントとキーワードの区別**: KPカード=色で区別（kpBold→.kp-point）。「更に詳しく」内の太字=サイズで区別（styleBold→.kw-hl）。逆にしない
 - **ブラウザキャッシュ**: JSを変更したら`?v=N`をURLに付けるかCmd+Shift+Rでハードリフレッシュ
 - **fortune-appのサーバー**: ポート8000で別アプリ（dispatch-app）が動いていることがある。`lsof -i :8000`で確認してから起動
 - **ユーザーの年指定**: 現在は2026年5月。2025年のデータが出ると怒られる
 - **ユーザーのデザインフィードバック傾向**: 改行ルールに極めて厳格。「直った」と報告する前に必ず実際のレンダリングを検証すること。場当たり修正を嫌う。問題を複数報告されたら即座に全件把握→一括修正
+- **word-break: keep-allは日本語NG**: 日本語にはスペースがなく、文全体が1単語扱いになりテキストがオーバーフローする。`auto-phrase`のみ使い、Safariはデフォルトnormalにフォールバック
+- **テーマ色のコントラスト**: 暗い紫背景(#352466)上では、紫・ピンク系の色はコントラスト比4.5:1以上を確保すること。旧色(#c084fc等)は3.2:1で不足していた
+- **「○○へ」フィルタ**: detail_body構築時に`^.{1,20}へ$`パターンの行をスキップ。人物宛サブヘッダーが孤立テキストとして表示されるのを防止
 
 ## 参照ファイル
 - Figma Make handoff: `figma-make-handoff.md`
 - Figma Make URL: `https://www.figma.com/make/m6t0jZEGUsCa9r2NjOyJnW/Improve-Compatibility-Reading-Design`
-- 反省ログ: `docs/reflections/2026-05-13.md`, `docs/reflections/2026-05-13_2.md`
+- 反省ログ: `docs/reflections/2026-05-13.md`, `docs/reflections/2026-05-13_2.md`, `docs/reflections/2026-05-13_3.md`
 - 設計書(Aura): `docs/superpowers/specs/2026-05-10-aura-redesign.md`
 - 実装計画(Aura): `docs/superpowers/plans/2026-05-10-aura-redesign.md`
 
@@ -250,7 +258,7 @@ fortune-app/
 
 ```
 HANDOFF.mdを読んで占いアプリの続きをして。
-まずRenderデプロイが完了しているか確認して、本番の reading/14 を開いて表示確認。
-次に個人リーディング（IDは1〜13のどれか）もブラウザで開いてKPパース変更の影響がないか確認。
-問題なければタロットカードの飛んでくるアニメーションに着手。
+まずRenderデプロイの状態を確認（全reading 404問題の調査）。
+次にポスター背景画像が消えた問題、魂のリーディングのサイズミスを調査・修正。
+問題解決後、タロットカードの飛んでくるアニメーションに着手。
 ```
