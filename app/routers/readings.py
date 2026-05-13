@@ -479,13 +479,16 @@ async def reading_result(
             title = lines[0].strip()
             body = lines[1].strip() if len(lines) > 1 else ""
             key_points = []
+            catchcopy_found = False
             for line in body.split('\n'):
-                line = line.strip()
-                if line.startswith('- ') or line.startswith('* '):
-                    point = line[2:].replace('**', '').strip('「」')
+                stripped = line.strip()
+                if stripped.startswith('- ') or stripped.startswith('* '):
+                    point = stripped[2:].strip('「」')
                     key_points.append(point)
-                elif line.startswith('**') and line.endswith('**'):
-                    key_points.append(line.strip('*').strip('「」'))
+                elif stripped.startswith('**') and stripped.endswith('**'):
+                    if not catchcopy_found:
+                        key_points.append(stripped.strip('*').strip('「」'))
+                        catchcopy_found = True
             clean_title = re.sub(r'^[①②③④⑤⑥⑦⑧⑨⑩]\s*', '', title)
             clean_title = clean_title.replace('・発信', '').replace('・発信力', '')
             if '最後のメッセージ' in clean_title:
@@ -496,17 +499,23 @@ async def reading_result(
             for bl in body_lines:
                 bl_s = bl.strip()
                 if not bl_s:
+                    if summary_paragraphs and summary_paragraphs[-1] != '':
+                        summary_paragraphs.append('')
                     continue
                 if bl_s.startswith('- ') or bl_s.startswith('* '):
                     continue
-                # Keep tarot card lines (e.g. **1枚目：...**)
-                if bl_s.startswith('**') and bl_s.endswith('**') and '枚目' not in bl_s:
+                if bl.startswith('  ') or bl.startswith('\t'):
                     continue
+                if bl_s.startswith('**') and bl_s.endswith('**'):
+                    if '枚目' not in bl_s and 'からのメッセージ' not in bl_s:
+                        continue
                 if bl_s.startswith('---'):
                     continue
                 if bl_s.startswith('|'):
                     continue
                 summary_paragraphs.append(bl_s)
+            while summary_paragraphs and summary_paragraphs[-1] == '':
+                summary_paragraphs.pop()
 
             sections.append({
                 "title": clean_title,
@@ -577,6 +586,8 @@ async def reading_result(
             {"slug": "action",    "color": "#fbbf24", "bg": "rgba(251,191,36,.12)"},
             {"slug": "message",   "color": "#34d399", "bg": "rgba(52,211,153,.12)"},
         ]
+        if monthly_data:
+            compat_themes = [t for t in compat_themes if t["slug"] != "timeline"]
         for i, section in enumerate(sections):
             theme = compat_themes[i] if i < len(compat_themes) else compat_themes[0]
             section["theme"] = theme

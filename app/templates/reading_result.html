@@ -21,15 +21,23 @@
     <div class="poster-label" style="animation:glowPulse 4s ease-in-out infinite">COMPATIBILITY READING</div>
     <div class="poster-meta">
       <div class="poster-name">{{ reading.profile.nickname if reading.profile else '' }} × {{ reading.profile_2.nickname if reading.profile_2 else '' }}</div>
+      <div class="poster-date">{{ reading.profile.birth_date.strftime('%Y.%m.%d') if reading.profile and reading.profile.birth_date else '' }} × {{ reading.profile_2.birth_date.strftime('%Y.%m.%d') if reading.profile_2 and reading.profile_2.birth_date else '' }}</div>
     </div>
-    <div class="tarot-mandala">
+    <div class="tarot-mandala compat-mandala">
       <svg viewBox="0 0 200 200" fill="none">
-        <circle cx="70" cy="100" r="50" stroke="rgba(240,171,252,.2)" stroke-width="1" fill="none"/>
-        <circle cx="130" cy="100" r="50" stroke="rgba(167,139,250,.2)" stroke-width="1" fill="none"/>
-        <ellipse cx="100" cy="100" rx="20" ry="45" fill="rgba(216,180,254,.08)" stroke="rgba(216,180,254,.15)" stroke-width=".8"/>
+        <circle cx="75" cy="100" r="50" stroke="#c084fc" stroke-width="2" opacity=".6"/>
+        <circle cx="75" cy="100" r="40" stroke="#a78bfa" stroke-width="1.5" opacity=".4"/>
+        <circle cx="75" cy="100" r="30" stroke="#e9d5ff" stroke-width="1" opacity=".3"/>
+        <circle cx="125" cy="100" r="50" stroke="#f0abfc" stroke-width="2" opacity=".6"/>
+        <circle cx="125" cy="100" r="40" stroke="#c084fc" stroke-width="1.5" opacity=".4"/>
+        <circle cx="125" cy="100" r="30" stroke="#e9d5ff" stroke-width="1" opacity=".3"/>
+        <path d="M100,90 L102,96 L108,100 L102,104 L100,110 L98,104 L92,100 L98,96 Z" fill="#FAF5FF" opacity=".9"/>
+        <circle cx="75" cy="100" r="2" fill="#F5F0FF" opacity=".6"/>
+        <circle cx="125" cy="100" r="2" fill="#F5F0FF" opacity=".6"/>
       </svg>
       <div class="tarot-center">✦</div>
     </div>
+    <div class="divider" style="margin:0 auto 20px;"><span class="divider-stars">✧ ✦ ✧</span></div>
     {% if sections %}
     {% set s0 = sections[0] if sections|length > 0 else none %}
     <div class="title-glass">
@@ -122,10 +130,12 @@
         </div>
         {% endfor %}
         {% endif %}
+        {% if section.detail_body %}
         <button class="read-more-toggle" onclick="toggleMore(this)" style="border-color:{{ theme.color }}40; color:{{ theme.color }}">✧ 更に詳しく</button>
         <div class="read-more-body">
           <div class="read-more-content" data-raw="{{ section.detail_body | e }}" data-color="{{ theme.color }}" data-slug="{{ theme.slug }}"></div>
         </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -202,8 +212,8 @@ var tarotSVGs = {
 function getTarotKey(name) {
   if (/女教皇|Priestess/i.test(name)) return 'priestess';
   if (/女帝|Empress/i.test(name)) return 'empress';
-  if (/星|Star/i.test(name)) return 'star';
-  if (/ペンタクル.*8|Eight.*Pentacle|8.*Pentacle/i.test(name)) return 'pentacles8';
+  if (/星(?!座)|Star/i.test(name)) return 'star';
+  if (/ペンタクル.*[78]|Eight.*Pentacle|8.*Pentacle|Seven.*Pentacle|7.*Pentacle/i.test(name)) return 'pentacles8';
   if (/ワンド.*8|Eight.*Wand|8.*Wand/i.test(name)) return 'wands8';
   return 'default';
 }
@@ -211,62 +221,101 @@ function getTarotKey(name) {
 // ===== 改行・太字ルール =====
 var PARTICLES = /を|が|に|で|は|の|と|も|から|まで|して|ている|ない|やすい|すぎ|よう|く$|ながら|つつ|ずつ|たび|ほど|だけ|ばかり/;
 
-// キャッチコピー・ハイライト・ラベルなしKP: 、。で改行、末尾、。削除
-function breakShort(s) {
+/*
+ * ===== 改行ルール（全ページ共通） =====
+ *
+ * 【全関数共通の除去・変換】(_clean)
+ *  - 「」『』 → 除去
+ *  - ダッシュ連続（──、——、ーー、━━、U+2500×2 等すべて） → 改行
+ *  - 半角スペース付きemダッシュ（ — ） → 改行
+ *  - ）の後に文字が続く場合 → ）の後で改行
+ *  - ／ → 改行
+ *
+ * 【breakShort】キャッチコピー・ハイライト・ラベルなしKP・ポスター要素
+ *  - 共通 + ：→改行  、→改行  。→改行（末尾の、。は削除）
+ *
+ * 【breakLabeled】「更に詳しく」内のラベル付きリスト項目の値部分のみ
+ *  - 共通 + ：→改行（、。はそのまま）
+ *  ※ KPカードのラベル付き値にはbreakShortを使用（、。も改行）
+ *
+ * 【breakBody】「更に詳しく」本文
+ *  - 共通 + 。→改行（。は残す）（、：はそのまま）
+ *
+ * 【formatCompatTitle】相性リーディングのポスタータイトル
+ *  - ダッシュで主題/副題に分割 → 各パートにbreakShort適用
+ *  - 主題=大文字(22px)、副題=小文字(14px)で差別化
+ */
+
+var DASHES = /[─━—―‒–ーｰ─]{2,}/g;
+
+var NO_HEAD = /^[をがにでではのともからまでよりへやかなばてし×・]/;
+
+function _clean(s) {
   s = s.replace(/[「」『』]/g, '');
+  s = s.replace(DASHES, '<br>');
   s = s.replace(/ — /g, '<br>');
-  s = s.replace(/）(?=.)/g, '）<br>');
+  s = s.replace(/）(?!$)/g, function(m, offset, str) {
+    var next = str.charAt(offset + 1);
+    return NO_HEAD.test(next) ? '）' : '）<br>';
+  });
   s = s.replace(/／/g, '<br>');
+  return s;
+}
+
+function _fixHead(html) {
+  return html.replace(/<br>([をがにでではのともからまでよりへやかなばてし×・])/g, '$1');
+}
+
+function breakShort(s) {
+  s = _clean(s);
   s = s.replace(/：/g, '<br>');
   s = s.replace(/、/g, '<br>');
   s = s.replace(/。(?=.)/g, '<br>');
   s = s.replace(/[、。]+$/, '');
   s = s.replace(/(<br>)+$/, '');
-  return s;
+  s = _fixHead(s);
+  // 4文字以下の短い断片を前の行に結合
+  var parts = s.split('<br>');
+  var merged = [];
+  for (var i = 0; i < parts.length; i++) {
+    var clean = parts[i].replace(/<[^>]*>/g,'').trim();
+    if (clean.length <= 4 && merged.length > 0) {
+      merged[merged.length-1] += parts[i];
+    } else {
+      merged.push(parts[i]);
+    }
+  }
+  return merged.join('<br>');
 }
 
-// ラベル付きKPの値部分: ：／）—で改行、、。はそのまま
 function breakLabeled(s) {
-  s = s.replace(/[「」『』]/g, '');
-  s = s.replace(/ — /g, '<br>');
-  s = s.replace(/）(?=.)/g, '）<br>');
-  s = s.replace(/／/g, '<br>');
+  s = _clean(s);
   s = s.replace(/：/g, '<br>');
-  return s;
+  return _fixHead(s);
 }
 
-// 本文(更に詳しく): 。で改行、、はそのまま、：／）—で改行
 function breakBody(s) {
-  s = s.replace(/[「」『』]/g, '');
-  s = s.replace(/ — /g, '<br>');
-  s = s.replace(/）(?=.)/g, '）<br>');
-  s = s.replace(/／/g, '<br>');
-  s = s.replace(/：/g, '<br>');
+  s = _clean(s);
   s = s.replace(/。(?=.)/g, '。<br>');
-  return s;
+  return _fixHead(s);
 }
 
 // **太字** → 単語(≤8文字+助詞なし)=サイズ大+背景、フレーズ=下線+色
 function styleBold(html, C) {
   return html.replace(/\*\*([^*\n]+)\*\*/g, function(m, p1) {
     var isWord = p1.length <= 8 && !PARTICLES.test(p1);
-    var cls = isWord ? 'kw-hl kw-word' : 'kw-hl kw-phrase';
-    return '<strong class="'+cls+'" style="color:'+C+'">'+p1+'</strong>';
+    var sz = isWord ? '1.25em' : '1.1em';
+    return '<strong class="kw-hl" style="font-size:'+sz+'">'+p1+'</strong>';
   }).replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
 }
 
 // 短い行は大きく、長い行は小さく
 function sizeLines(html) {
-  var parts = html.split('<br>');
-  return parts.map(function(p) {
-    var clean = p.replace(/<[^>]*>/g,'').trim();
-    if (!clean) return '';
-    var len = clean.length;
-    var sz = len<=6?20 : len<=10?17 : len<=16?15 : 13;
-    var w = len<=10 ? 700 : 500;
-    return '<span class="sized-line" style="font-size:'+sz+'px;font-weight:'+w+'">'+p.trim()+'</span>';
-  }).filter(Boolean).join('<br>');
+  return html;
 }
+
+var TAROT_RE = /^\*\*(\d+枚目|.+からのメッセージ|女教皇|女帝|皇帝|星(?!座)|塔|月(?!星)|太陽|世界|愚者|魔術師|力|隠者|運命|正義|節制|悪魔|死神|審判|吊|戦車|恋人|教皇|ワンド|ペンタクル|ソード|カップ)/;
+function _isTarotLine(t) { return TAROT_RE.test(t); }
 
 // ===== 「更に詳しく」レンダラー（本文ルール: 。で改行、、はそのまま） =====
 function renderMarkdownBody(el) {
@@ -276,6 +325,7 @@ function renderMarkdownBody(el) {
   if (!raw) return;
 
   raw = raw.replace(/[「」『』]/g, '');
+  raw = raw.replace(DASHES, ' ');
   var lines = raw.split('\n'), html = '', inList = false;
   for (var i = 0; i < lines.length; i++) {
     var t = lines[i].trim();
@@ -302,10 +352,20 @@ function renderMarkdownBody(el) {
       var pt = t.replace(/\*\*/g,'');
       if (/^(今の|が自分|あなたの|準備は|人生テーマ)/.test(pt)) {
         html += '<div class="reading-callout"><p>'+breakBody(t)+'</p></div>';
-      } else if (slug==='message' && /^\*\*\d+枚目/.test(t)) {
-        var cn = t.replace(/\*\*/g,'');
-        html += '<div class="tarot-card-row"><p class="tarot-card-name" style="color:'+C+'">'+t+'</p>';
-        html += '<div class="tarot-card-illust">'+(tarotSVGs[getTarotKey(cn)]||tarotSVGs['default'])+'</div></div>';
+      } else if (slug==='message' && _isTarotLine(t)) {
+        var cn = t.replace(/\*\*/g,'').replace(/からのメッセージ.*/, '').replace(/：$/, '').replace(/\d+枚目[：:]?\s*/, '');
+        var cardBody = '';
+        while (i + 1 < lines.length) {
+          var next = lines[i+1].trim();
+          if (!next || /^---$/.test(next) || _isTarotLine(next)) break;
+          var cleaned = next.replace(/[「」『』]/g, '');
+          cardBody += '<p style="font-size:13px;line-height:2.0;color:rgba(245,240,255,.85)">'+cleaned+'</p>';
+          i++;
+        }
+        html += '<div class="tarot-card-row"><p class="tarot-card-name" style="color:'+C+'">'+styleBold(t, C)+'</p>';
+        html += '<div class="tarot-card-illust">'+(tarotSVGs[getTarotKey(cn)]||tarotSVGs['default'])+'</div>';
+        if (cardBody) html += '<div class="tarot-card-body">'+cardBody+'</div>';
+        html += '</div>';
       } else if (/^✦/.test(pt)) {
         html += '<p class="rm-subhead" style="color:'+C+'">'+t+'</p>';
       } else {
@@ -318,19 +378,23 @@ function renderMarkdownBody(el) {
   el.innerHTML = html;
 }
 
-// ===== KPカード（ラベルあり→値は／）—で改行、ラベルなし→、。で改行） =====
+// ===== KPカード（結論=白/目立つ、技術テキスト=テーマ色/控えめ） =====
+function kpBold(html) {
+  return html.replace(/\*\*([^*\n]+)\*\*/g, '<span class="kp-point">$1</span>');
+}
+
 function formatKeyPoints() {
   document.querySelectorAll('.kp-text').forEach(function(el) {
     var text = el.textContent, color = el.dataset.color || '#d8b4fe';
     if (text.indexOf('：') !== -1) {
       var p = text.split('：'), lbl = p[0], rest = p.slice(1).join('：');
-      rest = breakLabeled(rest);
-      rest = sizeLines(rest);
-      el.innerHTML = '<span class="kp-label" style="color:'+color+'">'+lbl+'</span><br>'+rest;
+      rest = kpBold(rest);
+      rest = breakShort(rest);
+      el.innerHTML = '<span class="kp-label" style="color:'+color+'">'+lbl+'</span><span class="kp-sep" style="color:'+color+'">〰</span><span class="kp-body" style="color:'+color+'aa">'+rest+'</span>';
     } else {
-      var html = breakShort(text);
-      html = sizeLines(html);
-      el.innerHTML = html;
+      var html = kpBold(text);
+      html = breakShort(html);
+      el.innerHTML = '<span class="kp-body" style="color:'+color+'aa">'+html+'</span>';
     }
   });
 }
@@ -341,22 +405,54 @@ function formatCatchcopies() {
     var raw = el.textContent.trim();
     var broken = breakShort(raw);
     var parts = broken.split('<br>');
+    var maxLen = 0;
+    parts.forEach(function(p){ var c = p.trim(); if(c.length > maxLen) maxLen = c.length; });
+    var sz = maxLen<=8?24 : maxLen<=14?20 : 17;
     el.innerHTML = parts.map(function(p) {
       var clean = p.trim();
       if (!clean) return '';
-      var len = clean.length;
-      var sz = len<=8?24 : len<=14?20 : 17;
       return '<span style="display:block;font-size:'+sz+'px;line-height:1.5">'+clean+'</span>';
     }).filter(Boolean).join('');
   });
 }
 
 // ===== ポスター要素（poster-title, highlight-value, poster-message） =====
+function formatCompatTitle(el) {
+  var raw = el.textContent.trim();
+  raw = raw.replace(/[「」『』]/g, '');
+  // ダッシュ系で主題と副題に分割（──、——、ーー、 — すべて対応）
+  var halves = raw.split(/[─━—―‒–ーｰ]{2,}| — /).map(function(p){ return p.trim(); }).filter(Boolean);
+  if (halves.length < 2) halves = [raw];
+  // 各半分をbreakShortと同じルールで改行（、。：／で改行、末尾削除）
+  var html = '';
+  for (var h = 0; h < halves.length; h++) {
+    var s = halves[h];
+    s = s.replace(/[、。]+$/, '');
+    var broken = breakShort(s);
+    var lines = broken.split('<br>').filter(Boolean);
+    // 主題: 最長行に合わせてサイズ統一（小さい方に揃える）
+    var maxLen = 0;
+    for (var k = 0; k < lines.length; k++) { maxLen = Math.max(maxLen, lines[k].trim().length); }
+    var sz = h===0 ? (maxLen<=8 ? 22 : maxLen<=14 ? 20 : 18) : 14;
+    var w = h===0 ? 700 : 500;
+    var c = h===0 ? '#FAF5FF' : '#D8B4FE';
+    for (var j = 0; j < lines.length; j++) {
+      var mt = (h>0 && j===0) ? '8px' : '0';
+      html += '<span style="display:block;font-size:'+sz+'px;font-weight:'+w+';color:'+c+';line-height:1.6;margin-top:'+mt+'">'+lines[j].trim()+'</span>';
+    }
+  }
+  el.innerHTML = html;
+}
+
 function formatPosterElements() {
+  var isCompat = document.querySelector('.poster--compat');
   var title = document.querySelector('.poster-title');
   if (title) {
-    var raw = title.textContent.trim();
-    title.innerHTML = breakShort(raw);
+    if (isCompat) {
+      formatCompatTitle(title);
+    } else {
+      title.innerHTML = breakShort(title.textContent.trim());
+    }
   }
   document.querySelectorAll('.highlight-value').forEach(function(el) {
     var raw = el.textContent.trim();
@@ -369,9 +465,54 @@ function formatPosterElements() {
   }
 }
 
+function groupPersonCards() {
+  document.querySelectorAll('.section-content').forEach(function(content) {
+    var cards = content.querySelectorAll('.section-kp-card');
+    if (cards.length < 4) return;
+    var groups = {};
+    var order = [];
+    cards.forEach(function(card) {
+      var kp = card.querySelector('.kp-text');
+      if (!kp) return;
+      var text = kp.textContent;
+      if (text.indexOf('：') === -1) return;
+      var name = text.split('：')[0].trim();
+      if (!groups[name]) { groups[name] = []; order.push(name); }
+      groups[name].push(card);
+    });
+    if (order.length !== 2) return;
+    var colors = ['#c084fc', '#f0abfc'];
+    var container = cards[0].parentNode;
+    cards.forEach(function(c) { c.style.display = 'none'; });
+    order.forEach(function(name, gi) {
+      var wrap = document.createElement('div');
+      wrap.className = 'person-group';
+      wrap.style.cssText = 'border:1px solid '+colors[gi]+'30;border-radius:10px;padding:14px;margin-bottom:10px;background:rgba(255,255,255,.03)';
+      var header = document.createElement('div');
+      header.style.cssText = 'font-family:var(--font-label);font-size:12px;font-weight:700;color:'+colors[gi]+';letter-spacing:2px;margin-bottom:10px';
+      header.textContent = name;
+      wrap.appendChild(header);
+      groups[name].forEach(function(card) {
+        var clone = card.cloneNode(true);
+        clone.style.display = '';
+        var kpText = clone.querySelector('.kp-text');
+        if (kpText) {
+          var full = kpText.textContent;
+          var val = full.split('：').slice(1).join('：');
+          kpText.textContent = val;
+          kpText.dataset.color = colors[gi];
+        }
+        wrap.appendChild(clone);
+      });
+      container.insertBefore(wrap, cards[0]);
+    });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   formatPosterElements();
   document.querySelectorAll('.read-more-content').forEach(renderMarkdownBody);
+  groupPersonCards();
   formatKeyPoints();
   formatCatchcopies();
 });

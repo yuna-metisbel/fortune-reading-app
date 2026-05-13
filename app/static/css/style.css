@@ -611,6 +611,8 @@ img, svg { max-width: 100%; height: auto; }
 
 .tarot-mandala { width: 120px; height: 120px; margin: 0 auto 20px; position: relative; }
 .tarot-mandala svg { width: 100%; height: 100%; animation: slowSpin 60s linear infinite; }
+
+.compat-mandala { width: 160px; height: 160px; }
 .tarot-center {
   position: absolute; top: 50%; left: 50%;
   transform: translate(-50%,-50%);
@@ -852,8 +854,23 @@ img, svg { max-width: 100%; height: auto; }
   font-family: var(--font-label);
   font-size: 9px; font-weight: 700;
   letter-spacing: 2px;
-  display: block; margin-bottom: 4px;
+  display: block; margin-bottom: 2px;
   opacity: .6;
+}
+.kp-sep {
+  display: block;
+  font-size: 10px;
+  opacity: .25;
+  margin-bottom: 6px;
+  line-height: 1;
+}
+.kp-body {
+  display: block;
+  line-height: 1.8;
+}
+.kp-point {
+  color: #FAF5FF !important;
+  font-weight: 700;
 }
 .kp-val {
   font-family: var(--font-heading);
@@ -865,22 +882,7 @@ img, svg { max-width: 100%; height: auto; }
 .kw-hl {
   font-family: var(--font-emphasis);
   font-weight: 800;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-}
-.kw-hl.kw-word {
-  font-size: 1.2em;
-  padding: 1px 5px;
-  border-radius: 4px;
-  background: rgba(255,255,255,.08);
-}
-.kw-hl.kw-phrase {
-  font-size: 1em;
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
-  text-decoration-color: currentColor;
-  text-decoration-skip-ink: none;
+  color: var(--text-primary);
 }
 
 /* --- Read More internals --- */
