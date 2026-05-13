@@ -682,7 +682,6 @@ img, svg { max-width: 100%; height: auto; }
   font-family: var(--font-body);
   font-size: 14px; font-weight: 500;
   line-height: 2; text-align: center;
-  word-break: keep-all;
   word-break: auto-phrase;
   overflow-wrap: break-word;
 }
@@ -833,7 +832,6 @@ img, svg { max-width: 100%; height: auto; }
   background: rgba(255,255,255,.05);
   border-radius: 0 10px 10px 0;
   text-wrap: balance;
-  word-break: keep-all;
   word-break: auto-phrase;
   overflow-wrap: break-word;
 }
@@ -852,7 +850,6 @@ img, svg { max-width: 100%; height: auto; }
   border: 1px solid rgba(216,180,254,.1);
   border-radius: 8px;
   line-height: 1.8;
-  word-break: keep-all;
   word-break: auto-phrase;
   overflow-wrap: break-word;
 }
@@ -909,7 +906,6 @@ img, svg { max-width: 100%; height: auto; }
   border-radius: 8px;
   border-left: 2px solid rgba(216,180,254,.15);
   line-height: 1.9;
-  word-break: keep-all;
   word-break: auto-phrase;
   overflow-wrap: break-word;
 }
@@ -940,7 +936,6 @@ img, svg { max-width: 100%; height: auto; }
   font-size: 14px; font-weight: 700;
   line-height: 2.4;
   color: #f5f0ff;
-  word-break: keep-all;
   word-break: auto-phrase;
   overflow-wrap: break-word;
 }
@@ -982,7 +977,6 @@ img, svg { max-width: 100%; height: auto; }
   font-family: var(--font-detail);
   font-size: 14px; font-weight: 700;
   line-height: 2.4; color: rgba(245,240,255,.85);
-  word-break: keep-all;
   word-break: auto-phrase;
   overflow-wrap: break-word;
 }
