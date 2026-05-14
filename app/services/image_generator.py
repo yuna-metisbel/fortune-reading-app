@@ -63,28 +63,31 @@ async def generate_reading_image(
 
     try:
         response = await client.images.generate(
-            model="dall-e-3",
+            model="gpt-image-1",
             prompt=prompt,
-            size="1024x1792",
-            quality="hd",
+            size="1024x1536",
+            quality="high",
             n=1,
         )
-        dalle_url = response.data[0].url
 
-        # Download the image and save locally
+        image_data = response.data[0]
         IMAGES_DIR.mkdir(parents=True, exist_ok=True)
         filename = f"{uuid.uuid4()}.png"
         filepath = IMAGES_DIR / filename
 
-        async with httpx.AsyncClient() as http_client:
-            img_response = await http_client.get(dalle_url, timeout=60.0)
-            img_response.raise_for_status()
-            filepath.write_bytes(img_response.content)
+        if image_data.b64_json:
+            filepath.write_bytes(base64.b64decode(image_data.b64_json))
+        elif image_data.url:
+            async with httpx.AsyncClient() as http_client:
+                img_response = await http_client.get(image_data.url, timeout=60.0)
+                img_response.raise_for_status()
+                filepath.write_bytes(img_response.content)
+        else:
+            return None
 
-        logger.info("Image saved: %s", filepath)
         return f"{_URL_PREFIX}{filename}"
     except Exception as e:
-        logger.error("DALL-E image generation failed: %s", e)
+        logger.error("Image generation failed: %s", e)
         return None
 
 
