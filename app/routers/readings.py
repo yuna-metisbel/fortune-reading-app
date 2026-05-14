@@ -685,3 +685,18 @@ async def generate_poster(
         await db.commit()
         return JSONResponse({"image_url": image_url})
     return JSONResponse({"error": "Generation failed"}, status_code=500)
+
+
+@router.get("/api/diagnostics/image-config")
+async def image_config_check():
+    from app.services.image_generator import IMAGES_DIR, _URL_PREFIX
+    from app.config import settings as _s
+    import os
+    return JSONResponse({
+        "openai_key_set": bool(_s.openai_api_key),
+        "openai_key_prefix": _s.openai_api_key[:8] + "..." if _s.openai_api_key else None,
+        "images_dir": str(IMAGES_DIR),
+        "images_dir_exists": IMAGES_DIR.exists(),
+        "url_prefix": _URL_PREFIX,
+        "data_mount_exists": os.path.isdir("/data"),
+    })

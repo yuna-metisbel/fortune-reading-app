@@ -1,6 +1,7 @@
 """DALL-E 3 / GPT Image API を使用して鑑定結果ポスター画像を生成するモジュール。"""
 
 import base64
+import logging
 import uuid
 from pathlib import Path
 from typing import Optional
@@ -9,6 +10,8 @@ import httpx
 import openai
 
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 _DEFAULT_DIR = Path(__file__).resolve().parent.parent / "static" / "images" / "posters"
 IMAGES_DIR = Path(settings.images_dir) if settings.images_dir else _DEFAULT_DIR
@@ -27,9 +30,11 @@ async def generate_reading_image(
     生成画像をローカルに保存し、静的ファイルパスを返す。
     """
     if not settings.openai_api_key:
+        logger.warning("OPENAI_API_KEY not set, skipping image generation")
         return None
 
     client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
+    logger.info("Starting DALL-E image generation (dir=%s)", IMAGES_DIR)
 
     prompt = (
         "Create a vertical spiritual poster background illustration. "
@@ -76,8 +81,10 @@ async def generate_reading_image(
             img_response.raise_for_status()
             filepath.write_bytes(img_response.content)
 
+        logger.info("Image saved: %s", filepath)
         return f"{_URL_PREFIX}{filename}"
-    except Exception:
+    except Exception as e:
+        logger.error("DALL-E image generation failed: %s", e)
         return None
 
 
