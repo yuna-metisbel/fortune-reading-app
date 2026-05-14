@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     paypal_mode: str = "sandbox"
     base_url: str = "https://fortune-reading-app.onrender.com"
     database_url: str = "sqlite+aiosqlite:///./fortune.db"
+    images_dir: str = ""
 
     model_config = {"env_file": ".env"}
 

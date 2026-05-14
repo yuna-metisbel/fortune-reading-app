@@ -13,5 +13,7 @@ services:
         sync: false
       - key: DATABASE_URL
         value: sqlite+aiosqlite:////data/fortune.db
+      - key: IMAGES_DIR
+        value: /data/images/posters
       - key: PYTHON_VERSION
         value: 3.13.7

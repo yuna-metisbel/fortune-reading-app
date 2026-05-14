@@ -178,7 +178,21 @@
 {% block scripts %}
 <script>
 function toggleSection(el){el.closest('.reading-section').classList.toggle('open');}
-function toggleMore(btn){var b=btn.nextElementSibling;b.classList.toggle('open');btn.textContent=b.classList.contains('open')?'✧ 閉じる':'✧ 更に詳しく';}
+function toggleMore(btn){
+  var b=btn.nextElementSibling;b.classList.toggle('open');
+  btn.textContent=b.classList.contains('open')?'✧ 閉じる':'✧ 更に詳しく';
+  if(b.classList.contains('open')){
+    var sec=btn.closest('.reading-section');
+    if(sec && sec.dataset.theme==='message'){
+      var cards=b.querySelectorAll('.tarot-card-row');
+      cards.forEach(function(c,i){
+        if(!c.classList.contains('tarot-entered')){
+          setTimeout(function(){c.classList.add('tarot-entered');},i*350);
+        }
+      });
+    }
+  }
+}
 function toggleMonth(el){var w=el.classList.contains('expanded');document.querySelectorAll('.month-card.expanded').forEach(function(c){c.classList.remove('expanded');});if(!w)el.classList.add('expanded');}
 function copyLink(){navigator.clipboard.writeText(location.href).then(function(){showToast('✧ リンクをコピーしました');});}
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
@@ -452,7 +466,15 @@ function formatPosterElements() {
     if (isCompat) {
       formatCompatTitle(title);
     } else {
-      title.innerHTML = breakShort(title.textContent.trim());
+      var raw = title.textContent.trim();
+      var broken = breakShort(raw);
+      var parts = broken.split('<br>').filter(Boolean);
+      var maxLen = 0;
+      parts.forEach(function(p){ var c = p.replace(/<[^>]*>/g,'').trim(); if(c.length > maxLen) maxLen = c.length; });
+      var sz = maxLen<=8?26 : maxLen<=14?22 : 18;
+      title.innerHTML = parts.map(function(p) {
+        return '<span style="display:block;font-size:'+sz+'px;line-height:1.5">'+p.trim()+'</span>';
+      }).join('');
     }
   }
   document.querySelectorAll('.highlight-value').forEach(function(el) {
@@ -462,7 +484,16 @@ function formatPosterElements() {
   var msg = document.querySelector('.poster-message-text');
   if (msg) {
     var raw = msg.textContent.trim();
-    if (raw) msg.innerHTML = breakShort(raw);
+    if (raw) {
+      var broken = breakShort(raw);
+      var parts = broken.split('<br>').filter(Boolean);
+      var maxLen = 0;
+      parts.forEach(function(p){ var c = p.replace(/<[^>]*>/g,'').trim(); if(c.length > maxLen) maxLen = c.length; });
+      var sz = maxLen<=10?15 : maxLen<=18?14 : 13;
+      msg.innerHTML = parts.map(function(p) {
+        return '<span style="display:block;font-size:'+sz+'px;line-height:2">'+p.trim()+'</span>';
+      }).join('');
+    }
   }
 }
 

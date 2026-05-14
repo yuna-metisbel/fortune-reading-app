@@ -10,7 +10,9 @@ import openai
 
 from app.config import settings
 
-IMAGES_DIR = Path(__file__).resolve().parent.parent / "static" / "images" / "posters"
+_DEFAULT_DIR = Path(__file__).resolve().parent.parent / "static" / "images" / "posters"
+IMAGES_DIR = Path(settings.images_dir) if settings.images_dir else _DEFAULT_DIR
+_URL_PREFIX = "/poster-images/" if settings.images_dir else "/static/images/posters/"
 
 
 async def generate_reading_image(
@@ -74,7 +76,7 @@ async def generate_reading_image(
             img_response.raise_for_status()
             filepath.write_bytes(img_response.content)
 
-        return f"/static/images/posters/{filename}"
+        return f"{_URL_PREFIX}{filename}"
     except Exception:
         return None
 
@@ -157,7 +159,7 @@ async def generate_poster_image(
         else:
             return None
 
-        return f"/static/images/posters/{filename}"
+        return f"{_URL_PREFIX}{filename}"
     except Exception as e:
         print(f"Poster generation failed: {e}")
         return None
