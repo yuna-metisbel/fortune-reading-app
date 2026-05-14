@@ -700,3 +700,18 @@ async def image_config_check():
         "url_prefix": _URL_PREFIX,
         "data_mount_exists": os.path.isdir("/data"),
     })
+
+
+@router.get("/api/diagnostics/test-dalle")
+async def test_dalle():
+    import openai
+    from app.config import settings as _s
+    if not _s.openai_api_key:
+        return JSONResponse({"error": "OPENAI_API_KEY not set"})
+    try:
+        client = openai.AsyncOpenAI(api_key=_s.openai_api_key)
+        response = await client.models.list()
+        models = [m.id for m in response.data if "dall" in m.id.lower() or "gpt-image" in m.id.lower()]
+        return JSONResponse({"status": "ok", "image_models": models})
+    except Exception as e:
+        return JSONResponse({"error": str(e)})
