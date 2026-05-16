@@ -19,6 +19,7 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100))
+    browser_id: Mapped[str | None] = mapped_column(String(64), nullable=True, unique=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now_jst)
 
     profiles: Mapped[list["Profile"]] = relationship(back_populates="user")

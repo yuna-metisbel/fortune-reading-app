@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.deps import get_browser_user
 from app.models import Profile, User
 
 router = APIRouter(prefix="/api/profiles")
@@ -21,15 +22,11 @@ class ProfileCreate(BaseModel):
 
 
 @router.post("")
-async def create_profile(body: ProfileCreate, db: AsyncSession = Depends(get_db)):
-    # Auto-create a default User if none exists
-    result = await db.execute(select(User).limit(1))
-    user = result.scalar_one_or_none()
-    if user is None:
-        user = User(name="default")
-        db.add(user)
-        await db.flush()
-
+async def create_profile(
+    body: ProfileCreate,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_browser_user),
+):
     profile = Profile(
         user_id=user.id,
         nickname=body.nickname,
@@ -47,8 +44,15 @@ async def create_profile(body: ProfileCreate, db: AsyncSession = Depends(get_db)
 
 
 @router.get("")
-async def list_profiles(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Profile).order_by(Profile.created_at.desc()))
+async def list_profiles(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_browser_user),
+):
+    result = await db.execute(
+        select(Profile)
+        .where(Profile.user_id == user.id)
+        .order_by(Profile.created_at.desc())
+    )
     profiles = result.scalars().all()
 
     return [

@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.database import engine
+from app.deps import BrowserIdMiddleware
 from app.models import Base
 from app.routers import chat, pages, payment, profiles, readings
 
@@ -22,6 +23,7 @@ async def lifespan(app: FastAPI):
             "ALTER TABLE readings ADD COLUMN payment_status TEXT DEFAULT 'free'",
             "ALTER TABLE readings ADD COLUMN stripe_session_id TEXT",
             "ALTER TABLE readings ADD COLUMN form_data_json TEXT",
+            "ALTER TABLE users ADD COLUMN browser_id TEXT",
         ]:
             try:
                 await conn.execute(sa.text(col_sql))
@@ -31,6 +33,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="星図リーディング", lifespan=lifespan)
+app.add_middleware(BrowserIdMiddleware)
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
 if settings.images_dir:

@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.database import async_session, get_db
+from app.deps import get_browser_user
 from app.models import Profile, Reading, User
 from app.services.claude_client import stream_message
 from app.services.image_generator import generate_reading_image
@@ -66,16 +67,6 @@ class CompatibilityReadingRequest(BaseModel):
 # ---------------------------------------------------------------------------
 # Helper functions
 # ---------------------------------------------------------------------------
-
-async def _get_or_create_user(db: AsyncSession) -> User:
-    result = await db.execute(select(User).limit(1))
-    user = result.scalar_one_or_none()
-    if user is None:
-        user = User(name="default")
-        db.add(user)
-        await db.flush()
-    return user
-
 
 def _compute_fortune_data(birth_date_str: str) -> tuple[dict | None, dict | None, dict | None]:
     """生年月日文字列から六星占術・四柱推命・数秘術の計算結果を返す。"""
@@ -139,8 +130,8 @@ async def _get_or_create_profile(
 async def personal_stream(
     body: PersonalReadingRequest,
     db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_browser_user),
 ) -> StreamingResponse:
-    user = await _get_or_create_user(db)
     profile = await _get_or_create_profile(
         db,
         user_id=user.id,
@@ -225,8 +216,8 @@ async def personal_stream(
 async def compatibility_stream(
     body: CompatibilityReadingRequest,
     db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_browser_user),
 ) -> StreamingResponse:
-    user = await _get_or_create_user(db)
 
     profile1 = await _get_or_create_profile(
         db,
@@ -345,14 +336,13 @@ async def generate_paid_reading(
     reading_id: int,
     body: dict,
     db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_browser_user),
 ) -> StreamingResponse:
     reading = await db.get(Reading, reading_id)
     if reading is None:
         raise HTTPException(status_code=404, detail="Reading not found")
     if reading.payment_status != "paid":
         raise HTTPException(status_code=403, detail="Payment required")
-
-    user = await _get_or_create_user(db)
 
     if reading.type == "personal":
         profile = await _get_or_create_profile(
@@ -502,13 +492,6 @@ async def reading_result(
                     if summary_paragraphs and summary_paragraphs[-1] != '':
                         summary_paragraphs.append('')
                     continue
-                if bl_s.startswith('- ') or bl_s.startswith('* '):
-                    continue
-                if bl.startswith('  ') or bl.startswith('\t'):
-                    continue
-                if bl_s.startswith('**') and bl_s.endswith('**'):
-                    if '枚目' not in bl_s and 'からのメッセージ' not in bl_s:
-                        continue
                 if re.match(r'^.{1,20}へ$', bl_s):
                     continue
                 if bl_s.startswith('---'):

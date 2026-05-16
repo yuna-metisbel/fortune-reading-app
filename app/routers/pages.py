@@ -7,15 +7,24 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.models import Profile, Reading
+from app.deps import get_browser_user
+from app.models import Profile, Reading, User
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
 
 
 @router.get("/", response_class=HTMLResponse)
-async def index(request: Request, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Reading).order_by(Reading.created_at.desc()))
+async def index(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_browser_user),
+):
+    result = await db.execute(
+        select(Reading)
+        .where(Reading.user_id == user.id)
+        .order_by(Reading.created_at.desc())
+    )
     readings = result.scalars().all()
     return templates.TemplateResponse("index.html", {"request": request, "readings": readings})
 
@@ -26,15 +35,31 @@ async def sample_page(request: Request):
 
 
 @router.get("/reading/new", response_class=HTMLResponse)
-async def reading_new(request: Request, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Profile).order_by(Profile.created_at.desc()))
+async def reading_new(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_browser_user),
+):
+    result = await db.execute(
+        select(Profile)
+        .where(Profile.user_id == user.id)
+        .order_by(Profile.created_at.desc())
+    )
     profiles = result.scalars().all()
     return templates.TemplateResponse("reading_form.html", {"request": request, "profiles": profiles})
 
 
 @router.get("/compatibility/new", response_class=HTMLResponse)
-async def compatibility_new(request: Request, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Profile).order_by(Profile.created_at.desc()))
+async def compatibility_new(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_browser_user),
+):
+    result = await db.execute(
+        select(Profile)
+        .where(Profile.user_id == user.id)
+        .order_by(Profile.created_at.desc())
+    )
     profiles = result.scalars().all()
     return templates.TemplateResponse("compatibility_form.html", {"request": request, "profiles": profiles})
 
