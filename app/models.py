@@ -67,6 +67,33 @@ class Reading(Base):
     chat_sessions: Mapped[list["ChatSession"]] = relationship(back_populates="reading")
 
 
+class DailyFortune(Base):
+    __tablename__ = "daily_fortunes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    birth_date: Mapped[date] = mapped_column(Date)
+    fortune_date: Mapped[date] = mapped_column(Date)
+    overall_luck: Mapped[int] = mapped_column(Integer)
+    lucky_stone: Mapped[str] = mapped_column(String(100))
+    stone_message: Mapped[str] = mapped_column(Text)
+    lucky_color: Mapped[str] = mapped_column(String(50))
+    lucky_number: Mapped[int] = mapped_column(Integer)
+    nail_color: Mapped[str] = mapped_column(String(100))
+    nail_color_code: Mapped[str] = mapped_column(String(7))
+    nail_message: Mapped[str] = mapped_column(Text)
+    fashion_base: Mapped[str] = mapped_column(String(50))
+    fashion_accent: Mapped[str] = mapped_column(String(50))
+    fashion_message: Mapped[str] = mapped_column(Text)
+    one_liner: Mapped[str] = mapped_column(Text)
+    message: Mapped[str] = mapped_column(Text)
+    action_tip: Mapped[str] = mapped_column(Text)
+    caution: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now_jst)
+
+    user: Mapped["User"] = relationship()
+
+
 class ChatSession(Base):
     __tablename__ = "chat_sessions"
 
