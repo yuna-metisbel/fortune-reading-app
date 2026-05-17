@@ -26,10 +26,10 @@ html { scroll-behavior: smooth; }
   --highlight: #faf5ff;
 
   /* Fonts */
-  --font-heading: 'Zen Kaku Gothic New', 'Noto Sans JP', sans-serif;
+  --font-heading: 'Shippori Mincho', 'Noto Sans JP', serif;
   --font-emphasis: 'Zen Kaku Gothic New', 'Noto Sans JP', sans-serif;
   --font-label: 'JetBrains Mono', monospace;
-  --font-body: 'Noto Sans JP', sans-serif;
+  --font-body: 'Zen Kaku Gothic New', 'Noto Sans JP', sans-serif;
   --font-detail: 'Kaisei Decol', serif;
   --font-tab: 'Shippori Mincho', serif;
 }
@@ -739,6 +739,27 @@ img, svg { max-width: 100%; height: auto; }
   background: rgba(255,255,255,.12);
   color: var(--highlight);
   box-shadow: 0 0 16px rgba(167,139,250,.2);
+}
+
+.share-card-btn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(251,191,36,.12), rgba(251,191,36,.05));
+  border: 1px solid rgba(251,191,36,.35);
+  border-radius: 8px;
+  color: #fbbf24;
+  font-family: var(--font-label);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all .3s;
+}
+.share-card-btn:hover {
+  background: linear-gradient(135deg, rgba(251,191,36,.2), rgba(251,191,36,.1));
+  transform: translateY(-1px);
 }
 
 .scroll-prompt { margin-top: 32px; text-align: center; animation: float 2.5s ease-in-out infinite; }

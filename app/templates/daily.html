@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% block title %}今日の運勢 — 星図リーディング{% endblock %}
 
+{% block head %}
+<meta property="og:title" content="今日の運勢 — 星図リーディング">
+<meta property="og:description" content="{% if fortune %}{{ fortune.one_liner }}{% else %}毎日届くあなただけのメッセージ。ラッキーストーン・ネイルカラー・ファッション配色付き{% endif %}">
+{% endblock %}
+
 {% block content %}
 <div class="page-header" style="padding-top:32px;">
   <a href="/" class="back-link">← TOP</a>

@@ -137,6 +137,10 @@ function initPersonalForm() {
       theme:       form.theme.value.trim(),
     };
 
+    localStorage.setItem('fortune_birth', JSON.stringify({
+      y: y, m: (form.birth_month.value || '').trim(), d: (form.birth_day.value || '').trim()
+    }));
+
     try {
       var resp = await fetch('/api/readings/personal/stream', {
         method: 'POST',
@@ -383,6 +387,27 @@ function autoFillLatestProfile() {
 
 // ── Bootstrap ────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function () {
+  // Auto-fill birth date from localStorage
+  var savedBirth = localStorage.getItem('fortune_birth');
+  if (savedBirth) {
+    try {
+      var sb = JSON.parse(savedBirth);
+      var byEl = document.getElementById('birth_year');
+      var bmEl = document.getElementById('birth_month');
+      var bdEl = document.getElementById('birth_day');
+      if (byEl && !byEl.value) byEl.value = sb.y || '';
+      if (bmEl && !bmEl.value) bmEl.value = sb.m || '';
+      if (bdEl && !bdEl.value) bdEl.value = sb.d || '';
+      // Also fill person1 fields for compatibility form
+      var p1y = document.getElementById('person1_birth_year');
+      var p1m = document.getElementById('person1_birth_month');
+      var p1d = document.getElementById('person1_birth_day');
+      if (p1y && !p1y.value) p1y.value = sb.y || '';
+      if (p1m && !p1m.value) p1m.value = sb.m || '';
+      if (p1d && !p1d.value) p1d.value = sb.d || '';
+    } catch(e) {}
+  }
+
   initPersonalForm();
   initCompatibilityForm();
   initSavedProfileHandlers();

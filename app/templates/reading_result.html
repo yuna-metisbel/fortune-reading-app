@@ -3,7 +3,7 @@
 
 {% block head %}
 <meta property="og:title" content="{{ reading.profile.nickname if reading.profile else 'あなた' }}の星図リーディング">
-<meta property="og:description" content="6つの占術を統合したスピリチュアルリーディング">
+<meta property="og:description" content="{% if sections %}{{ sections[0].key_points[0] if sections[0].key_points else '6つの占術を統合した実用型スピリチュアルリーディング' }}{% else %}6つの占術を統合した実用型スピリチュアルリーディング{% endif %}">
 {% if reading.image_url %}<meta property="og:image" content="{{ reading.image_url }}">{% endif %}
 <meta property="og:type" content="article">
 <meta name="twitter:card" content="summary_large_image">
@@ -94,6 +94,7 @@
 
     <button class="save-image-btn" onclick="savePoster()">✦ 占いの結果を保存する</button>
     <button class="share-link-btn" onclick="copyLink()">✧ LINK をコピー</button>
+    <button class="share-card-btn" onclick="shareCard()">✦ SNSカードを保存</button>
 
     <div class="scroll-prompt">
       <div class="scroll-prompt-text">SCROLL FOR DETAIL</div>
@@ -538,6 +539,24 @@ function groupPersonCards() {
       });
       container.insertBefore(wrap, cards[0]);
     });
+  });
+}
+
+function shareCard(){
+  var poster=document.getElementById('poster-capture');
+  var btns=poster.querySelectorAll('button');
+  btns.forEach(function(b){b.style.display='none';});
+  var sp=document.querySelector('.scroll-prompt');if(sp)sp.style.display='none';
+  html2canvas(poster,{useCORS:true,scale:2,backgroundColor:'#352466',width:1080,height:1920,windowWidth:1080}).then(function(canvas){
+    var resized=document.createElement('canvas');
+    resized.width=1080;resized.height=1350;
+    var ctx=resized.getContext('2d');
+    ctx.drawImage(canvas,0,0,1080,1350,0,0,1080,1350);
+    var a=document.createElement('a');a.href=resized.toDataURL('image/png');a.download='fortune-share.png';a.click();
+    showToast('✧ SNSカードを保存しました');
+  }).catch(function(){showToast('保存に失敗しました');}).finally(function(){
+    btns.forEach(function(b){b.style.display='';});
+    if(sp)sp.style.display='';
   });
 }
 
