@@ -68,11 +68,11 @@
       <div class="input-group">
         <label class="input-label">関係性</label>
         <div class="dc-rel-grid">
-          <label class="dc-rel-option"><input type="radio" name="rel" value="lover"><span class="dc-rel-chip">💕 恋人</span></label>
-          <label class="dc-rel-option"><input type="radio" name="rel" value="partner"><span class="dc-rel-chip">🤝 ビジネス</span></label>
-          <label class="dc-rel-option"><input type="radio" name="rel" value="friend" checked><span class="dc-rel-chip">✨ 友人</span></label>
-          <label class="dc-rel-option"><input type="radio" name="rel" value="family"><span class="dc-rel-chip">🏠 家族</span></label>
-          <label class="dc-rel-option"><input type="radio" name="rel" value="colleague"><span class="dc-rel-chip">💼 同僚</span></label>
+          <label class="dc-rel-option"><input type="radio" name="rel" value="lover"><span class="dc-rel-chip">恋人</span></label>
+          <label class="dc-rel-option"><input type="radio" name="rel" value="partner"><span class="dc-rel-chip">ビジネス</span></label>
+          <label class="dc-rel-option"><input type="radio" name="rel" value="friend" checked><span class="dc-rel-chip">友人</span></label>
+          <label class="dc-rel-option"><input type="radio" name="rel" value="family"><span class="dc-rel-chip">家族</span></label>
+          <label class="dc-rel-option"><input type="radio" name="rel" value="colleague"><span class="dc-rel-chip">同僚</span></label>
         </div>
       </div>
     </div>
@@ -128,7 +128,7 @@
 
     <!-- Communication -->
     <div class="dc-card dc-comm-card">
-      <div class="dc-card-label">💬 COMMUNICATION TIP</div>
+      <div class="dc-card-label">COMMUNICATION TIP</div>
       <p class="dc-card-body" id="r-comm"></p>
     </div>
 
@@ -153,7 +153,7 @@
 
     <!-- Evening -->
     <div class="dc-card dc-evening-card">
-      <div class="dc-card-label">🌙 EVENING ACTION</div>
+      <div class="dc-card-label">EVENING ACTION</div>
       <p class="dc-card-body" id="r-evening"></p>
     </div>
   </div>
@@ -171,7 +171,7 @@
   <div class="dc-recent-header">✧ 今日占った相手</div>
   {% for r in recent %}
   <div class="dc-recent-card" onclick="showCached({{ r.id }})">
-    <span class="dc-recent-icon">{% if r.relationship_type == 'lover' %}💕{% elif r.relationship_type == 'partner' %}🤝{% elif r.relationship_type == 'family' %}🏠{% elif r.relationship_type == 'colleague' %}💼{% else %}✨{% endif %}</span>
+    <span class="dc-recent-icon">{% if r.relationship_type == 'lover' %}♡{% elif r.relationship_type == 'partner' %}◇{% elif r.relationship_type == 'family' %}◇{% elif r.relationship_type == 'colleague' %}◇{% else %}◇{% endif %}</span>
     <span class="dc-recent-name">{{ r.partner_nickname }}</span>
     <span class="dc-recent-score">{{ r.compatibility_score }}点</span>
   </div>

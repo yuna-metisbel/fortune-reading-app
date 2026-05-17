@@ -111,7 +111,7 @@
 <div class="recent-list">
   {% for reading in readings %}
   <a href="/reading/{{ reading.id }}" class="recent-card">
-    <span class="recent-card-icon">{% if reading.type == 'compatibility' %}✨{% else %}🌙{% endif %}</span>
+    <span class="recent-card-icon">{% if reading.type == 'compatibility' %}◇{% else %}◑{% endif %}</span>
     <div class="recent-card-info">
       <div class="recent-card-name">{{ reading.theme }}</div>
       <div class="recent-card-date">{{ reading.created_at.strftime('%Y.%m.%d') }}</div>
@@ -122,7 +122,7 @@
 {% else %}
 <div class="recent-header">✧ RECENT READINGS</div>
 <div class="recent-empty">
-  <div class="recent-empty-icon">🌙</div>
+  <div class="recent-empty-icon">◑</div>
   <div class="recent-empty-text">まだ鑑定履歴がありません<br>最初のリーディングを体験してみましょう</div>
 </div>
 {% endif %}

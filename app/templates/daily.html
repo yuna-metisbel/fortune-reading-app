@@ -93,7 +93,7 @@
         <p class="daily-card-body small" id="daily-action">{{ fortune.action_tip if fortune else '' }}</p>
       </div>
       <div class="daily-card daily-caution-card">
-        <div class="daily-card-label">⚠ CAUTION</div>
+        <div class="daily-card-label">CAUTION</div>
         <p class="daily-card-body small" id="daily-caution">{{ fortune.caution if fortune else '' }}</p>
       </div>
     </div>
@@ -159,7 +159,7 @@
     <div class="daily-card-label">LINE通知</div>
     <p class="daily-line-text">毎朝の運勢をLINEでお届け</p>
     <button class="line-subscribe-btn" id="line-btn" onclick="subscribeLine()">
-      🔔 LINE通知を受け取る
+      LINE通知を受け取る
     </button>
     <p class="daily-line-note">※ 近日公開予定。登録しておくと開始時にお知らせします</p>
   </div>
@@ -322,7 +322,7 @@ async function subscribeLine(){
     }
   } catch(e) {
     btn.disabled = false;
-    btn.textContent = '🔔 LINE通知を受け取る';
+    btn.textContent = 'LINE通知を受け取る';
   }
 }
 

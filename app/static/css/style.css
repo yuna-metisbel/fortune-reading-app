@@ -1908,3 +1908,119 @@ img, svg { max-width: 100%; height: auto; }
   color: var(--text-secondary);
   opacity: .6;
 }
+
+/* ============================================
+   WAKUWAKU / DOKI DESIGN ENHANCEMENTS
+   ============================================ */
+
+/* --- A. Card entrance animations (stagger) --- */
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(20px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.daily-card, .dc-card {
+  animation: cardReveal .5s ease-out both;
+}
+.daily-row .daily-card:nth-child(2),
+.daily-row .dc-card:nth-child(2) {
+  animation-delay: .1s;
+}
+
+/* --- B. Score ring glow pulse --- */
+.daily-luck-ring, .dc-score-ring {
+  filter: drop-shadow(0 0 12px rgba(196,181,253,.2));
+  animation: ringGlow 3s ease-in-out infinite;
+}
+@keyframes ringGlow {
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(196,181,253,.2)); }
+  50% { filter: drop-shadow(0 0 24px rgba(196,181,253,.45)); }
+}
+
+/* --- C. Gradient text for catchcopies and one-liners --- */
+.section-catchcopy,
+.daily-one-liner,
+.dc-one-liner,
+.dc-power-word {
+  background: linear-gradient(135deg, #faf5ff 0%, #e9d5ff 50%, #f5c6ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* --- D. Subtle shimmer on stone orb --- */
+.daily-stone-orb {
+  position: relative;
+  overflow: hidden;
+}
+.daily-stone-orb::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,.2) 50%, transparent 60%);
+  animation: stoneShimmer 3s ease-in-out infinite;
+}
+@keyframes stoneShimmer {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* --- E. Button hover glow effect --- */
+.submit-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all .3s, box-shadow .3s;
+}
+.submit-btn:hover {
+  box-shadow: 0 0 24px rgba(147,51,234,.4), 0 4px 16px rgba(147,51,234,.2);
+}
+.submit-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,.08) 50%, transparent 60%);
+  animation: btnShimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes btnShimmer {
+  0% { transform: translateX(-100%) rotate(25deg); }
+  50% { transform: translateX(100%) rotate(25deg); }
+  100% { transform: translateX(100%) rotate(25deg); }
+}
+
+/* --- F. Power word card special glow --- */
+.dc-power-card {
+  position: relative;
+  overflow: hidden;
+}
+.dc-power-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(135deg, rgba(240,171,252,.3), rgba(167,139,250,.2), rgba(240,171,252,.3));
+  border-radius: 14px;
+  z-index: -1;
+  animation: borderGlow 4s ease-in-out infinite;
+}
+@keyframes borderGlow {
+  0%, 100% { opacity: .3; }
+  50% { opacity: .7; }
+}
+
+/* --- G. KP card tap feedback --- */
+.section-kp-card {
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.section-kp-card:active {
+  transform: scale(.98);
+}
+
+/* --- H. Highlight cards subtle hover --- */
+.highlight-card {
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.highlight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(167,139,250,.2);
+}

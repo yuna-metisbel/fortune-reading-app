@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function(){
     // Show invite banner
     var banner = document.createElement('div');
     banner.className = 'invite-banner';
-    banner.innerHTML = '💌 <strong>' + fromNick + '</strong>さんから相性占いの招待が届いています';
+    banner.innerHTML = '<strong>' + fromNick + '</strong>さんから相性占いの招待が届いています';
     var header = document.querySelector('.page-header');
     if (header) header.after(banner);
 
