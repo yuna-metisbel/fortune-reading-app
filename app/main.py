@@ -9,7 +9,7 @@ from app.config import settings
 from app.database import engine
 from app.deps import BrowserIdMiddleware
 from app.models import Base
-from app.routers import chat, daily, pages, payment, profiles, readings
+from app.routers import chat, daily, daily_compat, pages, payment, profiles, readings
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -44,6 +44,7 @@ if settings.images_dir:
 
 app.include_router(pages.router)
 app.include_router(daily.router)
+app.include_router(daily_compat.router)
 app.include_router(profiles.router)
 app.include_router(readings.router)
 app.include_router(chat.router)

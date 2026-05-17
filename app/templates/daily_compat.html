@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% block title %}今日の相性 — 星図リーディング{% endblock %}
+
+{% block head %}
+<meta property="og:title" content="今日の相性 — 星図リーディング">
+<meta property="og:description" content="大切な人との今日の相性を占う。コミュニケーションのコツ、やるべきこと、避けるべきこと。">
+{% endblock %}
+
+{% block content %}
+<div class="page-header" style="padding-top:32px;">
+  <a href="/" class="back-link">← TOP</a>
+  <h1 class="page-title">今日の相性</h1>
+  <p class="page-sub">{{ today.strftime('%Y.%m.%d') }} — 大切な人との一日</p>
+  <div class="campaign-badge">✦ 通常¥300 → 期間限定 無料</div>
+</div>
+
+<!-- INPUT FORM -->
+<div id="input-section">
+  <form id="compat-form" novalidate>
+    <div class="form-card">
+      <div class="form-section-title">YOUR BIRTH DATE</div>
+      <div class="input-group">
+        <label class="input-label">あなたの生年月日</label>
+        <div class="date-row">
+          <input type="text" id="my_year" class="text-input" placeholder="1995" inputmode="numeric" maxlength="4" required>
+          <input type="text" id="my_month" class="text-input" placeholder="6" inputmode="numeric" maxlength="2" required>
+          <input type="text" id="my_day" class="text-input" placeholder="15" inputmode="numeric" maxlength="2" required>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-section-title">PARTNER</div>
+      <div class="input-group">
+        <label class="input-label">相手のニックネーム</label>
+        <input type="text" id="partner_nick" class="text-input" placeholder="名前やあだ名" required autocomplete="off">
+      </div>
+      <div class="input-group">
+        <label class="input-label">相手の生年月日</label>
+        <div class="date-row">
+          <input type="text" id="p_year" class="text-input" placeholder="1993" inputmode="numeric" maxlength="4" required>
+          <input type="text" id="p_month" class="text-input" placeholder="12" inputmode="numeric" maxlength="2" required>
+          <input type="text" id="p_day" class="text-input" placeholder="3" inputmode="numeric" maxlength="2" required>
+        </div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">関係性</label>
+        <div class="dc-rel-grid">
+          <label class="dc-rel-option"><input type="radio" name="rel" value="lover"><span class="dc-rel-chip">💕 恋人</span></label>
+          <label class="dc-rel-option"><input type="radio" name="rel" value="partner"><span class="dc-rel-chip">🤝 ビジネス</span></label>
+          <label class="dc-rel-option"><input type="radio" name="rel" value="friend" checked><span class="dc-rel-chip">✨ 友人</span></label>
+          <label class="dc-rel-option"><input type="radio" name="rel" value="family"><span class="dc-rel-chip">🏠 家族</span></label>
+          <label class="dc-rel-option"><input type="radio" name="rel" value="colleague"><span class="dc-rel-chip">💼 同僚</span></label>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn">✦ 今日の相性を見る</button>
+  </form>
+</div>
+
+<!-- LOADING -->
+<div id="loading-section" style="display:none">
+  <div class="loading-page" style="min-height:50vh;padding-top:60px;">
+    <div class="ritual-orb">
+      <div class="ritual-ring ritual-ring--1"></div>
+      <div class="ritual-ring ritual-ring--2"></div>
+      <div class="ritual-ring ritual-ring--3"></div>
+      <div class="ritual-core">💫</div>
+    </div>
+    <h2 class="loading-title" style="margin-top:24px;">二人の星を重ねています</h2>
+    <p class="loading-sub">今日のエネルギーを読んでいます...</p>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result-section" style="display:none">
+  <div id="compat-capture">
+
+    <!-- Header -->
+    <div class="dc-hero">
+      <div class="dc-pair">
+        <span class="dc-you">あなた</span>
+        <span class="dc-x">×</span>
+        <span class="dc-partner" id="r-partner"></span>
+      </div>
+      <div class="dc-rel-label" id="r-rel-label"></div>
+      <div class="dc-score-ring">
+        <svg viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(240,171,252,.15)" stroke-width="6"/>
+          <circle cx="60" cy="60" r="54" fill="none" stroke="url(#compat-grad)" stroke-width="6"
+            stroke-dasharray="339.3" stroke-dashoffset="339.3" stroke-linecap="round"
+            id="compat-arc" style="transition:stroke-dashoffset 1.5s ease-out"/>
+          <defs><linearGradient id="compat-grad"><stop offset="0%" stop-color="#f9a8d4"/><stop offset="100%" stop-color="#c4b5fd"/></linearGradient></defs>
+        </svg>
+        <div class="dc-score-num" id="r-score">?</div>
+      </div>
+      <p class="dc-one-liner" id="r-one-liner"></p>
+    </div>
+
+    <!-- Energy -->
+    <div class="dc-card dc-energy-card">
+      <div class="dc-card-label">TODAY'S ENERGY</div>
+      <p class="dc-card-body" id="r-energy"></p>
+    </div>
+
+    <!-- Communication -->
+    <div class="dc-card dc-comm-card">
+      <div class="dc-card-label">💬 COMMUNICATION TIP</div>
+      <p class="dc-card-body" id="r-comm"></p>
+    </div>
+
+    <!-- Do / Avoid -->
+    <div class="daily-row">
+      <div class="dc-card dc-do-card">
+        <div class="dc-card-label">✦ DO THIS</div>
+        <p class="dc-card-body small" id="r-do"></p>
+      </div>
+      <div class="dc-card dc-avoid-card">
+        <div class="dc-card-label">✕ AVOID</div>
+        <p class="dc-card-body small" id="r-avoid"></p>
+      </div>
+    </div>
+
+    <!-- Power Word -->
+    <div class="dc-card dc-power-card">
+      <div class="dc-card-label">POWER WORD</div>
+      <p class="dc-power-word" id="r-power"></p>
+      <p class="dc-power-sub">今日、この人に伝えてみて</p>
+    </div>
+
+    <!-- Evening -->
+    <div class="dc-card dc-evening-card">
+      <div class="dc-card-label">🌙 EVENING ACTION</div>
+      <p class="dc-card-body" id="r-evening"></p>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="daily-actions">
+    <button class="submit-btn" onclick="shareCompat()" style="margin-top:16px;">✦ シェアする</button>
+    <button class="dc-another-btn" onclick="showForm()">✧ 別の相手を占う</button>
+    <a href="/" class="cta-back" style="margin-top:8px;">← TOP</a>
+  </div>
+</div>
+
+{% if recent %}
+<div id="recent-section">
+  <div class="dc-recent-header">✧ 今日占った相手</div>
+  {% for r in recent %}
+  <div class="dc-recent-card" onclick="showCached({{ r.id }})">
+    <span class="dc-recent-icon">{% if r.relationship_type == 'lover' %}💕{% elif r.relationship_type == 'partner' %}🤝{% elif r.relationship_type == 'family' %}🏠{% elif r.relationship_type == 'colleague' %}💼{% else %}✨{% endif %}</span>
+    <span class="dc-recent-name">{{ r.partner_nickname }}</span>
+    <span class="dc-recent-score">{{ r.compatibility_score }}点</span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+var cachedResults = {
+{% for r in recent %}
+  {{ r.id }}: {
+    partner_nickname: "{{ r.partner_nickname }}",
+    relationship_type: "{{ r.relationship_type }}",
+    compatibility_score: {{ r.compatibility_score }},
+    one_liner: {{ r.one_liner | tojson }},
+    today_energy: {{ r.today_energy | tojson }},
+    communication_tip: {{ r.communication_tip | tojson }},
+    do_this: {{ r.do_this | tojson }},
+    avoid_this: {{ r.avoid_this | tojson }},
+    power_word: {{ r.power_word | tojson }},
+    evening_action: {{ r.evening_action | tojson }}
+  },
+{% endfor %}
+};
+
+var REL_LABELS = {lover:'恋人',partner:'ビジネスパートナー',friend:'友人',family:'家族',colleague:'同僚'};
+
+(function(){
+  var saved = localStorage.getItem('fortune_birth');
+  if (saved) {
+    try {
+      var s = JSON.parse(saved);
+      document.getElementById('my_year').value = s.y || '';
+      document.getElementById('my_month').value = s.m || '';
+      document.getElementById('my_day').value = s.d || '';
+    } catch(e) {}
+  }
+
+  document.getElementById('compat-form').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var my = buildDate('my_'); var p = buildDate('p_');
+    var nick = document.getElementById('partner_nick').value.trim();
+    var rel = document.querySelector('input[name="rel"]:checked').value;
+    if (!my || !p || !nick) return;
+
+    localStorage.setItem('fortune_birth', JSON.stringify({
+      y: document.getElementById('my_year').value.trim(),
+      m: document.getElementById('my_month').value.trim(),
+      d: document.getElementById('my_day').value.trim()
+    }));
+
+    document.getElementById('input-section').style.display='none';
+    var recentEl = document.getElementById('recent-section');
+    if(recentEl) recentEl.style.display='none';
+    document.getElementById('loading-section').style.display='block';
+
+    try {
+      var resp = await fetch('/api/daily/compatibility/generate', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({my_birth_date:my, partner_birth_date:p, partner_nickname:nick, relationship_type:rel})
+      });
+      var data = await resp.json();
+      if (data.error) { alert(data.error); location.reload(); return; }
+      renderResult(data);
+    } catch(err) { alert('通信エラーが発生しました'); location.reload(); }
+  });
+})();
+
+function buildDate(prefix) {
+  var y = document.getElementById(prefix+'year').value.trim();
+  var m = document.getElementById(prefix+'month').value.trim().padStart(2,'0');
+  var d = document.getElementById(prefix+'day').value.trim().padStart(2,'0');
+  return (y && m && d) ? y+'-'+m+'-'+d : '';
+}
+
+function renderResult(d) {
+  document.getElementById('loading-section').style.display='none';
+  document.getElementById('result-section').style.display='block';
+  document.getElementById('r-partner').textContent = d.partner_nickname;
+  document.getElementById('r-rel-label').textContent = REL_LABELS[d.relationship_type] || d.relationship_type;
+  document.getElementById('r-score').textContent = d.compatibility_score;
+  document.getElementById('r-one-liner').textContent = d.one_liner;
+  document.getElementById('r-energy').textContent = d.today_energy;
+  document.getElementById('r-comm').textContent = d.communication_tip;
+  document.getElementById('r-do').textContent = d.do_this;
+  document.getElementById('r-avoid').textContent = d.avoid_this;
+  document.getElementById('r-power').textContent = d.power_word;
+  document.getElementById('r-evening').textContent = d.evening_action;
+  var arc = document.getElementById('compat-arc');
+  if(arc) setTimeout(function(){ arc.style.strokeDashoffset = 339.3*(1-d.compatibility_score/100); }, 100);
+}
+
+function showCached(id) {
+  var d = cachedResults[id];
+  if (!d) return;
+  document.getElementById('input-section').style.display='none';
+  var recentEl = document.getElementById('recent-section');
+  if(recentEl) recentEl.style.display='none';
+  renderResult(d);
+}
+
+function showForm() {
+  document.getElementById('result-section').style.display='none';
+  document.getElementById('input-section').style.display='block';
+  var recentEl = document.getElementById('recent-section');
+  if(recentEl) recentEl.style.display='block';
+}
+
+function shareCompat() {
+  var el = document.getElementById('compat-capture');
+  var btns = document.querySelector('.daily-actions');
+  if(btns) btns.style.display='none';
+  html2canvas(el,{useCORS:true,scale:2,backgroundColor:'#352466'}).then(function(canvas){
+    var a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download='daily-compatibility.png';a.click();
+  }).finally(function(){ if(btns) btns.style.display=''; });
+}
+</script>
+{% endblock %}

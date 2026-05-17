@@ -95,6 +95,29 @@ class DailyFortune(Base):
     user: Mapped["User"] = relationship()
 
 
+class DailyCompatibility(Base):
+    __tablename__ = "daily_compatibilities"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    my_birth_date: Mapped[date] = mapped_column(Date)
+    partner_birth_date: Mapped[date] = mapped_column(Date)
+    partner_nickname: Mapped[str] = mapped_column(String(100))
+    relationship_type: Mapped[str] = mapped_column(String(30))
+    fortune_date: Mapped[date] = mapped_column(Date)
+    compatibility_score: Mapped[int] = mapped_column(Integer)
+    one_liner: Mapped[str] = mapped_column(Text)
+    today_energy: Mapped[str] = mapped_column(Text)
+    communication_tip: Mapped[str] = mapped_column(Text)
+    do_this: Mapped[str] = mapped_column(Text)
+    avoid_this: Mapped[str] = mapped_column(Text)
+    power_word: Mapped[str] = mapped_column(String(100))
+    evening_action: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now_jst)
+
+    user: Mapped["User"] = relationship()
+
+
 class LineSubscription(Base):
     __tablename__ = "line_subscriptions"
 
