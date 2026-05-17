@@ -106,7 +106,7 @@
     <button class="share-link-btn" onclick="copyLink()">✧ LINK をコピー</button>
     <button class="share-card-btn" onclick="shareCard()">✦ SNSカードを保存</button>
     {% if not is_compat %}
-    <button class="invite-btn" onclick="copyInviteLink()">💌 相性を占ってもらう</button>
+    <button class="invite-btn" onclick="copyInviteLink()">✦ 相性を占ってもらう</button>
     {% endif %}
 
     <div class="scroll-prompt">
@@ -182,6 +182,7 @@
 {% endif %}
 
 <div class="cta-section">
+  <button class="submit-btn" onclick="saveFullReading()" style="margin-bottom:12px;">✦ 全ての結果を保存</button>
   <a href="/chat/{{ reading.id }}" class="cta-btn">✦ 鑑定師に相談する</a>
   <a href="/" class="cta-back">← TOP</a>
 </div>
@@ -215,7 +216,7 @@ function copyInviteLink(){
   var params = new URLSearchParams({from_nick: nick, from_bd: bd});
   var url = location.origin + '/compatibility/new?' + params.toString();
   navigator.clipboard.writeText(url).then(function(){
-    showToast('💌 招待リンクをコピーしました！相手に送ってね');
+    showToast('✦ 招待リンクをコピーしました！相手に送ってね');
   });
 }
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
@@ -333,8 +334,7 @@ function breakLabeled(s) {
 
 function breakBody(s) {
   s = _clean(s);
-  s = s.replace(/。(?=.)/g, '。<br>');
-  return _fixHead(s);
+  return s;
 }
 
 // **太字** → 単語(≤8文字+助詞なし)=サイズ大+背景、フレーズ=下線+色
@@ -580,6 +580,30 @@ function shareCard(){
     btns.forEach(function(b){b.style.display='';});
     if(sp)sp.style.display='';
   });
+}
+
+function saveFullReading(){
+  var btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '保存中...';
+  // Open all sections first
+  document.querySelectorAll('.reading-section').forEach(function(s){ s.classList.add('open'); });
+  document.querySelectorAll('.read-more-body').forEach(function(b){ b.classList.add('open'); });
+  // Wait for render, then capture
+  setTimeout(function(){
+    var el = document.querySelector('.detail-section');
+    if (!el) { btn.disabled=false; btn.textContent='✦ 全ての結果を保存'; return; }
+    html2canvas(el, {useCORS:true, scale:2, backgroundColor:'#352466'}).then(function(canvas){
+      var a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'full-reading.png';
+      a.click();
+      showToast('✦ 全結果を保存しました');
+    }).catch(function(){ showToast('保存に失敗しました'); }).finally(function(){
+      btn.disabled = false;
+      btn.textContent = '✦ 全ての結果を保存';
+    });
+  }, 500);
 }
 
 document.addEventListener('DOMContentLoaded', function() {

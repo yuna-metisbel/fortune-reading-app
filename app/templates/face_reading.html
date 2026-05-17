@@ -26,7 +26,7 @@
     </div>
     <p class="photo-upload-text">顔写真をアップロード</p>
     <p class="photo-upload-sub">正面からの写真がベスト</p>
-    <input type="file" id="photo-input" accept="image/*" capture="user" style="display:none">
+    <input type="file" id="photo-input" accept="image/*" style="display:none">
     <button class="submit-btn" onclick="document.getElementById('photo-input').click()" style="margin-top:16px;">写真を選択</button>
   </div>
   <div class="photo-preview" id="preview" style="display:none">
@@ -64,7 +64,7 @@
             id="face-arc" style="transition:stroke-dashoffset 1.5s ease-out"/>
           <defs><linearGradient id="face-grad"><stop offset="0%" stop-color="#c4b5fd"/><stop offset="100%" stop-color="#34d399"/></linearGradient></defs>
         </svg>
-        <div class="dc-score-num" id="f-score">?</div>
+        <div class="dc-score-num" id="f-score">?<span class="score-unit">/100</span></div>
       </div>
       <div class="dc-rel-label" id="f-type"></div>
       <p class="dc-one-liner" id="f-impression"></p>
@@ -137,7 +137,7 @@ async function analyzePhoto(){
 function showResult(d){
   document.getElementById('loading-section').style.display = 'none';
   document.getElementById('result-section').style.display = 'block';
-  document.getElementById('f-score').textContent = d.fortune_score || '?';
+  document.getElementById('f-score').innerHTML = (d.fortune_score || '?') + '<span class="score-unit">/100</span>';
   document.getElementById('f-type').textContent = d.face_type || '';
   document.getElementById('f-impression').textContent = d.overall_impression || '';
   document.getElementById('f-personality').textContent = d.personality || '';

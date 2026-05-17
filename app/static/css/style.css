@@ -36,6 +36,7 @@ html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--font-body);
+  font-size: 16px;
   font-weight: 500;
   background: var(--bg-top);
   color: var(--text-primary);
@@ -217,7 +218,7 @@ img, svg { max-width: 100%; height: auto; }
   background: linear-gradient(90deg, transparent, rgba(216,180,254,.4), transparent);
 }
 .divider-stars {
-  font-size: 10px; color: var(--text-secondary);
+  font-size: 12px; color: var(--text-secondary);
   letter-spacing: 6px;
   animation: twinkle 3s ease-in-out infinite;
 }
@@ -255,7 +256,7 @@ img, svg { max-width: 100%; height: auto; }
 }
 .label {
   font-family: var(--font-label);
-  font-size: 11px; font-weight: 600;
+  font-size: 12px; font-weight: 600;
   letter-spacing: 4px; text-transform: uppercase;
   color: var(--text-secondary);
 }
@@ -375,7 +376,7 @@ img, svg { max-width: 100%; height: auto; }
 .back-link {
   display: inline-flex; align-items: center; gap: 6px;
   font-family: var(--font-label);
-  font-size: 10px; font-weight: 500;
+  font-size: 12px; font-weight: 500;
   letter-spacing: 2px;
   color: rgba(216,180,254,.5);
   text-decoration: none; margin-bottom: 24px;
@@ -485,7 +486,7 @@ img, svg { max-width: 100%; height: auto; }
 
 .recent-header {
   font-family: var(--font-label);
-  font-size: 10px; font-weight: 700;
+  font-size: 12px; font-weight: 700;
   letter-spacing: 4px; text-transform: uppercase;
   color: var(--text-secondary); margin-bottom: 20px;
 }
@@ -595,7 +596,7 @@ img, svg { max-width: 100%; height: auto; }
 .poster-content { position: relative; z-index: 1; width: 100%; }
 .poster-label {
   font-family: var(--font-label);
-  font-size: 11px; font-weight: 600;
+  font-size: 12px; font-weight: 600;
   letter-spacing: 5px; text-transform: uppercase;
   color: var(--text-secondary); margin-bottom: 16px;
   animation: glowPulse 4s ease-in-out infinite;
@@ -610,7 +611,7 @@ img, svg { max-width: 100%; height: auto; }
 }
 .poster-date {
   font-family: var(--font-label);
-  font-size: 11px; font-weight: 500;
+  font-size: 12px; font-weight: 500;
   color: rgba(216,180,254,.55); letter-spacing: 3px;
 }
 
@@ -681,8 +682,8 @@ img, svg { max-width: 100%; height: auto; }
   backdrop-filter: blur(16px);
   position: relative; overflow: hidden;
 }
-.poster-message::before { content: '✧'; position: absolute; top: 12px; left: 16px; font-size: 10px; color: rgba(216,180,254,.35); }
-.poster-message::after { content: '✧'; position: absolute; bottom: 12px; right: 16px; font-size: 10px; color: rgba(216,180,254,.35); }
+.poster-message::before { content: '✧'; position: absolute; top: 12px; left: 16px; font-size: 12px; color: rgba(216,180,254,.35); }
+.poster-message::after { content: '✧'; position: absolute; bottom: 12px; right: 16px; font-size: 12px; color: rgba(216,180,254,.35); }
 .poster-message p {
   font-family: var(--font-body);
   font-size: 14px; font-weight: 500;
@@ -720,7 +721,7 @@ img, svg { max-width: 100%; height: auto; }
 .share-link {
   display: block; margin-top: 14px; text-align: center;
   font-family: var(--font-label);
-  font-size: 11px; font-weight: 500;
+  font-size: 12px; font-weight: 500;
   letter-spacing: 2px; color: rgba(216,180,254,.5);
   cursor: pointer; background: none; border: none;
   transition: color .3s;
@@ -803,7 +804,7 @@ img, svg { max-width: 100%; height: auto; }
 .scroll-prompt { margin-top: 32px; text-align: center; animation: float 2.5s ease-in-out infinite; }
 .scroll-prompt-text {
   font-family: var(--font-label);
-  font-size: 10px; font-weight: 600;
+  font-size: 12px; font-weight: 600;
   letter-spacing: 4px; color: rgba(216,180,254,.45);
   margin-bottom: 10px;
 }
@@ -813,7 +814,7 @@ img, svg { max-width: 100%; height: auto; }
 .detail-section { margin-top: 24px; }
 .detail-header {
   font-family: var(--font-label);
-  font-size: 10px; font-weight: 700;
+  font-size: 12px; font-weight: 700;
   letter-spacing: 4px; text-transform: uppercase;
   color: var(--text-secondary);
   text-align: center; margin-bottom: 20px;
@@ -863,7 +864,7 @@ img, svg { max-width: 100%; height: auto; }
   font-family: var(--font-tab);
   font-size: 14px; font-weight: 700; letter-spacing: .5px;
 }
-.section-arrow { font-size: 10px; color: var(--text-secondary); transition: transform .3s; }
+.section-arrow { font-size: 12px; color: var(--text-secondary); transition: transform .3s; }
 .reading-section.open .section-arrow { transform: rotate(180deg); }
 .section-body { max-height: 0; overflow: hidden; transition: max-height .5s ease; }
 .reading-section.open .section-body { max-height: 3000px; }
@@ -898,7 +899,7 @@ img, svg { max-width: 100%; height: auto; }
   display: flex; align-items: baseline; gap: 8px;
   margin-bottom: 8px; line-height: 1.9;
 }
-.point-marker { flex-shrink: 0; font-size: 10px; }
+.point-marker { flex-shrink: 0; font-size: 12px; }
 
 /* --- Key Point Cards --- */
 .section-kp-card {
@@ -922,7 +923,7 @@ img, svg { max-width: 100%; height: auto; }
 }
 .kp-sep {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   opacity: .25;
   margin-bottom: 6px;
   line-height: 1;
@@ -970,7 +971,7 @@ img, svg { max-width: 100%; height: auto; }
 }
 .rm-lbl {
   font-family: var(--font-label);
-  font-size: 10px; font-weight: 700;
+  font-size: 12px; font-weight: 700;
   letter-spacing: 1px;
   display: block; margin-bottom: 4px;
 }
@@ -1061,7 +1062,7 @@ img, svg { max-width: 100%; height: auto; }
   display: inline-flex; align-items: center; gap: 6px;
   margin-top: 16px;
   font-family: var(--font-label);
-  font-size: 10px; font-weight: 600; letter-spacing: 2px;
+  font-size: 12px; font-weight: 600; letter-spacing: 2px;
   color: var(--accent-pink);
   background: none; border: 1px solid rgba(240,171,252,.2);
   cursor: pointer; padding: 8px 14px; border-radius: 6px;
@@ -1111,7 +1112,7 @@ img, svg { max-width: 100%; height: auto; }
 .month-card.expanded { grid-column: 1 / -1; text-align: left; padding: 20px; }
 .month-num {
   font-family: var(--font-label);
-  font-size: 11px; font-weight: 700;
+  font-size: 12px; font-weight: 700;
   letter-spacing: 2px; color: var(--text-secondary);
   margin-bottom: 8px;
 }
@@ -1147,7 +1148,7 @@ img, svg { max-width: 100%; height: auto; }
 .cta-back {
   display: block; margin-top: 20px;
   font-family: var(--font-label);
-  font-size: 11px; font-weight: 500;
+  font-size: 12px; font-weight: 500;
   color: rgba(216,180,254,.45);
   text-decoration: none; letter-spacing: 3px;
 }
@@ -1168,7 +1169,7 @@ img, svg { max-width: 100%; height: auto; }
 }
 .chat-back {
   font-family: var(--font-label);
-  font-size: 10px; font-weight: 500;
+  font-size: 12px; font-weight: 500;
   letter-spacing: 2px; color: rgba(216,180,254,.5);
   text-decoration: none; cursor: pointer;
   background: none; border: none;
@@ -1293,7 +1294,7 @@ img, svg { max-width: 100%; height: auto; }
   position: fixed; bottom: 40px; left: 50%;
   transform: translateX(-50%) translateY(20px);
   font-family: var(--font-label);
-  font-size: 11px; font-weight: 600; letter-spacing: 2px;
+  font-size: 12px; font-weight: 600; letter-spacing: 2px;
   padding: 12px 24px;
   background: rgba(147,51,234,.9);
   color: white; border-radius: 8px;
@@ -1397,7 +1398,7 @@ img, svg { max-width: 100%; height: auto; }
   border: 1px solid rgba(251,191,36,.35);
   border-radius: 20px;
   font-family: var(--font-label);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: #fbbf24;
   letter-spacing: .5px;
@@ -1443,7 +1444,7 @@ img, svg { max-width: 100%; height: auto; }
 }
 .daily-one-liner {
   font-family: var(--font-heading);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 1.8;
   color: var(--highlight);
@@ -1461,19 +1462,19 @@ img, svg { max-width: 100%; height: auto; }
 }
 .daily-card-label {
   font-family: var(--font-label);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
 .daily-card-body {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.9;
   color: var(--text-primary);
 }
 .daily-card-body.small {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.8;
 }
 
@@ -1677,7 +1678,7 @@ img, svg { max-width: 100%; height: auto; }
 }
 .dc-rel-label {
   font-family: var(--font-label);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 2px;
   color: var(--accent-pink);
@@ -1700,7 +1701,7 @@ img, svg { max-width: 100%; height: auto; }
 }
 .dc-one-liner {
   font-family: var(--font-heading);
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 1.8;
   color: var(--highlight);
@@ -1718,19 +1719,19 @@ img, svg { max-width: 100%; height: auto; }
 }
 .dc-card-label {
   font-family: var(--font-label);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
 .dc-card-body {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.9;
   color: var(--text-primary);
 }
 .dc-card-body.small {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.8;
 }
 
@@ -1752,7 +1753,7 @@ img, svg { max-width: 100%; height: auto; }
   margin: 4px 0;
 }
 .dc-power-sub {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-secondary);
   opacity: .7;
 }
@@ -1812,7 +1813,7 @@ img, svg { max-width: 100%; height: auto; }
 /* Recent */
 .dc-recent-header {
   font-family: var(--font-label);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 3px;
   text-align: center;
@@ -1884,3 +1885,11 @@ img, svg { max-width: 100%; height: auto; }
   object-fit: cover;
 }
 .menu-icon.face { background: rgba(216,180,254,.12); }
+
+/* Score unit label (/100) */
+.score-unit {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  opacity: .6;
+}

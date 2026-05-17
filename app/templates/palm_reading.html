@@ -27,8 +27,8 @@
       </svg>
     </div>
     <p class="photo-upload-text">手のひらの写真をアップロード</p>
-    <p class="photo-upload-sub">手を開いて正面から撮影してください</p>
-    <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none">
+    <p class="photo-upload-sub">利き手の反対の手を正面から撮影<br>（右利きなら左手）</p>
+    <input type="file" id="photo-input" accept="image/*" style="display:none">
     <button class="submit-btn" onclick="document.getElementById('photo-input').click()" style="margin-top:16px;">写真を選択</button>
   </div>
   <div class="photo-preview" id="preview" style="display:none">
@@ -66,7 +66,7 @@
             id="palm-arc" style="transition:stroke-dashoffset 1.5s ease-out"/>
           <defs><linearGradient id="palm-grad"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#c4b5fd"/></linearGradient></defs>
         </svg>
-        <div class="dc-score-num" id="p-score">?</div>
+        <div class="dc-score-num" id="p-score">?<span class="score-unit">/100</span></div>
       </div>
       <div class="dc-rel-label" id="p-type"></div>
     </div>
@@ -141,7 +141,7 @@ async function analyzePhoto(){
 function showResult(d){
   document.getElementById('loading-section').style.display = 'none';
   document.getElementById('result-section').style.display = 'block';
-  document.getElementById('p-score').textContent = d.fortune_score || '?';
+  document.getElementById('p-score').innerHTML = (d.fortune_score || '?') + '<span class="score-unit">/100</span>';
   document.getElementById('p-type').textContent = d.hand_type || '';
   document.getElementById('p-life').textContent = d.life_line || '';
   document.getElementById('p-head').textContent = d.head_line || '';
