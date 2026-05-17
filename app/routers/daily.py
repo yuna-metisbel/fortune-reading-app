@@ -47,7 +47,11 @@ DAILY_SYSTEM_PROMPT = """あなたは鋭い直感と深い占術知識を持つ�
 - one_linerは絶対に曖昧にしない。「あなたに転機が」は禁止。日時・場所・感情を具体的に
 - パワーストーンは必ず実在するものを選ぶ
 - ネイルカラーコードは実際にネイルとして美しい色を選ぶ（くすみ系、シアー系が好まれる）
-- JSONのみ出力。説明文は不要"""
+- JSONのみ出力。説明文は不要
+- 全フィールド合計で400文字以内に収める
+- one_linerは30文字以内
+- messageは80文字以内（2文まで）
+- action_tip, caution, stone_message, nail_message, fashion_messageはそれぞれ40文字以内"""
 
 
 def _build_daily_prompt(birth_date: date, today: date) -> str:

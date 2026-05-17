@@ -745,3 +745,18 @@ async def test_dalle():
         return JSONResponse({"status": "ok", "image_models": models})
     except Exception as e:
         return JSONResponse({"error": str(e)})
+
+
+# ---------------------------------------------------------------------------
+# GET /api/readings/{reading_id}/badge
+# ---------------------------------------------------------------------------
+
+@router.get("/api/readings/{reading_id}/badge")
+async def get_badge(reading_id: int, db: AsyncSession = Depends(get_db)):
+    reading = await db.get(Reading, reading_id)
+    if reading is None:
+        raise HTTPException(status_code=404, detail="Reading not found")
+    if not reading.type_badge and reading.content:
+        await _generate_type_badge(reading_id)
+        await db.refresh(reading)
+    return JSONResponse({"type_badge": reading.type_badge or ""})

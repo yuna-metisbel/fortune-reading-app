@@ -9,7 +9,7 @@ from app.config import settings
 from app.database import engine
 from app.deps import BrowserIdMiddleware
 from app.models import Base
-from app.routers import chat, daily, daily_compat, pages, payment, profiles, readings
+from app.routers import chat, daily, daily_compat, face_reading, pages, palm_reading, payment, profiles, readings
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -49,3 +49,5 @@ app.include_router(profiles.router)
 app.include_router(readings.router)
 app.include_router(chat.router)
 app.include_router(payment.router)
+app.include_router(face_reading.router)
+app.include_router(palm_reading.router)

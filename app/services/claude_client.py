@@ -24,6 +24,28 @@ async def generate_message(
     return response.content[0].text
 
 
+async def generate_vision_message(
+    system_prompt: str,
+    user_prompt: str,
+    image_base64: str,
+    media_type: str = "image/jpeg",
+) -> str:
+    client = get_client()
+    response = await client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=1024,
+        system=system_prompt,
+        messages=[{
+            "role": "user",
+            "content": [
+                {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": image_base64}},
+                {"type": "text", "text": user_prompt},
+            ],
+        }],
+    )
+    return response.content[0].text
+
+
 async def stream_message(
     system_prompt: str,
     user_prompt: str,

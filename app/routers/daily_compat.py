@@ -51,7 +51,12 @@ COMPAT_SYSTEM_PROMPT = """あなたは人間関係の専門家であり、鋭い
 - 家族向け: 日常の中の小さな気遣い・会話を含む
 - 「心がけましょう」は禁止。全て具体的な行動で書く
 - power_wordは「」で囲まず、そのまま口に出せる自然な日本語で
-- JSONのみ出力。説明文は不要"""
+- JSONのみ出力。説明文は不要
+- 全フィールド合計で350文字以内に収める
+- one_linerは30文字以内
+- today_energyは60文字以内（2文まで）
+- communication_tip, do_this, avoid_this, evening_actionはそれぞれ40文字以内
+- power_wordは20文字以内"""
 
 
 def _build_compat_prompt(my_bd: date, partner_bd: date, rel_type: str, nickname: str, today: date) -> str:
