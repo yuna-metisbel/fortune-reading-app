@@ -484,6 +484,15 @@ async def reading_result(
             if '最後のメッセージ' in clean_title:
                 clean_title = '魂のメッセージ'
 
+            used_kps = set()
+            for kp in key_points[:5]:
+                used_kps.add(kp)
+                used_kps.add('- ' + kp)
+                used_kps.add('* ' + kp)
+                used_kps.add('**' + kp + '**')
+                used_kps.add('- 「' + kp + '」')
+                used_kps.add('* 「' + kp + '」')
+
             body_lines = body.split('\n')
             summary_paragraphs = []
             for bl in body_lines:
@@ -491,6 +500,11 @@ async def reading_result(
                 if not bl_s:
                     if summary_paragraphs and summary_paragraphs[-1] != '':
                         summary_paragraphs.append('')
+                    continue
+                if bl_s.strip('「」') in used_kps or bl_s in used_kps:
+                    continue
+                content = bl_s.lstrip('- ').lstrip('* ').strip('「」')
+                if content in used_kps or content in {kp.strip('「」') for kp in key_points[:5]}:
                     continue
                 if re.match(r'^.{1,20}へ$', bl_s):
                     continue
