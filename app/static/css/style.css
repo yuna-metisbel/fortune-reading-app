@@ -811,7 +811,10 @@ img, svg { max-width: 100%; height: auto; }
 .scroll-prompt-arrow { font-size: 16px; color: rgba(216,180,254,.35); }
 
 /* --- Detail Section (Accordions — 2-column grid) --- */
-.detail-section { margin-top: 24px; }
+.detail-section {
+  padding-top: 32px;
+  margin-top: 20px;
+}
 .detail-header {
   font-family: var(--font-label);
   font-size: 12px; font-weight: 700;
@@ -822,7 +825,7 @@ img, svg { max-width: 100%; height: auto; }
 .detail-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 20px;
 }
 .poster--compat + .detail-section .detail-grid {
   grid-template-columns: 1fr;
@@ -834,6 +837,7 @@ img, svg { max-width: 100%; height: auto; }
   border-radius: 12px;
   backdrop-filter: blur(16px);
   overflow: hidden; transition: all .3s;
+  margin-bottom: 20px;
 }
 .reading-section {
   animation: fadeSlideUp .5s ease-out both;
@@ -866,14 +870,14 @@ img, svg { max-width: 100%; height: auto; }
 }
 .section-arrow { font-size: 12px; color: var(--text-secondary); transition: transform .3s; }
 .reading-section.open .section-arrow { transform: rotate(180deg); }
-.section-body { max-height: 0; overflow: hidden; transition: max-height .5s ease; }
+.section-body { max-height: 0; overflow: hidden; transition: max-height .5s ease; padding: 0 4px 20px; }
 .reading-section.open .section-body { max-height: 3000px; }
 
 .section-illust { display: flex; justify-content: center; padding: 8px 0 16px; }
 .section-illust svg { opacity: .5; }
 
 .section-content {
-  padding: 0 18px 18px;
+  padding: 0 20px 20px;
   font-family: var(--font-body);
   font-size: 14px; font-weight: 500;
   line-height: 2.2; letter-spacing: .5px;
@@ -905,7 +909,7 @@ img, svg { max-width: 100%; height: auto; }
 .section-kp-card {
   display: flex; align-items: baseline; gap: 10px;
   padding: 12px 14px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   background: rgba(255,255,255,.04);
   border: 1px solid rgba(216,180,254,.1);
   border-radius: 8px;
@@ -1076,9 +1080,20 @@ img, svg { max-width: 100%; height: auto; }
   border-radius: 8px;
   font-family: var(--font-detail);
   font-size: 14px; font-weight: 700;
-  line-height: 2.4; color: rgba(245,240,255,.85);
+  line-height: 2.1; color: rgba(245,240,255,.85);
   word-break: auto-phrase;
   overflow-wrap: break-word;
+  text-align: left;
+}
+.read-more-content p {
+  margin-bottom: 16px;
+  font-size: 15px;
+  line-height: 2.1;
+}
+.read-more-content strong,
+.read-more-content .kw-hl {
+  font-size: inherit !important;
+  display: inline;
 }
 
 /* --- Monthly Grid --- */
@@ -1456,8 +1471,8 @@ img, svg { max-width: 100%; height: auto; }
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 14px;
-  padding: 18px;
-  margin-bottom: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
   backdrop-filter: blur(8px);
 }
 .daily-card-label {
@@ -1481,7 +1496,7 @@ img, svg { max-width: 100%; height: auto; }
 .daily-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 16px;
   margin-bottom: 12px;
 }
 
@@ -1713,8 +1728,8 @@ img, svg { max-width: 100%; height: auto; }
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 14px;
-  padding: 18px;
-  margin-bottom: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
   backdrop-filter: blur(8px);
 }
 .dc-card-label {

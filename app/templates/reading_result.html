@@ -339,11 +339,8 @@ function breakBody(s) {
 
 // **太字** → 単語(≤8文字+助詞なし)=サイズ大+背景、フレーズ=下線+色
 function styleBold(html, C) {
-  return html.replace(/\*\*([^*\n]+)\*\*/g, function(m, p1) {
-    var isWord = p1.length <= 8 && !PARTICLES.test(p1);
-    var sz = isWord ? '1.25em' : '1.1em';
-    return '<strong class="kw-hl" style="font-size:'+sz+'">'+p1+'</strong>';
-  }).replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+  return html.replace(/\*\*([^*\n]+)\*\*/g, '<strong class="kw-hl">$1</strong>')
+    .replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
 }
 
 // 短い行は大きく、長い行は小さく
@@ -391,6 +388,8 @@ function renderMarkdownBody(el) {
         html += '<div class="reading-callout"><p>'+breakBody(t)+'</p></div>';
       } else if (slug==='message' && _isTarotLine(t)) {
         var cn = t.replace(/\*\*/g,'').replace(/からのメッセージ.*/, '').replace(/：$/, '').replace(/\d+枚目[：:]?\s*/, '');
+        var isReversed = /逆位置/.test(t);
+        var cardColor = isReversed ? '#f9a8d4' : '#34d399';
         var cardBody = '';
         while (i + 1 < lines.length) {
           var next = lines[i+1].trim();
@@ -399,7 +398,7 @@ function renderMarkdownBody(el) {
           cardBody += '<p style="font-size:13px;line-height:2.0;color:rgba(245,240,255,.85)">'+cleaned+'</p>';
           i++;
         }
-        html += '<div class="tarot-card-row"><p class="tarot-card-name" style="color:'+C+'">'+styleBold(t, C)+'</p>';
+        html += '<div class="tarot-card-row" style="border-left:3px solid ' + cardColor + '30"><p class="tarot-card-name" style="color:'+cardColor+'">'+styleBold(t, cardColor)+'</p>';
         html += '<div class="tarot-card-illust">'+(tarotSVGs[getTarotKey(cn)]||tarotSVGs['default'])+'</div>';
         if (cardBody) html += '<div class="tarot-card-body">'+cardBody+'</div>';
         html += '</div>';
@@ -441,16 +440,19 @@ function formatKeyPoints() {
 function formatCatchcopies() {
   document.querySelectorAll('.section-catchcopy').forEach(function(el) {
     var raw = el.textContent.trim();
-    var broken = breakShort(raw);
-    var parts = broken.split('<br>');
-    var maxLen = 0;
-    parts.forEach(function(p){ var c = p.trim(); if(c.length > maxLen) maxLen = c.length; });
-    var sz = maxLen<=8?24 : maxLen<=14?20 : 16;
-    el.innerHTML = parts.map(function(p) {
-      var clean = p.trim();
-      if (!clean) return '';
-      return '<span style="display:block;font-size:'+sz+'px;line-height:1.5">'+clean+'</span>';
-    }).filter(Boolean).join('');
+    var text = raw.replace(/[「」『』]/g, '');
+    // Calculate appropriate font size to fit in ~2 lines
+    // Assume container width ~350px, each char ~font-size px wide
+    var charCount = text.length;
+    var sz;
+    if (charCount <= 12) sz = 24;
+    else if (charCount <= 20) sz = 20;
+    else if (charCount <= 30) sz = 17;
+    else sz = 15;
+    el.style.fontSize = sz + 'px';
+    el.style.lineHeight = '1.7';
+    el.style.fontWeight = '700';
+    el.textContent = text;
   });
 }
 
