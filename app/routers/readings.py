@@ -468,43 +468,38 @@ async def reading_result(
             lines = part.strip().split('\n', 1)
             title = lines[0].strip()
             body = lines[1].strip() if len(lines) > 1 else ""
+            body_lines = body.split('\n')
             key_points = []
+            kp_line_indices = set()
             catchcopy_found = False
-            for line in body.split('\n'):
+            bullet_count = 0
+            for i, line in enumerate(body_lines):
                 stripped = line.strip()
                 if stripped.startswith('- ') or stripped.startswith('* '):
-                    point = stripped[2:].strip('「」')
-                    key_points.append(point)
+                    bullet_count += 1
+                    if bullet_count <= 5:
+                        point = stripped[2:].strip('「」')
+                        key_points.append(point)
+                        kp_line_indices.add(i)
                 elif stripped.startswith('**') and stripped.endswith('**'):
                     if not catchcopy_found:
-                        key_points.append(stripped.strip('*').strip('「」'))
+                        key_points.insert(0, stripped.strip('*').strip('「」'))
+                        kp_line_indices.add(i)
                         catchcopy_found = True
+
             clean_title = re.sub(r'^[①②③④⑤⑥⑦⑧⑨⑩]\s*', '', title)
             clean_title = clean_title.replace('・発信', '').replace('・発信力', '')
             if '最後のメッセージ' in clean_title:
                 clean_title = '魂のメッセージ'
 
-            used_kps = set()
-            for kp in key_points[:5]:
-                used_kps.add(kp)
-                used_kps.add('- ' + kp)
-                used_kps.add('* ' + kp)
-                used_kps.add('**' + kp + '**')
-                used_kps.add('- 「' + kp + '」')
-                used_kps.add('* 「' + kp + '」')
-
-            body_lines = body.split('\n')
             summary_paragraphs = []
-            for bl in body_lines:
+            for i, bl in enumerate(body_lines):
                 bl_s = bl.strip()
                 if not bl_s:
                     if summary_paragraphs and summary_paragraphs[-1] != '':
                         summary_paragraphs.append('')
                     continue
-                if bl_s.strip('「」') in used_kps or bl_s in used_kps:
-                    continue
-                content = bl_s.lstrip('- ').lstrip('* ').strip('「」')
-                if content in used_kps or content in {kp.strip('「」') for kp in key_points[:5]}:
+                if i in kp_line_indices:
                     continue
                 if re.match(r'^.{1,20}へ$', bl_s):
                     continue
