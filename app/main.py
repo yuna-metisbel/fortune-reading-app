@@ -24,6 +24,7 @@ async def lifespan(app: FastAPI):
             "ALTER TABLE readings ADD COLUMN stripe_session_id TEXT",
             "ALTER TABLE readings ADD COLUMN form_data_json TEXT",
             "ALTER TABLE users ADD COLUMN browser_id TEXT",
+            "ALTER TABLE readings ADD COLUMN type_badge TEXT",
         ]:
             try:
                 await conn.execute(sa.text(col_sql))

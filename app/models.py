@@ -56,6 +56,7 @@ class Reading(Base):
     content: Mapped[str] = mapped_column(Text, default="")
     prompt_used: Mapped[str] = mapped_column(Text, default="")
     image_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    type_badge: Mapped[str | None] = mapped_column(String(50), nullable=True)
     payment_status: Mapped[str] = mapped_column(String(20), default="free")
     stripe_session_id: Mapped[str | None] = mapped_column(String(200), nullable=True)
     form_data_json: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -89,6 +90,17 @@ class DailyFortune(Base):
     message: Mapped[str] = mapped_column(Text)
     action_tip: Mapped[str] = mapped_column(Text)
     caution: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now_jst)
+
+    user: Mapped["User"] = relationship()
+
+
+class LineSubscription(Base):
+    __tablename__ = "line_subscriptions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    subscribed: Mapped[bool] = mapped_column(Integer, default=1)  # SQLite doesn't have bool
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now_jst)
 
     user: Mapped["User"] = relationship()

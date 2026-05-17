@@ -54,6 +54,8 @@ async def compatibility_new(
     request: Request,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_browser_user),
+    from_nick: str = "",
+    from_bd: str = "",
 ):
     result = await db.execute(
         select(Profile)
@@ -61,7 +63,12 @@ async def compatibility_new(
         .order_by(Profile.created_at.desc())
     )
     profiles = result.scalars().all()
-    return templates.TemplateResponse("compatibility_form.html", {"request": request, "profiles": profiles})
+    return templates.TemplateResponse("compatibility_form.html", {
+        "request": request,
+        "profiles": profiles,
+        "from_nick": from_nick,
+        "from_bd": from_bd,
+    })
 
 
 @router.get("/reading/generate/{reading_id}")

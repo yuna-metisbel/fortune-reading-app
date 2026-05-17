@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.deps import get_browser_user
-from app.models import DailyFortune, User
+from app.models import DailyFortune, LineSubscription, User
 from app.services.claude_client import generate_message
 from app.services.numerology import calculate_life_path
 
@@ -147,6 +147,39 @@ async def generate_daily(
     await db.refresh(fortune)
 
     return JSONResponse(_fortune_to_dict(fortune))
+
+
+@router.post("/api/daily/line-subscribe")
+async def line_subscribe(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_browser_user),
+):
+    result = await db.execute(
+        select(LineSubscription).where(LineSubscription.user_id == user.id).limit(1)
+    )
+    existing = result.scalar_one_or_none()
+    if existing:
+        existing.subscribed = 1
+        await db.commit()
+    else:
+        sub = LineSubscription(user_id=user.id, subscribed=1)
+        db.add(sub)
+        await db.commit()
+    return JSONResponse({"status": "subscribed"})
+
+
+@router.get("/api/daily/line-status")
+async def line_status(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_browser_user),
+):
+    result = await db.execute(
+        select(LineSubscription).where(LineSubscription.user_id == user.id).limit(1)
+    )
+    sub = result.scalar_one_or_none()
+    return JSONResponse({"subscribed": bool(sub and sub.subscribed)})
 
 
 def _fortune_to_dict(f: DailyFortune) -> dict:

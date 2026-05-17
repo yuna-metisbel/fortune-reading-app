@@ -188,4 +188,43 @@
 
 {% block scripts %}
 <script src="/static/js/reading.js?v=2"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var fromNick = '{{ from_nick | default("") }}';
+  var fromBd = '{{ from_bd | default("") }}';
+  if (fromNick && fromBd) {
+    // Show invite banner
+    var banner = document.createElement('div');
+    banner.className = 'invite-banner';
+    banner.innerHTML = '💌 <strong>' + fromNick + '</strong>さんから相性占いの招待が届いています';
+    var header = document.querySelector('.page-header');
+    if (header) header.after(banner);
+
+    // Fill person2 (the inviter)
+    var parts = fromBd.split('-');
+    var p2y = document.getElementById('person2_birth_year');
+    var p2m = document.getElementById('person2_birth_month');
+    var p2d = document.getElementById('person2_birth_day');
+    var p2n = document.getElementById('person2_nickname');
+    if (p2n) p2n.value = fromNick;
+    if (p2y && parts[0]) p2y.value = parts[0];
+    if (p2m && parts[1]) p2m.value = String(parseInt(parts[1]));
+    if (p2d && parts[2]) p2d.value = String(parseInt(parts[2]));
+
+    // Auto-fill person1 from localStorage
+    var saved = localStorage.getItem('fortune_birth');
+    if (saved) {
+      try {
+        var sb = JSON.parse(saved);
+        var p1y = document.getElementById('person1_birth_year');
+        var p1m = document.getElementById('person1_birth_month');
+        var p1d = document.getElementById('person1_birth_day');
+        if (p1y && !p1y.value) p1y.value = sb.y || '';
+        if (p1m && !p1m.value) p1m.value = sb.m || '';
+        if (p1d && !p1d.value) p1d.value = sb.d || '';
+      } catch(e) {}
+    }
+  }
+});
+</script>
 {% endblock %}

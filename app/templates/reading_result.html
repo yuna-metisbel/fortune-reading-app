@@ -47,6 +47,11 @@
     <div class="poster-message sparkle-message">
       <p class="poster-message-text">{% if last and last.key_points %}{{ last.key_points[0] | replace('「','') | replace('」','') }}{% endif %}</p>
     </div>
+    {% if reading.type_badge %}
+    <div class="type-badge-wrap">
+      <div class="type-badge">{{ reading.type_badge }}</div>
+    </div>
+    {% endif %}
     {% endif %}
   {% else %}
     <div class="poster-label" style="animation:glowPulse 4s ease-in-out infinite">SOUL READING</div>
@@ -89,12 +94,20 @@
     <div class="poster-message sparkle-message">
       <p class="poster-message-text">{% if last and last.key_points %}{{ last.key_points[0] | replace('「','') | replace('」','') }}{% endif %}</p>
     </div>
+    {% if reading.type_badge %}
+    <div class="type-badge-wrap">
+      <div class="type-badge">{{ reading.type_badge }}</div>
+    </div>
+    {% endif %}
     {% endif %}
   {% endif %}
 
     <button class="save-image-btn" onclick="savePoster()">✦ 占いの結果を保存する</button>
     <button class="share-link-btn" onclick="copyLink()">✧ LINK をコピー</button>
     <button class="share-card-btn" onclick="shareCard()">✦ SNSカードを保存</button>
+    {% if not is_compat %}
+    <button class="invite-btn" onclick="copyInviteLink()">💌 相性を占ってもらう</button>
+    {% endif %}
 
     <div class="scroll-prompt">
       <div class="scroll-prompt-text">SCROLL FOR DETAIL</div>
@@ -196,6 +209,15 @@ function toggleMore(btn){
 }
 function toggleMonth(el){var w=el.classList.contains('expanded');document.querySelectorAll('.month-card.expanded').forEach(function(c){c.classList.remove('expanded');});if(!w)el.classList.add('expanded');}
 function copyLink(){navigator.clipboard.writeText(location.href).then(function(){showToast('✧ リンクをコピーしました');});}
+function copyInviteLink(){
+  var nick = '{{ reading.profile.nickname if reading.profile else "" }}';
+  var bd = '{{ reading.profile.birth_date.isoformat() if reading.profile and reading.profile.birth_date else "" }}';
+  var params = new URLSearchParams({from_nick: nick, from_bd: bd});
+  var url = location.origin + '/compatibility/new?' + params.toString();
+  navigator.clipboard.writeText(url).then(function(){
+    showToast('💌 招待リンクをコピーしました！相手に送ってね');
+  });
+}
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
 function savePoster(){
   var btn=document.querySelector('.save-image-btn');

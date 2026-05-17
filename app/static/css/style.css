@@ -762,6 +762,39 @@ img, svg { max-width: 100%; height: auto; }
   transform: translateY(-1px);
 }
 
+/* Invite */
+.invite-btn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, rgba(240,171,252,.12), rgba(240,171,252,.05));
+  border: 1px solid rgba(240,171,252,.4);
+  border-radius: 8px;
+  color: #f5c6ff;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .3s;
+}
+.invite-btn:hover {
+  background: linear-gradient(135deg, rgba(240,171,252,.2), rgba(240,171,252,.1));
+  transform: translateY(-1px);
+}
+.invite-banner {
+  background: linear-gradient(135deg, rgba(240,171,252,.12), rgba(167,139,250,.08));
+  border: 1px solid rgba(240,171,252,.35);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 14px;
+  color: var(--accent-pink);
+  text-align: center;
+  line-height: 1.6;
+  animation: fadeSlideUp .6s ease-out both;
+}
+
 .scroll-prompt { margin-top: 32px; text-align: center; animation: float 2.5s ease-in-out infinite; }
 .scroll-prompt-text {
   font-family: var(--font-label);
@@ -1539,6 +1572,48 @@ img, svg { max-width: 100%; height: auto; }
   font-size: 18px;
   font-weight: 700;
   color: var(--highlight);
+}
+
+/* LINE notification */
+.daily-line-card {
+  text-align: center;
+  margin-bottom: 16px;
+}
+.daily-line-text {
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+.line-subscribe-btn {
+  display: inline-block;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #06C755, #04a648);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .3s;
+}
+.line-subscribe-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(6,199,85,.3);
+}
+.line-subscribe-btn.subscribed {
+  background: rgba(6,199,85,.2);
+  color: #06C755;
+  border: 1px solid rgba(6,199,85,.4);
+}
+.line-subscribe-btn:disabled {
+  cursor: default;
+}
+.daily-line-note {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  opacity: .7;
 }
 
 .daily-actions {

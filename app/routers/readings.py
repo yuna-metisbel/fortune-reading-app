@@ -1,4 +1,5 @@
 import asyncio
+import json as _json
 import re
 from datetime import date, time
 from pathlib import Path
@@ -16,7 +17,7 @@ from sqlalchemy.orm import selectinload
 from app.database import async_session, get_db
 from app.deps import get_browser_user
 from app.models import Profile, Reading, User
-from app.services.claude_client import stream_message
+from app.services.claude_client import generate_message, stream_message
 from app.services.image_generator import generate_reading_image
 from app.services.prompts import (
     SYSTEM_PROMPT_COMPATIBILITY,
@@ -30,6 +31,41 @@ from app.services.shichusuimei import calculate_year_pillar
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
+
+
+async def _generate_type_badge(reading_id: int):
+    """Generate a 〇〇タイプ badge from reading content."""
+    try:
+        async with async_session() as db:
+            reading = await db.get(Reading, reading_id)
+            if not reading or not reading.content or reading.type_badge:
+                return
+            prompt = f"""以下の占い結果から、この人を一言で表す「〇〇タイプ」を生成してください。
+
+ルール:
+- 「〇〇タイプ」の形式で、〇〇は4-8文字
+- ポジティブで、本人が自己紹介に使いたくなるもの
+- 例: 「静かな革命家タイプ」「直感の魔術師タイプ」「愛の建築家タイプ」「言葉の錬金術師タイプ」
+- JSON形式で返す: {{"type_badge": "〇〇タイプ"}}
+- JSON以外のテキストは一切含めない
+
+占い結果:
+{reading.content[:1500]}"""
+
+            raw = await generate_message(
+                "あなたは占い結果からパーソナリティタイプを抽出する専門家です。JSONのみ出力してください。",
+                prompt,
+            )
+            match = re.search(r'\{.*?\}', raw, re.DOTALL)
+            if match:
+                data = _json.loads(match.group())
+                reading.type_badge = data.get("type_badge", "")
+            else:
+                data = _json.loads(raw)
+                reading.type_badge = data.get("type_badge", "")
+            await db.commit()
+    except Exception:
+        pass
 
 
 # ---------------------------------------------------------------------------
@@ -203,6 +239,7 @@ async def personal_stream(
         except (asyncio.TimeoutError, Exception):
             pass
 
+        asyncio.create_task(_generate_type_badge(reading_id))
         yield f"event: done\ndata: {reading_id}\n\n"
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")
@@ -322,6 +359,7 @@ async def compatibility_stream(
         except (asyncio.TimeoutError, Exception):
             pass
 
+        asyncio.create_task(_generate_type_badge(reading_id))
         yield f"event: done\ndata: {reading_id}\n\n"
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")

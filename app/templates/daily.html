@@ -139,6 +139,16 @@
 
   </div>
 
+  <!-- LINE notification opt-in -->
+  <div class="daily-card daily-line-card" id="line-card">
+    <div class="daily-card-label">LINE通知</div>
+    <p class="daily-line-text">毎朝の運勢をLINEでお届け</p>
+    <button class="line-subscribe-btn" id="line-btn" onclick="subscribeLine()">
+      🔔 LINE通知を受け取る
+    </button>
+    <p class="daily-line-note">※ 近日公開予定。登録しておくと開始時にお知らせします</p>
+  </div>
+
   <!-- Actions -->
   <div class="daily-actions">
     <button class="submit-btn" onclick="shareDaily()" style="margin-top:16px;">✦ シェアする</button>
@@ -236,6 +246,35 @@ function animateResult(luck, nailCode) {
     setTimeout(function(){ arc.style.strokeDashoffset = offset; }, 100);
   }
 }
+
+async function subscribeLine(){
+  var btn = document.getElementById('line-btn');
+  btn.disabled = true;
+  btn.textContent = '登録中...';
+  try {
+    var resp = await fetch('/api/daily/line-subscribe', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
+    var data = await resp.json();
+    if (data.status === 'subscribed') {
+      btn.textContent = '✓ 登録済み';
+      btn.classList.add('subscribed');
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '🔔 LINE通知を受け取る';
+  }
+}
+
+// Check subscription status on load
+(async function(){
+  try {
+    var resp = await fetch('/api/daily/line-status');
+    var data = await resp.json();
+    if (data.subscribed) {
+      var btn = document.getElementById('line-btn');
+      if (btn) { btn.textContent = '✓ 登録済み'; btn.classList.add('subscribed'); btn.disabled = true; }
+    }
+  } catch(e) {}
+})();
 
 function shareDaily() {
   var el = document.getElementById('daily-capture');
