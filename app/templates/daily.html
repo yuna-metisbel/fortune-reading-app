@@ -18,17 +18,31 @@
 <div id="input-section" {% if fortune %}style="display:none"{% endif %}>
   <form id="daily-form" novalidate>
     <div class="form-card">
-      <div class="form-section-title">BIRTH DATE</div>
+      <div class="form-section-title">BASIC INFO</div>
       <div class="input-group">
-        <label class="input-label">生年月日を入力</label>
+        <label class="input-label">生年月日</label>
         <div class="date-row">
           <input type="text" id="d_year" class="text-input" placeholder="1995" inputmode="numeric" maxlength="4" required>
           <input type="text" id="d_month" class="text-input" placeholder="6" inputmode="numeric" maxlength="2" required>
           <input type="text" id="d_day" class="text-input" placeholder="15" inputmode="numeric" maxlength="2" required>
         </div>
       </div>
+      <div class="input-group">
+        <label class="input-label">血液型</label>
+        <select id="d_blood" class="select-input">
+          <option value="">選択してください</option>
+          <option value="A">A型</option>
+          <option value="B">B型</option>
+          <option value="O">O型</option>
+          <option value="AB">AB型</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label class="input-label">出身地 <span class="optional">OPTIONAL</span></label>
+        <input type="text" id="d_place" class="text-input" placeholder="東京都" autocomplete="off">
+      </div>
     </div>
-    <button type="submit" class="submit-btn">☀ 今日の運勢を見る</button>
+    <button type="submit" class="submit-btn">✦ 今日の運勢を見る</button>
   </form>
 </div>
 
@@ -165,14 +179,26 @@
   if (!form) return;
 
   // Auto-fill from localStorage
-  var saved = localStorage.getItem('fortune_birth');
+  var saved = localStorage.getItem('fortune_profile');
   if (saved) {
     try {
       var s = JSON.parse(saved);
       document.getElementById('d_year').value = s.y || '';
       document.getElementById('d_month').value = s.m || '';
       document.getElementById('d_day').value = s.d || '';
+      if (s.blood) document.getElementById('d_blood').value = s.blood;
+      if (s.place) document.getElementById('d_place').value = s.place;
     } catch(e) {}
+  } else {
+    var oldSaved = localStorage.getItem('fortune_birth');
+    if (oldSaved) {
+      try {
+        var s = JSON.parse(oldSaved);
+        document.getElementById('d_year').value = s.y || '';
+        document.getElementById('d_month').value = s.m || '';
+        document.getElementById('d_day').value = s.d || '';
+      } catch(e) {}
+    }
   }
 
   {% if fortune %}
@@ -184,9 +210,13 @@
     var y = document.getElementById('d_year').value.trim();
     var m = document.getElementById('d_month').value.trim().padStart(2,'0');
     var d = document.getElementById('d_day').value.trim().padStart(2,'0');
+    var blood = document.getElementById('d_blood').value;
+    var place = document.getElementById('d_place').value.trim();
     if (!y || !m || !d) return;
 
-    localStorage.setItem('fortune_birth', JSON.stringify({y:y,m:m,d:d}));
+    var profile = {y:y, m:document.getElementById('d_month').value.trim(), d:document.getElementById('d_day').value.trim(), blood:blood, place:place};
+    localStorage.setItem('fortune_profile', JSON.stringify(profile));
+    localStorage.setItem('fortune_birth', JSON.stringify({y:profile.y, m:profile.m, d:profile.d}));
 
     document.getElementById('input-section').style.display='none';
     document.getElementById('loading-section').style.display='block';
@@ -195,7 +225,7 @@
       var resp = await fetch('/api/daily/generate', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({birth_date: y+'-'+m+'-'+d})
+        body: JSON.stringify({birth_date: y+'-'+m+'-'+d, blood_type: blood || null, birth_place: place || null})
       });
       var data = await resp.json();
       if (data.error) { alert(data.error); location.reload(); return; }
@@ -206,11 +236,12 @@
     }
   });
 
-  // Auto-submit if birth date is saved and no fortune yet
+  // Auto-submit if profile is saved and no fortune yet
   {% if not fortune %}
-  if (saved) {
-    var s = JSON.parse(saved);
-    if (s.y && s.m && s.d) {
+  var autoSaved = saved || localStorage.getItem('fortune_birth');
+  if (autoSaved) {
+    var s = JSON.parse(autoSaved);
+    if (s.y && (s.m || s.m === 0) && (s.d || s.d === 0)) {
       form.dispatchEvent(new Event('submit'));
     }
   }

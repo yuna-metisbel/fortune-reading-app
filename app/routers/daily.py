@@ -54,17 +54,28 @@ DAILY_SYSTEM_PROMPT = """あなたは鋭い直感と深い占術知識を持つ�
 - action_tip, caution, stone_message, nail_message, fashion_messageはそれぞれ40文字以内"""
 
 
-def _build_daily_prompt(birth_date: date, today: date) -> str:
+def _build_daily_prompt(birth_date: date, today: date, blood_type: str | None = None, birth_place: str | None = None) -> str:
     life_path = calculate_life_path(birth_date.year, birth_date.month, birth_date.day)
     day_number = (today.year + today.month + today.day) % 9 + 1
 
-    return f"""生年月日: {birth_date.isoformat()}
-今日の日付: {today.isoformat()}
-曜日: {today.strftime('%A')}
-ライフパスナンバー: {life_path.get('life_path', '不明')}
-今日の数秘デイナンバー: {day_number}
-
-この情報を元に今日の運勢をJSON形式で出力してください。"""
+    lines = [
+        f"生年月日: {birth_date.isoformat()}",
+        f"今日の日付: {today.isoformat()}",
+        f"曜日: {today.strftime('%A')}",
+        f"ライフパスナンバー: {life_path.get('life_path', '不明')}",
+        f"今日の数秘デイナンバー: {day_number}",
+    ]
+    if blood_type:
+        lines.append(f"血液型: {blood_type}型")
+    if birth_place:
+        lines.append(f"出身地: {birth_place}")
+    lines.append("")
+    lines.append("この情報を元に今日の運勢をJSON形式で出力してください。")
+    if blood_type:
+        lines.append(f"血液型{blood_type}型の性格特性も加味して占ってください。")
+    if birth_place:
+        lines.append(f"出身地の土地のエネルギーも考慮してください。")
+    return "\n".join(lines)
 
 
 @router.get("/daily")
@@ -95,6 +106,8 @@ async def generate_daily(
 ):
     body = await request.json()
     birth_date_str = body.get("birth_date", "")
+    blood_type = body.get("blood_type") or None
+    birth_place = body.get("birth_place") or None
     try:
         birth_date = date.fromisoformat(birth_date_str)
     except (ValueError, TypeError):
@@ -111,7 +124,7 @@ async def generate_daily(
     if existing:
         return JSONResponse(_fortune_to_dict(existing))
 
-    user_prompt = _build_daily_prompt(birth_date, today)
+    user_prompt = _build_daily_prompt(birth_date, today, blood_type, birth_place)
 
     for attempt in range(2):
         raw = await generate_message(DAILY_SYSTEM_PROMPT, user_prompt)

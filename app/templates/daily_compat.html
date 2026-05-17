@@ -18,7 +18,7 @@
 <div id="input-section">
   <form id="compat-form" novalidate>
     <div class="form-card">
-      <div class="form-section-title">YOUR BIRTH DATE</div>
+      <div class="form-section-title">YOUR INFO</div>
       <div class="input-group">
         <label class="input-label">あなたの生年月日</label>
         <div class="date-row">
@@ -26,6 +26,16 @@
           <input type="text" id="my_month" class="text-input" placeholder="6" inputmode="numeric" maxlength="2" required>
           <input type="text" id="my_day" class="text-input" placeholder="15" inputmode="numeric" maxlength="2" required>
         </div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">血液型</label>
+        <select id="my_blood" class="select-input">
+          <option value="">選択してください</option>
+          <option value="A">A型</option>
+          <option value="B">B型</option>
+          <option value="O">O型</option>
+          <option value="AB">AB型</option>
+        </select>
       </div>
     </div>
 
@@ -42,6 +52,16 @@
           <input type="text" id="p_month" class="text-input" placeholder="12" inputmode="numeric" maxlength="2" required>
           <input type="text" id="p_day" class="text-input" placeholder="3" inputmode="numeric" maxlength="2" required>
         </div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">相手の血液型</label>
+        <select id="p_blood" class="select-input">
+          <option value="">選択してください</option>
+          <option value="A">A型</option>
+          <option value="B">B型</option>
+          <option value="O">O型</option>
+          <option value="AB">AB型</option>
+        </select>
       </div>
       <div class="input-group">
         <label class="input-label">関係性</label>
@@ -181,14 +201,25 @@ var cachedResults = {
 var REL_LABELS = {lover:'恋人',partner:'ビジネスパートナー',friend:'友人',family:'家族',colleague:'同僚'};
 
 (function(){
-  var saved = localStorage.getItem('fortune_birth');
+  var saved = localStorage.getItem('fortune_profile');
   if (saved) {
     try {
       var s = JSON.parse(saved);
       document.getElementById('my_year').value = s.y || '';
       document.getElementById('my_month').value = s.m || '';
       document.getElementById('my_day').value = s.d || '';
+      if (s.blood) document.getElementById('my_blood').value = s.blood;
     } catch(e) {}
+  } else {
+    var oldSaved = localStorage.getItem('fortune_birth');
+    if (oldSaved) {
+      try {
+        var s = JSON.parse(oldSaved);
+        document.getElementById('my_year').value = s.y || '';
+        document.getElementById('my_month').value = s.m || '';
+        document.getElementById('my_day').value = s.d || '';
+      } catch(e) {}
+    }
   }
 
   document.getElementById('compat-form').addEventListener('submit', async function(e){
@@ -196,13 +227,13 @@ var REL_LABELS = {lover:'恋人',partner:'ビジネスパートナー',friend:'�
     var my = buildDate('my_'); var p = buildDate('p_');
     var nick = document.getElementById('partner_nick').value.trim();
     var rel = document.querySelector('input[name="rel"]:checked').value;
+    var myBlood = document.getElementById('my_blood').value;
+    var pBlood = document.getElementById('p_blood').value;
     if (!my || !p || !nick) return;
 
-    localStorage.setItem('fortune_birth', JSON.stringify({
-      y: document.getElementById('my_year').value.trim(),
-      m: document.getElementById('my_month').value.trim(),
-      d: document.getElementById('my_day').value.trim()
-    }));
+    var profile = {y:document.getElementById('my_year').value.trim(), m:document.getElementById('my_month').value.trim(), d:document.getElementById('my_day').value.trim(), blood:myBlood};
+    localStorage.setItem('fortune_profile', JSON.stringify(profile));
+    localStorage.setItem('fortune_birth', JSON.stringify({y:profile.y, m:profile.m, d:profile.d}));
 
     document.getElementById('input-section').style.display='none';
     var recentEl = document.getElementById('recent-section');
@@ -212,7 +243,7 @@ var REL_LABELS = {lover:'恋人',partner:'ビジネスパートナー',friend:'�
     try {
       var resp = await fetch('/api/daily/compatibility/generate', {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({my_birth_date:my, partner_birth_date:p, partner_nickname:nick, relationship_type:rel})
+        body: JSON.stringify({my_birth_date:my, partner_birth_date:p, partner_nickname:nick, relationship_type:rel, my_blood_type:myBlood||null, partner_blood_type:pBlood||null})
       });
       var data = await resp.json();
       if (data.error) { alert(data.error); location.reload(); return; }

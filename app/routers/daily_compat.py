@@ -59,22 +59,38 @@ COMPAT_SYSTEM_PROMPT = """あなたは人間関係の専門家であり、鋭い
 - power_wordは20文字以内"""
 
 
-def _build_compat_prompt(my_bd: date, partner_bd: date, rel_type: str, nickname: str, today: date) -> str:
+def _build_compat_prompt(
+    my_bd: date, partner_bd: date, rel_type: str, nickname: str, today: date,
+    my_blood: str | None = None, partner_blood: str | None = None,
+) -> str:
     my_lp = calculate_life_path(my_bd.year, my_bd.month, my_bd.day)
     p_lp = calculate_life_path(partner_bd.year, partner_bd.month, partner_bd.day)
     day_num = (today.year + today.month + today.day) % 9 + 1
     rel_label = RELATIONSHIP_LABELS.get(rel_type, rel_type)
 
-    return f"""あなたの生年月日: {my_bd.isoformat()}
-あなたのライフパスナンバー: {my_lp.get('life_path', '不明')}
-相手（{nickname}）の生年月日: {partner_bd.isoformat()}
-相手のライフパスナンバー: {p_lp.get('life_path', '不明')}
-二人の関係性: {rel_label}
-今日の日付: {today.isoformat()}
-曜日: {today.strftime('%A')}
-今日の数秘デイナンバー: {day_num}
-
-この情報を元に今日の二人の相性とアドバイスをJSON形式で出力してください。"""
+    lines = [
+        f"あなたの生年月日: {my_bd.isoformat()}",
+        f"あなたのライフパスナンバー: {my_lp.get('life_path', '不明')}",
+    ]
+    if my_blood:
+        lines.append(f"あなたの血液型: {my_blood}型")
+    lines += [
+        f"相手（{nickname}）の生年月日: {partner_bd.isoformat()}",
+        f"相手のライフパスナンバー: {p_lp.get('life_path', '不明')}",
+    ]
+    if partner_blood:
+        lines.append(f"相手の血液型: {partner_blood}型")
+    lines += [
+        f"二人の関係性: {rel_label}",
+        f"今日の日付: {today.isoformat()}",
+        f"曜日: {today.strftime('%A')}",
+        f"今日の数秘デイナンバー: {day_num}",
+        "",
+        "この情報を元に今日の二人の相性とアドバイスをJSON形式で出力してください。",
+    ]
+    if my_blood and partner_blood:
+        lines.append(f"血液型相性（{my_blood}型×{partner_blood}型）の特性も加味してください。")
+    return "\n".join(lines)
 
 
 @router.get("/daily/compatibility")
@@ -112,6 +128,8 @@ async def generate_daily_compat(
 
     nickname = body.get("partner_nickname", "相手")
     rel_type = body.get("relationship_type", "friend")
+    my_blood = body.get("my_blood_type") or None
+    partner_blood = body.get("partner_blood_type") or None
     today = date.today()
 
     result = await db.execute(
@@ -126,7 +144,7 @@ async def generate_daily_compat(
     if existing:
         return JSONResponse(_compat_to_dict(existing))
 
-    prompt = _build_compat_prompt(my_bd, partner_bd, rel_type, nickname, today)
+    prompt = _build_compat_prompt(my_bd, partner_bd, rel_type, nickname, today, my_blood, partner_blood)
 
     for attempt in range(2):
         raw = await generate_message(COMPAT_SYSTEM_PROMPT, prompt)
