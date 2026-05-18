@@ -26,8 +26,12 @@
     </div>
     <p class="photo-upload-text">顔写真をアップロード</p>
     <p class="photo-upload-sub">正面からの写真がベスト</p>
+    <input type="file" id="photo-camera" accept="image/*" capture="user" style="display:none">
     <input type="file" id="photo-input" accept="image/*" style="display:none">
-    <button class="submit-btn" onclick="document.getElementById('photo-input').click()" style="margin-top:16px;">写真を選択</button>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="submit-btn" onclick="document.getElementById('photo-camera').click()" style="flex:1;">カメラで撮る</button>
+      <button class="submit-btn" onclick="document.getElementById('photo-input').click()" style="flex:1;background:rgba(216,180,254,.15);color:var(--text-secondary);">カメラロール</button>
+    </div>
   </div>
   <div class="photo-preview" id="preview" style="display:none">
     <img id="preview-img" alt="">
@@ -102,10 +106,10 @@
 var imageData = '';
 var mediaType = 'image/jpeg';
 
-document.getElementById('photo-input').addEventListener('change', function(e){
-  var file = e.target.files[0];
+function handleFile(file) {
   if (!file) return;
   mediaType = file.type || 'image/jpeg';
+  if (file.size > 20 * 1024 * 1024) { alert('ファイルが大きすぎます（20MB以下）'); return; }
   var reader = new FileReader();
   reader.onload = function(ev){
     imageData = ev.target.result;
@@ -113,7 +117,17 @@ document.getElementById('photo-input').addEventListener('change', function(e){
     document.getElementById('drop-area').style.display = 'none';
     document.getElementById('preview').style.display = 'block';
   };
+  reader.onerror = function(){ alert('写真の読み込みに失敗しました。もう一度お試しください'); };
   reader.readAsDataURL(file);
+}
+
+document.getElementById('photo-input').addEventListener('change', function(e){
+  handleFile(e.target.files[0]);
+  this.value = '';
+});
+document.getElementById('photo-camera').addEventListener('change', function(e){
+  handleFile(e.target.files[0]);
+  this.value = '';
 });
 
 async function analyzePhoto(){

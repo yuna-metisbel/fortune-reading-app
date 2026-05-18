@@ -176,6 +176,7 @@ function handleFileSelect(e) {
   var file = e.target.files[0];
   if (!file) return;
   mediaType = file.type || 'image/jpeg';
+  if (file.size > 20 * 1024 * 1024) { alert('ファイルが大きすぎます（20MB以下）'); return; }
   var reader = new FileReader();
   reader.onload = function(ev){
     imageData = ev.target.result;
@@ -185,7 +186,9 @@ function handleFileSelect(e) {
     document.querySelector('.photo-guide').style.display = 'none';
     document.getElementById('preview').style.display = 'block';
   };
+  reader.onerror = function(){ alert('写真の読み込みに失敗しました。もう一度お試しください'); };
   reader.readAsDataURL(file);
+  e.target.value = '';
 }
 
 document.getElementById('photo-camera').addEventListener('change', handleFileSelect);
