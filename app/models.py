@@ -90,6 +90,23 @@ class DailyFortune(Base):
     message: Mapped[str] = mapped_column(Text)
     action_tip: Mapped[str] = mapped_column(Text)
     caution: Mapped[str] = mapped_column(Text)
+    prediction: Mapped[str | None] = mapped_column(Text, nullable=True)
+    prediction_result: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    prediction_checked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now_jst)
+
+    user: Mapped["User"] = relationship()
+
+
+class WeeklyArc(Base):
+    __tablename__ = "weekly_arcs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    birth_date: Mapped[date] = mapped_column(Date)
+    week_start: Mapped[date] = mapped_column(Date)
+    theme: Mapped[str] = mapped_column(Text)
+    story_seed: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now_jst)
 
     user: Mapped["User"] = relationship()

@@ -1,0 +1,218 @@
+{% extends "a/base.html" %}
+{% block title %}{{ reading.theme }} — LUNA ORACLE{% endblock %}
+
+{% block head %}
+<meta property="og:title" content="{{ reading.profile.nickname if reading.profile else 'あなた' }} — LUNA ORACLE">
+<meta property="og:description" content="{% if sections %}{{ sections[0].key_points[0] if sections[0].key_points else '' }}{% endif %}">
+{% endblock %}
+
+{% block style %}
+/* Type reveal with dramatic entrance */
+.type-area{text-align:center;padding:32px 0}
+.type-cat{font-family:var(--f-label);font-size:9px;font-weight:700;letter-spacing:4px;color:var(--green);margin-bottom:10px;opacity:0;animation:typeFadeIn .6s ease-out .3s forwards}
+.type-name{font-family:var(--f-head);font-size:32px;font-weight:800;line-height:1.4;background:linear-gradient(135deg,var(--cream),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;opacity:0;transform:scale(.8);animation:typeReveal 1s cubic-bezier(.16,1,.3,1) .8s forwards}
+.type-en{font-family:var(--f-label);font-size:10px;font-weight:600;letter-spacing:3px;color:rgba(212,165,116,.4);margin-bottom:16px;opacity:0;animation:typeFadeIn .6s ease-out 1.4s forwards}
+.type-catch{font-family:var(--f-head);font-size:14px;font-weight:600;line-height:2;color:var(--gold-bright);opacity:0;animation:typeFadeIn .8s ease-out 1.8s forwards}
+@keyframes typeReveal{0%{opacity:0;transform:scale(.8) translateY(10px)}60%{opacity:1;transform:scale(1.04) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes typeFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Share card */
+.share-card{margin:0 0 24px;padding:28px 20px;background:linear-gradient(135deg,rgba(212,165,116,.08),rgba(212,165,116,.02));border:1px solid rgba(212,165,116,.18);border-radius:14px;text-align:center}
+.share-card-type{font-family:var(--f-head);font-size:20px;font-weight:800;color:var(--cream);margin-bottom:6px}
+.share-card-catch{font-size:11px;line-height:1.8;color:var(--gold);margin-bottom:10px}
+.share-card-meta{font-family:var(--f-label);font-size:8px;font-weight:600;letter-spacing:2px;color:rgba(212,165,116,.3);margin-bottom:12px}
+.share-card-btn{display:inline-block;padding:8px 20px;background:rgba(212,165,116,.12);border:1px solid rgba(212,165,116,.25);border-radius:6px;font-family:var(--f-label);font-size:10px;font-weight:700;letter-spacing:2px;color:var(--gold);cursor:pointer}
+
+/* Section card */
+.sec-card{margin-bottom:14px;animation:fadeUp .5s ease-out both}
+.sec-label{color:var(--gold)}
+.sec-head{font-family:var(--f-head);font-size:16px;font-weight:700;line-height:1.7;color:var(--cream);margin-bottom:12px;border-left:2px solid var(--gold);padding-left:12px}
+.sec-body{font-size:13px;line-height:2.2;color:rgba(240,230,214,.75)}
+.sec-body strong{color:var(--gold);font-weight:700}
+
+/* KP items */
+.kp{display:flex;gap:8px;align-items:baseline;margin-bottom:5px;font-size:12px;line-height:1.9;color:rgba(240,230,214,.65)}
+.kp-dot{color:var(--gold);flex-shrink:0;font-size:9px}
+
+/* Timeline */
+.tl-row{display:flex;gap:6px;overflow-x:auto;padding:4px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tl-row::-webkit-scrollbar{display:none}
+.tl-c{min-width:72px;padding:10px;background:rgba(212,165,116,.04);border:1px solid rgba(212,165,116,.08);border-radius:8px;text-align:center;flex-shrink:0;transition:all .3s}
+.tl-c.now{border-color:rgba(212,165,116,.3);background:rgba(212,165,116,.08)}
+.tl-m{font-family:var(--f-label);font-size:10px;font-weight:700;color:var(--gold-dim);margin-bottom:3px;letter-spacing:1px}
+.tl-c.now .tl-m{color:var(--gold)}
+.tl-kw{font-family:var(--f-head);font-size:11px;font-weight:700;color:var(--cream);line-height:1.4}
+
+/* Basis */
+.basis{margin-top:14px;padding:14px 18px;background:rgba(212,165,116,.03);border:1px solid rgba(212,165,116,.06);border-radius:10px}
+.basis-label{font-family:var(--f-label);font-size:8px;font-weight:700;letter-spacing:3px;color:rgba(212,165,116,.3);margin-bottom:8px}
+.basis-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px}
+.basis-item{font-size:10px;color:rgba(212,165,116,.4);line-height:1.5}
+.basis-item span{color:rgba(240,230,214,.6);font-weight:600}
+
+/* Read more */
+.rm-toggle{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-family:var(--f-label);font-size:11px;font-weight:600;letter-spacing:1px;color:var(--gold);background:none;border:1px solid rgba(212,165,116,.2);cursor:pointer;padding:7px 12px;border-radius:6px;transition:all .3s}
+.rm-toggle:hover{background:rgba(212,165,116,.06)}
+.rm-body{max-height:0;overflow:hidden;transition:max-height .5s ease}
+.rm-body.open{max-height:5000px}
+.rm-content{margin-top:16px;font-size:13px;line-height:2.2;color:rgba(240,230,214,.7)}
+.rm-content strong{color:var(--gold);font-weight:700}
+.rm-content h4{font-family:var(--f-head);font-size:14px;font-weight:700;color:var(--cream);margin:20px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(212,165,116,.1)}
+.rm-content ul{list-style:none;margin:10px 0}
+.rm-content li{padding:8px 12px;margin-bottom:4px;background:rgba(212,165,116,.03);border-radius:6px;border-left:2px solid rgba(212,165,116,.15);line-height:1.9}
+.rm-content p{margin-bottom:12px}
+
+/* Header bar */
+.result-bar{display:flex;justify-content:space-between;align-items:center;padding-top:48px;margin-bottom:4px}
+.result-date{font-family:var(--f-label);font-size:9px;font-weight:600;letter-spacing:3px;color:rgba(212,165,116,.3);margin-bottom:24px}
+.share-btn{font-family:var(--f-label);font-size:10px;font-weight:700;letter-spacing:2px;color:var(--gold);background:rgba(212,165,116,.1);border:1px solid rgba(212,165,116,.2);padding:5px 12px;border-radius:5px;cursor:pointer}
+{% endblock %}
+
+{% block content %}
+<div class="result-bar">
+  <a href="/" class="page-back">&larr; BACK</a>
+  <div class="share-btn" onclick="copyLink()">SHARE</div>
+</div>
+<div class="result-date">{{ reading.created_at.strftime('%Y.%m.%d') }} — LUNA ORACLE</div>
+
+<!-- Type Reveal -->
+<div class="type-area">
+  <div class="type-cat">YOUR ARCHETYPE</div>
+  {% if reading.type_badge %}
+  <div class="type-name">{{ reading.type_badge | replace('タイプ','') }}</div>
+  {% elif sections and sections[0].key_points %}
+  <div class="type-name">{{ sections[0].key_points[0] | replace('「','') | replace('」','') }}</div>
+  {% endif %}
+  {% if reading.type_badge %}
+  <div class="type-en">{{ reading.type_badge }}</div>
+  {% endif %}
+  {% if sections and sections[0].key_points|length > 1 %}
+  <div class="type-catch">{{ sections[0].key_points[1] | replace('「','') | replace('」','') }}</div>
+  {% endif %}
+</div>
+
+<div class="divider-line"></div>
+
+<!-- Share Card -->
+<div class="share-card" id="share-capture">
+  <div class="share-card-type">{% if reading.type_badge %}{{ reading.type_badge }}{% elif sections and sections[0].key_points %}{{ sections[0].key_points[0] | replace('「','') | replace('」','') }}{% endif %}</div>
+  {% if sections and sections[0].key_points|length > 1 %}
+  <div class="share-card-catch">{{ sections[0].key_points[1] | replace('「','') | replace('」','') }}</div>
+  {% endif %}
+  <div class="share-card-meta">LUNA ORACLE &middot; {{ reading.created_at.strftime('%Y.%m.%d') }}</div>
+  <div class="share-card-btn" onclick="shareCard()">&#10022; シェア画像を保存</div>
+  <div class="share-card-btn" onclick="copyInvite()" style="margin-top:6px;background:transparent;border-color:rgba(212,165,116,.15);color:rgba(212,165,116,.4)">&#10023; 友達にも占ってもらう</div>
+</div>
+
+<!-- Cognitive Profile -->
+{% if cognitive_profile and not is_compat %}
+<div class="card" style="margin-bottom:14px">
+  <div class="card-label sec-label" style="color:var(--gold)">COGNITIVE PROFILE</div>
+  {% for item in cognitive_profile %}
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+    <div style="width:56px;font-family:var(--f-label);font-size:10px;color:var(--gold-dim);text-align:right;flex-shrink:0">{{ item.name }}</div>
+    <div style="flex:1;height:4px;background:rgba(212,165,116,.1);border-radius:2px;overflow:hidden"><div class="cog-bar" style="height:100%;width:0%;border-radius:2px;background:linear-gradient(90deg,var(--gold),rgba(212,165,116,.3));transition:width 1s ease-out" data-w="{{ item.value }}%"></div></div>
+    <div style="width:22px;font-family:var(--f-label);font-size:10px;font-weight:700;color:var(--cream);text-align:right">{{ item.value }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Sections -->
+{% if sections %}
+{% for section in sections %}
+{% set theme_s = section.theme %}
+<div class="card sec-card" style="animation-delay:{{ loop.index0 * 0.05 }}s">
+  <div class="card-label sec-label" style="color:{{ theme_s.color }}">{{ section.title | upper }}</div>
+  {% if section.key_points %}
+  <div class="sec-head" style="border-left-color:{{ theme_s.color }}">{{ section.key_points[0] | replace('「','') | replace('」','') }}</div>
+  {% for kp in section.key_points[1:] %}
+  <div class="kp"><span class="kp-dot" style="color:{{ theme_s.color }}">&#10022;</span>{{ kp }}</div>
+  {% endfor %}
+  {% endif %}
+  {% if section.detail_body %}
+  <button class="rm-toggle" onclick="toggleMore(this)" style="border-color:{{ theme_s.color }}40;color:{{ theme_s.color }}">&#10023; 更に詳しく</button>
+  <div class="rm-body">
+    <div class="rm-content" data-raw="{{ section.detail_body | e }}"></div>
+  </div>
+  {% endif %}
+</div>
+{% endfor %}
+
+{% if monthly_data %}
+<div class="card">
+  <div class="card-label sec-label">TIMELINE</div>
+  <div class="tl-row">
+    {% for m in monthly_data %}
+    <div class="tl-c {% if m.num == '5' %}now{% endif %}">
+      <div class="tl-m">{{ m.num }}月</div>
+      <div class="tl-kw">{{ m.keyword }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endif %}
+
+<!-- Basis -->
+<div class="basis">
+  <div class="basis-label">CALCULATION BASIS</div>
+  <div class="basis-grid">
+    {% if reading.profile %}
+    <div class="basis-item">生年月日 <span>{{ reading.profile.birth_date.strftime('%Y.%m.%d') if reading.profile.birth_date else '—' }}</span></div>
+    <div class="basis-item">血液型 <span>{{ reading.profile.blood_type or '未入力' }}</span></div>
+    <div class="basis-item">出生地 <span>{{ reading.profile.birth_place or '未入力' }}</span></div>
+    <div class="basis-item">出生時刻 <span>{{ reading.profile.birth_time.strftime('%H:%M') if reading.profile.birth_time else '未入力' }}</span></div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- CTA -->
+<div style="text-align:center;margin-top:24px">
+  <a href="/chat/{{ reading.id }}" class="btn-gold" style="display:block;text-align:center;text-decoration:none;color:var(--bg)">鑑定師に相談する</a>
+  <a href="/" class="page-back" style="display:block;margin-top:12px">&larr; TOP</a>
+</div>
+
+<div class="footer"><div class="footer-text">LUNA ORACLE 2026</div></div>
+<div class="toast" id="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleMore(btn){var b=btn.nextElementSibling;b.classList.toggle('open');btn.textContent=b.classList.contains('open')?'&#10023; 閉じる':'&#10023; 更に詳しく';}
+function copyLink(){navigator.clipboard.writeText(location.href).then(function(){showToast('&#10023; リンクをコピーしました');});}
+function shareCard(){
+  var el=document.getElementById('share-capture');
+  html2canvas(el,{useCORS:true,scale:2,backgroundColor:'#0F0B1A'}).then(function(c){
+    var a=document.createElement('a');a.href=c.toDataURL('image/png');a.download='luna-oracle-share.png';a.click();
+    showToast('シェア画像を保存しました');
+  });
+}
+function copyInvite(){
+  var url = location.origin + '/reading/new';
+  navigator.clipboard.writeText(url).then(function(){
+    showToast('招待リンクをコピーしました');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(function(){ document.querySelectorAll('.cog-bar').forEach(function(b){ b.style.width = b.dataset.w; }); }, 300);
+  document.querySelectorAll('.rm-content').forEach(function(el){
+    var raw = el.dataset.raw || '';
+    if (!raw) return;
+    raw = raw.replace(/[「」『』]/g,'');
+    var lines = raw.split('\n'), html = '', inList = false;
+    for (var i=0; i<lines.length; i++){
+      var t = lines[i].trim();
+      if (!t) { if(inList){html+='</ul>';inList=false;} continue; }
+      if (/^### (.+)/.test(t)) { if(inList){html+='</ul>';inList=false;} html+='<h4>'+t.replace(/^### /,'')+'</h4>'; }
+      else if (/^[-*] (.+)/.test(t)) { if(!inList){html+='<ul>';inList=true;} html+='<li>'+t.replace(/^[-*] /,'')+'</li>'; }
+      else { if(inList){html+='</ul>';inList=false;} html+='<p>'+t+'</p>'; }
+    }
+    if(inList) html+='</ul>';
+    html = html.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+    el.innerHTML = html;
+  });
+});
+</script>
+{% endblock %}

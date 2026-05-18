@@ -14,27 +14,76 @@
   <div class="campaign-badge">✦ 通常¥500 → 期間限定 無料</div>
 </div>
 
-<!-- UPLOAD -->
+<!-- HAND SELECT + UPLOAD -->
 <div id="upload-section">
+
+  <!-- Step 1: Hand selection -->
+  <div class="hand-selector" id="hand-select">
+    <div class="hand-card selected" data-hand="left" onclick="selectHand(this)">
+      <div class="hand-check">&#10003;</div>
+      <div class="hand-icon">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><path d="M32 12c-1-1-3-1-4 0l-1 2V10c0-2-1-3-3-3s-3 1-3 3v4c0-2-1-3-3-3s-3 1-3 3v6c0-2-1-3-3-3s-3 1-3 3v10c0 8 5 13 12 13s12-5 12-13V16c0-2-1-3-3-3z" stroke="var(--text-secondary)" stroke-width="1.5" fill="none"/></svg>
+      </div>
+      <div class="hand-label">左手</div>
+      <div class="hand-desc">持って生まれた<br>本来の運命</div>
+    </div>
+    <div class="hand-card" data-hand="right" onclick="selectHand(this)">
+      <div class="hand-check">&#10003;</div>
+      <div class="hand-icon">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><path d="M16 12c1-1 3-1 4 0l1 2V10c0-2 1-3 3-3s3 1 3 3v4c0-2 1-3 3-3s3 1 3 3v6c0-2 1-3 3-3s3 1 3 3v10c0 8-5 13-12 13s-12-5-12-13V16c0-2 1-3 3-3z" stroke="var(--text-secondary)" stroke-width="1.5" fill="none"/></svg>
+      </div>
+      <div class="hand-label">右手</div>
+      <div class="hand-desc">自分で切り拓いた<br>今の運勢</div>
+    </div>
+  </div>
+
+  <div class="hand-why">
+    <div class="hand-why-title">WHY THIS HAND?</div>
+    <div class="hand-why-text" id="hand-why-text">左手には<strong>先天的な運命</strong>が刻まれている。生まれ持った才能、本質的な性格、魂の設計図。右手は<strong>後天的な努力</strong>の結果。迷ったら<strong>利き手と反対の手</strong>を選んで。</div>
+  </div>
+
+  <!-- Step 2: Photo upload -->
   <div class="photo-upload-area" id="drop-area">
     <div class="photo-upload-icon">
       <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-        <path d="M24 8c-1 0-2 .5-2.5 1.5L18 16h-2c-2 0-3 1-3 3v2l-3 8c0 2 1 4 3 4h22c2 0 3-2 3-4l-3-8v-2c0-2-1-3-3-3h-2l-3.5-6.5C26 8.5 25 8 24 8z" stroke="#d8b4fe" stroke-width="1.5" fill="rgba(216,180,254,.08)"/>
+        <path d="M24 8c-1 0-2 .5-2.5 1.5L18 16h-2c-2 0-3 1-3 3v2l-3 8c0 2 1 4 3 4h22c2 0 3-2 3-4l-3-8v-2c0-2-1-3-3-3h-2l-3.5-6.5C26 8.5 25 8 24 8z" stroke="var(--text-secondary)" stroke-width="1.5" fill="rgba(216,180,254,.08)"/>
         <path d="M16 24c1-2 4-3 8-3s7 1 8 3" stroke="rgba(216,180,254,.4)" stroke-width="1" fill="none"/>
         <line x1="20" y1="20" x2="20" y2="28" stroke="rgba(216,180,254,.3)" stroke-width=".8"/>
         <line x1="24" y1="18" x2="24" y2="30" stroke="rgba(216,180,254,.3)" stroke-width=".8"/>
         <line x1="28" y1="20" x2="28" y2="28" stroke="rgba(216,180,254,.3)" stroke-width=".8"/>
       </svg>
     </div>
-    <p class="photo-upload-text">手のひらの写真をアップロード</p>
-    <p class="photo-upload-sub">利き手の反対の手を正面から撮影<br>（右利きなら左手）</p>
-    <input type="file" id="photo-input" accept="image/*" style="display:none">
-    <button class="submit-btn" onclick="document.getElementById('photo-input').click()" style="margin-top:16px;">写真を選択</button>
+    <p class="photo-upload-text" id="upload-label">左手のひらを撮影</p>
+    <p class="photo-upload-sub">明るい場所で、指を軽く開いて<br>手のひら全体が写るように</p>
   </div>
+
+  <div class="upload-btns">
+    <button class="upload-btn" onclick="document.getElementById('photo-camera').click()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="1.5"><rect x="2" y="6" width="20" height="14" rx="3"/><circle cx="12" cy="13" r="4"/><path d="M8 6l1.5-3h5L16 6"/></svg>
+      <span>カメラで撮る</span>
+    </button>
+    <button class="upload-btn" onclick="document.getElementById('photo-library').click()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <span>カメラロール</span>
+    </button>
+  </div>
+  <input type="file" id="photo-camera" accept="image/*" capture="environment" style="display:none">
+  <input type="file" id="photo-library" accept="image/*" style="display:none">
+
+  <div class="photo-guide">
+    <div class="photo-guide-title">PHOTO TIPS</div>
+    <ul class="photo-guide-list">
+      <li>明るい自然光の下で撮影する</li>
+      <li>指を自然に開き、力を入れない</li>
+      <li>手のひら全体をフレームに収める</li>
+      <li>影が入らないよう角度を調整する</li>
+    </ul>
+  </div>
+
   <div class="photo-preview" id="preview" style="display:none">
     <img id="preview-img" alt="">
-    <button class="submit-btn" onclick="analyzePhoto()" id="analyze-btn" style="margin-top:12px;">✦ 手相を読み解く</button>
-    <button class="dc-another-btn" onclick="resetUpload()" style="margin-top:8px;">✧ 別の写真を選ぶ</button>
+    <button class="submit-btn" onclick="analyzePhoto()" id="analyze-btn" style="margin-top:12px;">&#10022; 手相を読み解く</button>
+    <button class="dc-another-btn" onclick="resetUpload()" style="margin-top:8px;">&#10023; 別の写真を選ぶ</button>
   </div>
 </div>
 
@@ -106,8 +155,24 @@
 <script>
 var imageData = '';
 var mediaType = 'image/jpeg';
+var selectedHand = 'left';
 
-document.getElementById('photo-input').addEventListener('change', function(e){
+function selectHand(el) {
+  document.querySelectorAll('.hand-card').forEach(function(c){ c.classList.remove('selected'); });
+  el.classList.add('selected');
+  selectedHand = el.dataset.hand;
+  var label = document.getElementById('upload-label');
+  var why = document.getElementById('hand-why-text');
+  if (selectedHand === 'left') {
+    label.textContent = '左手のひらを撮影';
+    why.innerHTML = '左手には<strong>先天的な運命</strong>が刻まれている。生まれ持った才能、本質的な性格、魂の設計図。右手は<strong>後天的な努力</strong>の結果。迷ったら<strong>利き手と反対の手</strong>を選んで。';
+  } else {
+    label.textContent = '右手のひらを撮影';
+    why.innerHTML = '右手には<strong>後天的な努力と現在の運勢</strong>が表れている。自分で切り拓いてきた道と、今のエネルギーの流れ。<strong>今の自分を知りたいなら右手</strong>を。';
+  }
+}
+
+function handleFileSelect(e) {
   var file = e.target.files[0];
   if (!file) return;
   mediaType = file.type || 'image/jpeg';
@@ -116,10 +181,15 @@ document.getElementById('photo-input').addEventListener('change', function(e){
     imageData = ev.target.result;
     document.getElementById('preview-img').src = imageData;
     document.getElementById('drop-area').style.display = 'none';
+    document.querySelector('.upload-btns').style.display = 'none';
+    document.querySelector('.photo-guide').style.display = 'none';
     document.getElementById('preview').style.display = 'block';
   };
   reader.readAsDataURL(file);
-});
+}
+
+document.getElementById('photo-camera').addEventListener('change', handleFileSelect);
+document.getElementById('photo-library').addEventListener('change', handleFileSelect);
 
 async function analyzePhoto(){
   if (!imageData) return;
@@ -130,7 +200,7 @@ async function analyzePhoto(){
   try {
     var resp = await fetch('/api/palm-reading/analyze', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({image: imageData, media_type: mediaType})
+      body: JSON.stringify({image: imageData, media_type: mediaType, hand: selectedHand})
     });
     var data = await resp.json();
     if (data.error) { alert(data.error); location.reload(); return; }
@@ -161,8 +231,13 @@ function resetUpload(){
   document.getElementById('loading-section').style.display = 'none';
   document.getElementById('upload-section').style.display = 'block';
   document.getElementById('drop-area').style.display = 'block';
+  var btns = document.querySelector('.upload-btns');
+  if (btns) btns.style.display = '';
+  var guide = document.querySelector('.photo-guide');
+  if (guide) guide.style.display = '';
   document.getElementById('preview').style.display = 'none';
-  document.getElementById('photo-input').value = '';
+  document.getElementById('photo-camera').value = '';
+  document.getElementById('photo-library').value = '';
   imageData = '';
 }
 

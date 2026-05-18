@@ -2,8 +2,9 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 import sqlalchemy as sa
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
 from app.database import engine
@@ -25,6 +26,9 @@ async def lifespan(app: FastAPI):
             "ALTER TABLE readings ADD COLUMN form_data_json TEXT",
             "ALTER TABLE users ADD COLUMN browser_id TEXT",
             "ALTER TABLE readings ADD COLUMN type_badge TEXT",
+            "ALTER TABLE daily_fortunes ADD COLUMN prediction TEXT",
+            "ALTER TABLE daily_fortunes ADD COLUMN prediction_result TEXT",
+            "ALTER TABLE daily_fortunes ADD COLUMN prediction_checked_at DATETIME",
         ]:
             try:
                 await conn.execute(sa.text(col_sql))
@@ -41,6 +45,18 @@ if settings.images_dir:
     _img_dir = Path(settings.images_dir)
     _img_dir.mkdir(parents=True, exist_ok=True)
     app.mount("/poster-images", StaticFiles(directory=str(_img_dir)), name="poster-images")
+
+VALID_THEMES = {"default", "a", "b", "c"}
+
+
+@app.get("/theme/{theme_name}")
+async def switch_theme(theme_name: str):
+    from fastapi.responses import RedirectResponse
+    t = theme_name if theme_name in VALID_THEMES else "default"
+    resp = RedirectResponse("/", status_code=302)
+    resp.set_cookie("luna_theme", t, max_age=60 * 60 * 24 * 365)
+    return resp
+
 
 app.include_router(pages.router)
 app.include_router(daily.router)

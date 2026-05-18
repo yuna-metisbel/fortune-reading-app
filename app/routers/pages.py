@@ -13,6 +13,18 @@ from app.models import Profile, Reading, User
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
 
+THEMED_TEMPLATES = {"a", "b", "c"}
+
+
+def _t(request: Request, base_name: str) -> str:
+    theme = getattr(request.state, "theme", "default")
+    if theme in THEMED_TEMPLATES:
+        themed = f"{theme}/{base_name}"
+        tpl_dir = Path(__file__).resolve().parent.parent / "templates" / theme
+        if (tpl_dir / base_name).exists():
+            return themed
+    return base_name
+
 
 @router.get("/", response_class=HTMLResponse)
 async def index(
@@ -26,7 +38,7 @@ async def index(
         .order_by(Reading.created_at.desc())
     )
     readings = result.scalars().all()
-    return templates.TemplateResponse("index.html", {"request": request, "readings": readings})
+    return templates.TemplateResponse(_t(request, "index.html"), {"request": request, "readings": readings})
 
 
 @router.get("/sample", response_class=HTMLResponse)

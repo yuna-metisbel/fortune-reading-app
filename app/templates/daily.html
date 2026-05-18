@@ -63,6 +63,44 @@
 
 <!-- RESULT -->
 <div id="result-section" {% if not fortune %}style="display:none"{% endif %}>
+
+  <!-- Hit Rate & Yesterday's Prediction -->
+  {% if hit_rate is not none %}
+  <div style="display:flex;gap:10px;margin-bottom:14px">
+    <div class="daily-card" style="flex:1;display:flex;align-items:center;gap:10px;padding:14px">
+      <div style="font-size:24px;font-weight:700;color:var(--accent-pink)">{{ hit_rate }}%</div>
+      <div><div style="font-family:var(--font-label);font-size:8px;font-weight:700;letter-spacing:2px;color:rgba(167,139,250,.5);margin-bottom:2px">HIT RATE (30 DAYS)</div><div style="font-size:10px;color:rgba(245,240,255,.5)">{{ hit_count }}/{{ hit_total }} predictions</div></div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if yesterday_fortune and yesterday_fortune.prediction and not yesterday_fortune.prediction_result %}
+  <div class="daily-card" id="yest-section" style="border-left:3px solid var(--accent-green);margin-bottom:14px">
+    <div class="daily-card-label">YESTERDAY'S PREDICTION</div>
+    <p class="daily-card-body small" style="margin-bottom:8px">{{ yesterday_fortune.prediction }}</p>
+    <div style="display:flex;gap:6px">
+      <button onclick="reportHit('hit',{{ yesterday_fortune.id }},this)" class="action-btn" style="flex:1;padding:7px;font-size:10px">HIT</button>
+      <button onclick="reportHit('miss',{{ yesterday_fortune.id }},this)" class="action-btn" style="flex:1;padding:7px;font-size:10px">MISS</button>
+      <button onclick="reportHit('na',{{ yesterday_fortune.id }},this)" class="action-btn" style="flex:1;padding:7px;font-size:10px">N/A</button>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if weekly_arc %}
+  <div style="margin-bottom:12px;text-align:center">
+    <div style="font-family:var(--font-label);font-size:8px;font-weight:700;letter-spacing:2px;color:rgba(167,139,250,.4);margin-bottom:6px">WEEKLY: {{ weekly_arc.theme }}</div>
+    {% set days = ['M','T','W','T','F','S','S'] %}
+    <div style="display:flex;gap:4px;justify-content:center">
+      {% for d in days %}
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1">
+        <div style="width:7px;height:7px;border-radius:50%;{% if loop.index0 < day_index %}background:rgba(167,139,250,.5){% elif loop.index0 == day_index %}background:var(--accent-purple);box-shadow:0 0 6px rgba(167,139,250,.4){% else %}background:rgba(167,139,250,.15){% endif %}"></div>
+        <div style="font-family:var(--font-label);font-size:7px;color:rgba(167,139,250,.3)">{{ d }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
   <div id="daily-capture">
 
     <!-- One-liner -->
@@ -84,6 +122,18 @@
     <div class="daily-card daily-message-card">
       <div class="daily-card-label">TODAY'S MESSAGE</div>
       <p class="daily-card-body" id="daily-message">{{ fortune.message if fortune else '' }}</p>
+    </div>
+
+    <!-- Prediction -->
+    {% if fortune and fortune.prediction %}
+    <div class="daily-card" style="border-left:3px solid var(--accent-green)">
+      <div class="daily-card-label">TOMORROW'S PREDICTION</div>
+      <p class="daily-card-body small" id="daily-prediction">{{ fortune.prediction }}</p>
+    </div>
+    {% endif %}
+    <div class="daily-card" id="prediction-card-dynamic" style="display:none;border-left:3px solid var(--accent-green)">
+      <div class="daily-card-label">TOMORROW'S PREDICTION</div>
+      <p class="daily-card-body small" id="daily-prediction-dynamic"></p>
     </div>
 
     <!-- Action & Caution -->
@@ -223,10 +273,12 @@
     document.getElementById('loading-section').style.display='block';
 
     try {
+      var bd = y+'-'+m+'-'+d;
+      fetch('/api/daily/weekly-arc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({birth_date:bd})});
       var resp = await fetch('/api/daily/generate', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({birth_date: y+'-'+m+'-'+d, blood_type: blood || null, birth_place: place || null})
+        body: JSON.stringify({birth_date: bd, blood_type: blood || null, birth_place: place || null})
       });
       var data = await resp.json();
       if (data.error) { alert(data.error); location.reload(); return; }
@@ -268,6 +320,17 @@ function getColorHex(name) {
   return '#A0A0A0';
 }
 
+function reportHit(result, fortuneId, btn){
+  fetch('/api/daily/prediction-check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fortune_id:fortuneId,result:result})})
+  .then(function(r){return r.json();})
+  .then(function(){
+    btn.parentElement.querySelectorAll('button').forEach(function(b){b.style.opacity='.4';});
+    btn.style.opacity='1';
+    showToast(result === 'hit' ? '✦ HIT!' : result === 'miss' ? 'MISS' : 'N/A');
+    setTimeout(function(){ var s=document.getElementById('yest-section'); if(s) s.style.display='none'; }, 1500);
+  });
+}
+
 function renderResult(d) {
   document.getElementById('loading-section').style.display='none';
   document.getElementById('result-section').style.display='block';
@@ -288,6 +351,11 @@ function renderResult(d) {
   document.getElementById('luck-num').innerHTML = d.overall_luck + '<span class="score-unit">/100</span>';
   document.getElementById('fashion-base-swatch').style.background = getColorHex(d.fashion_base);
   document.getElementById('fashion-accent-swatch').style.background = getColorHex(d.fashion_accent);
+
+  if(d.prediction){
+    var pc=document.getElementById('prediction-card-dynamic');
+    if(pc){pc.style.display='block';document.getElementById('daily-prediction-dynamic').textContent=d.prediction;}
+  }
 
   animateResult(d.overall_luck, d.nail_color_code);
 }

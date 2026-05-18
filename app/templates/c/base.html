@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>{% block title %}LUNA ORACLE{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta property="og:site_name" content="LUNA ORACLE">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    {% block head %}{% endblock %}
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    :root{
+      --bg:#08060E;
+      --text:#E8E8E8;
+      --cyan:#00D4AA;
+      --dim:#666;
+      --red:#FF4444;
+      --card:rgba(255,255,255,.02);
+      --card-b:rgba(255,255,255,.05);
+      --f-head:'Inter',sans-serif;
+      --f-body:'Zen Kaku Gothic New',sans-serif;
+      --f-mono:'JetBrains Mono',monospace;
+    }
+    body{font-family:var(--f-body);font-size:16px;font-weight:500;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+    a{color:var(--dim);text-decoration:none;transition:color .3s}
+    a:hover{color:var(--text)}
+
+    /* Grid background */
+    .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:
+      linear-gradient(rgba(0,212,170,.02) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,212,170,.02) 1px,transparent 1px);
+      background-size:40px 40px}
+
+    .container{position:relative;z-index:2;max-width:440px;margin:0 auto;padding:0 20px 100px}
+
+    /* Bottom Tab */
+    .bottom-tab{position:fixed;bottom:0;left:0;right:0;height:65px;background:rgba(8,6,14,.96);border-top:1px solid rgba(0,212,170,.06);display:flex;align-items:center;justify-content:space-around;z-index:100;max-width:440px;margin:0 auto;padding-bottom:env(safe-area-inset-bottom,0)}
+    .tab-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:#2A2A2A;font-size:7px;font-family:var(--f-mono);font-weight:600;letter-spacing:2px;text-decoration:none;transition:color .3s;padding:8px 12px}
+    .tab-item:hover,.tab-item.active{color:var(--cyan)}
+    .tab-icon{font-size:14px;height:18px;display:flex;align-items:center;justify-content:center}
+    .tab-icon svg{width:18px;height:18px}
+
+    /* Cards */
+    .card{background:var(--card);border:1px solid var(--card-b);border-radius:6px;padding:20px 18px;margin-bottom:10px;transition:all .3s}
+    .card:hover{border-color:rgba(255,255,255,.08)}
+    .card-label{font-family:var(--f-mono);font-size:8px;font-weight:700;letter-spacing:3px;margin-bottom:10px;text-transform:uppercase}
+
+    /* Buttons */
+    .btn-void{width:100%;padding:15px;background:transparent;border:1px solid rgba(0,212,170,.35);border-radius:4px;color:var(--cyan);font-family:var(--f-mono);font-size:12px;font-weight:700;letter-spacing:3px;cursor:pointer;transition:all .3s}
+    .btn-void:hover{background:rgba(0,212,170,.06);border-color:rgba(0,212,170,.5)}
+    .btn-outline{width:100%;padding:12px;background:transparent;border:1px solid var(--card-b);border-radius:4px;color:var(--dim);font-family:var(--f-mono);font-size:11px;font-weight:500;letter-spacing:1px;cursor:pointer;transition:all .3s}
+    .btn-outline:hover{border-color:rgba(255,255,255,.1);color:var(--text)}
+
+    /* Inputs */
+    .input-f{width:100%;padding:13px 10px;background:rgba(0,212,170,.025);border:1px solid rgba(0,212,170,.1);border-radius:4px;color:var(--text);font-family:var(--f-mono);font-size:16px;text-align:center;outline:none;transition:border-color .3s}
+    .input-f:focus{border-color:rgba(0,212,170,.35)}
+    .input-f::placeholder{color:#333}
+    select.input-f{appearance:none;cursor:pointer;text-align:left;font-size:12px;color:#555}
+    select.input-f option{background:var(--bg);color:var(--text)}
+    textarea.input-f{text-align:left;min-height:80px;resize:vertical;line-height:2;font-size:13px}
+    .input-label{font-family:var(--f-mono);font-size:9px;font-weight:600;letter-spacing:3px;color:rgba(0,212,170,.4);margin-bottom:6px}
+    .input-row{display:flex;gap:8px;margin-bottom:12px}
+    .input-opt{font-family:var(--f-mono);font-size:7px;font-weight:500;letter-spacing:1px;color:rgba(0,212,170,.2);margin-left:4px}
+
+    /* Page header */
+    .page-back{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:2px;color:#333}
+    .page-back:hover{color:var(--cyan)}
+
+    /* Divider */
+    .divider-line{width:40px;height:1px;background:rgba(0,212,170,.1);margin:20px auto}
+
+    /* Toast */
+    .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:2px;padding:12px 24px;background:rgba(0,212,170,.9);color:var(--bg);border-radius:4px;box-shadow:0 4px 24px rgba(0,0,0,.4);z-index:200;opacity:0;transition:all .4s;pointer-events:none}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* Animations */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Footer */
+    .footer{margin-top:40px;text-align:center;padding-bottom:16px}
+    .footer-text{font-family:var(--f-mono);font-size:8px;font-weight:500;letter-spacing:4px;color:#222}
+
+    {% block style %}{% endblock %}
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Bottom Tab -->
+    <div class="bottom-tab">
+      <a href="/daily" class="tab-item {% if active_tab == 'daily' %}active{% endif %}">
+        <div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg></div>
+        <span>TODAY</span>
+      </a>
+      <a href="/reading/new" class="tab-item {% if active_tab == 'oracle' %}active{% endif %}">
+        <div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg></div>
+        <span>ORACLE</span>
+      </a>
+      <a href="/compatibility/new" class="tab-item {% if active_tab == 'match' %}active{% endif %}">
+        <div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg></div>
+        <span>MATCH</span>
+      </a>
+      <a href="/" class="tab-item {% if active_tab == 'my' %}active{% endif %}">
+        <div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg></div>
+        <span>MY</span>
+      </a>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    {% block scripts %}{% endblock %}
+    <script>
+    function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
+    </script>
+</body>
+</html>

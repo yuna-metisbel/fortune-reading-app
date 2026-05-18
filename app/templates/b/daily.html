@@ -1,0 +1,297 @@
+{% extends "b/base.html" %}
+{% block title %}TODAY — LUNA ORACLE{% endblock %}
+
+{% block style %}
+.daily-header{padding:0;margin-bottom:4px}
+.daily-brand{font-family:var(--f-label);font-size:8px;font-weight:700;letter-spacing:4px;color:rgba(155,123,94,.4)}
+.daily-date{font-family:var(--f-label);font-size:9px;font-weight:600;letter-spacing:3px;color:rgba(155,123,94,.35);margin-bottom:16px}
+
+/* Score ring */
+.score-wrap{text-align:center;padding:8px 0 16px}
+.score-ring{width:100px;height:100px;margin:0 auto 10px;position:relative}
+.score-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.score-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--f-label);font-size:28px;font-weight:700;color:var(--text)}
+.score-num small{font-size:10px;color:var(--gold-dim);font-weight:500}
+.daily-one{font-family:var(--f-head);font-size:17px;font-weight:700;line-height:1.9;color:var(--text);text-align:center;margin-bottom:20px}
+
+/* Daily cards */
+.dc{margin-bottom:12px;padding:18px 16px;background:rgba(212,165,116,.03);border:1px solid rgba(212,165,116,.08);border-radius:10px}
+.dc-label{font-family:var(--f-label);font-size:8px;font-weight:700;letter-spacing:2px;margin-bottom:6px}
+.dc-text{font-size:13px;line-height:2;color:var(--text-body)}
+.dc-text strong{color:var(--text);font-weight:700;background:linear-gradient(transparent 60%,rgba(212,165,116,.12) 60%)}
+
+/* Style cards */
+.style-swatch{width:32px;height:32px;border-radius:50%;border:2px solid rgba(212,165,116,.1);display:inline-block;vertical-align:middle}
+.style-name{display:inline-block;vertical-align:middle;margin-left:10px;font-size:13px;font-weight:600;color:var(--text)}
+.style-msg{font-size:11px;color:var(--gold-dim);margin-top:4px;line-height:1.7}
+
+/* Lucky items grid */
+.lucky-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lucky-card{padding:16px;background:rgba(212,165,116,.03);border:1px solid rgba(212,165,116,.08);border-radius:10px;text-align:center}
+.lucky-label{font-family:var(--f-label);font-size:8px;font-weight:700;letter-spacing:2px;color:var(--gold-dim);margin-bottom:4px}
+.lucky-val{font-family:var(--f-head);font-size:16px;font-weight:700;color:var(--text)}
+{% endblock %}
+
+{% block content %}
+<div style="padding-top:48px;">
+  <div class="daily-header">
+    <div class="daily-brand">LUNA ORACLE</div>
+  </div>
+  <div class="daily-date">{{ today.strftime('%Y.%m.%d') }} {{ today.strftime('%a').upper() }}</div>
+</div>
+
+<!-- HIT RATE & YESTERDAY'S PREDICTION -->
+{% if hit_rate is not none or (yesterday_fortune and yesterday_fortune.prediction and not yesterday_fortune.prediction_result) %}
+<div style="display:flex;gap:10px;margin-bottom:12px">
+  {% if hit_rate is not none %}
+  <div style="flex:1;padding:14px;background:rgba(212,165,116,.03);border:1px solid rgba(212,165,116,.08);border-radius:10px;display:flex;align-items:center;gap:10px">
+    <div style="font-family:var(--f-label);font-size:24px;font-weight:700;color:var(--gold-bright)">{{ hit_rate }}%</div>
+    <div><div style="font-family:var(--f-label);font-size:8px;font-weight:700;letter-spacing:2px;color:var(--gold-dim);margin-bottom:2px">HIT RATE</div><div style="font-size:10px;color:var(--text-muted)">{{ hit_count }}/{{ hit_total }}</div></div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if yesterday_fortune and yesterday_fortune.prediction and not yesterday_fortune.prediction_result %}
+<div class="dc" id="yest-section" style="border-left:2px solid var(--green);margin-bottom:12px">
+  <div class="dc-label" style="color:var(--green)">YESTERDAY'S PREDICTION</div>
+  <div style="font-size:12px;color:var(--text-body);line-height:1.8;margin-bottom:8px">{{ yesterday_fortune.prediction }}</div>
+  <div style="display:flex;gap:6px">
+    <button onclick="reportHit('hit',{{ yesterday_fortune.id }},this)" style="flex:1;padding:7px;border:1px solid rgba(212,165,116,.15);border-radius:8px;background:transparent;color:var(--gold-dim);font-family:var(--f-label);font-size:10px;font-weight:600;cursor:pointer">HIT</button>
+    <button onclick="reportHit('miss',{{ yesterday_fortune.id }},this)" style="flex:1;padding:7px;border:1px solid rgba(212,165,116,.15);border-radius:8px;background:transparent;color:var(--gold-dim);font-family:var(--f-label);font-size:10px;font-weight:600;cursor:pointer">MISS</button>
+    <button onclick="reportHit('na',{{ yesterday_fortune.id }},this)" style="flex:1;padding:7px;border:1px solid rgba(212,165,116,.15);border-radius:8px;background:transparent;color:var(--gold-dim);font-family:var(--f-label);font-size:10px;font-weight:600;cursor:pointer">N/A</button>
+  </div>
+</div>
+{% endif %}
+
+<!-- Weekly Arc -->
+{% if weekly_arc %}
+<div style="margin-bottom:12px">
+  <div style="font-family:var(--f-label);font-size:8px;font-weight:700;letter-spacing:2px;color:var(--gold-dim);margin-bottom:6px">WEEKLY: {{ weekly_arc.theme }}</div>
+  {% set days = ['M','T','W','T','F','S','S'] %}
+  <div style="display:flex;gap:4px;justify-content:center">
+    {% for d in days %}
+    <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1">
+      <div style="width:8px;height:8px;border-radius:50%;{% if loop.index0 < day_index %}background:var(--gold);opacity:.5{% elif loop.index0 == day_index %}background:var(--gold-bright);box-shadow:0 0 6px rgba(212,165,116,.4){% else %}background:rgba(212,165,116,.15){% endif %}"></div>
+      <div style="font-family:var(--f-label);font-size:8px;color:var(--gold-dim)">{{ d }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- INPUT or RESULT -->
+<div id="input-section" {% if fortune %}style="display:none"{% endif %}>
+  <form id="daily-form" novalidate>
+    <div class="dc" style="padding:20px">
+      <div class="input-label">BIRTHDAY</div>
+      <div class="input-row">
+        <input type="text" id="d_year" class="input-f" placeholder="1995" inputmode="numeric" maxlength="4" required>
+        <input type="text" id="d_month" class="input-f" placeholder="6" inputmode="numeric" maxlength="2" required>
+        <input type="text" id="d_day" class="input-f" placeholder="15" inputmode="numeric" maxlength="2" required>
+      </div>
+      <div class="input-label">BLOOD TYPE <span class="input-opt">OPTIONAL</span></div>
+      <select id="d_blood" class="input-f" style="margin-bottom:12px">
+        <option value="">選択</option><option value="不明">不明</option><option value="A">A型</option><option value="B">B型</option><option value="O">O型</option><option value="AB">AB型</option>
+      </select>
+      <div class="input-label">BIRTHPLACE <span class="input-opt">OPTIONAL</span></div>
+      <input type="text" id="d_place" class="input-f" placeholder="東京都" style="margin-bottom:4px" autocomplete="off">
+    </div>
+    <button type="submit" class="btn-dark">今日の月を読む</button>
+  </form>
+</div>
+
+<div id="loading-section" style="display:none;text-align:center;padding:60px 0">
+  <div style="width:60px;height:60px;margin:0 auto 20px;border-radius:50%;background:radial-gradient(circle at 38% 35%,rgba(232,201,160,.5),rgba(212,165,116,.2) 50%,transparent);opacity:.7"></div>
+  <div style="font-family:var(--f-head);font-size:16px;color:var(--text)">星の配置を読んでいます</div>
+</div>
+
+<div id="result-section" {% if not fortune %}style="display:none"{% endif %}>
+  <!-- Score -->
+  <div class="score-wrap">
+    <div class="score-ring">
+      <svg viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(212,165,116,.1)" stroke-width="5"/>
+        <circle cx="60" cy="60" r="50" fill="none" stroke="var(--gold)" stroke-width="5" stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round" id="luck-arc" style="transition:stroke-dashoffset 1.5s ease-out"/>
+      </svg>
+      <div class="score-num" id="luck-num">{{ fortune.overall_luck if fortune else '?' }}<small>/100</small></div>
+    </div>
+  </div>
+  <div class="daily-one" id="one-liner">{{ fortune.one_liner if fortune else '' }}</div>
+
+  <!-- Message -->
+  <div class="dc">
+    <div class="dc-label" style="color:var(--gold-dim)">TODAY'S MESSAGE</div>
+    <div class="dc-text" id="daily-message">{{ fortune.message if fortune else '' }}</div>
+  </div>
+
+  <!-- Prediction -->
+  {% if fortune and fortune.prediction %}
+  <div class="dc" style="border-left:2px solid var(--green)">
+    <div class="dc-label" style="color:var(--green)">TOMORROW'S PREDICTION</div>
+    <div style="font-size:12px;line-height:1.9;color:var(--text-body)" id="daily-prediction">{{ fortune.prediction }}</div>
+  </div>
+  {% endif %}
+  <div class="dc" id="prediction-card-dynamic" style="display:none;border-left:2px solid var(--green)">
+    <div class="dc-label" style="color:var(--green)">TOMORROW'S PREDICTION</div>
+    <div style="font-size:12px;line-height:1.9;color:var(--text-body)" id="daily-prediction-dynamic"></div>
+  </div>
+
+  <!-- Action & Caution -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="dc" style="border-left:2px solid var(--green)">
+      <div class="dc-label" style="color:var(--green)">ACTION</div>
+      <div style="font-size:12px;line-height:1.9;color:var(--text-body)" id="daily-action">{{ fortune.action_tip if fortune else '' }}</div>
+    </div>
+    <div class="dc" style="border-left:2px solid var(--red)">
+      <div class="dc-label" style="color:var(--red)">CAUTION</div>
+      <div style="font-size:12px;line-height:1.9;color:var(--text-body)" id="daily-caution">{{ fortune.caution if fortune else '' }}</div>
+    </div>
+  </div>
+
+  <!-- Stone -->
+  <div class="dc">
+    <div class="dc-label" style="color:var(--gold-dim)">LUCKY STONE</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:40px;height:40px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(212,165,116,.25),rgba(155,123,94,.15),rgba(212,165,116,.08));box-shadow:0 2px 12px rgba(212,165,116,.12)" id="stone-orb"></div>
+      <div>
+        <div style="font-family:var(--f-head);font-size:14px;font-weight:700;color:var(--gold-dim)" id="stone-name">{{ fortune.lucky_stone if fortune else '' }}</div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.6" id="stone-msg">{{ fortune.stone_message if fortune else '' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Style -->
+  <div class="dc">
+    <div class="dc-label" style="color:var(--gold-dim)">TODAY'S STYLE</div>
+    <div style="margin-bottom:12px">
+      <div class="style-swatch" id="nail-swatch" style="background:{{ fortune.nail_color_code if fortune else '#ccc' }}"></div>
+      <span class="style-name" id="nail-name">{{ fortune.nail_color if fortune else '' }}</span>
+      <div class="style-msg" id="nail-msg">{{ fortune.nail_message if fortune else '' }}</div>
+    </div>
+    <div style="height:1px;background:rgba(212,165,116,.1);margin:12px 0"></div>
+    <div>
+      <div class="style-swatch" id="fashion-base" style="width:28px;height:28px"></div>
+      <span style="color:var(--gold-dim);font-size:12px;margin:0 4px">+</span>
+      <div class="style-swatch" id="fashion-accent" style="width:28px;height:28px"></div>
+      <span class="style-name" id="fashion-name">{{ fortune.fashion_base if fortune else '' }} x {{ fortune.fashion_accent if fortune else '' }}</span>
+      <div class="style-msg" id="fashion-msg">{{ fortune.fashion_message if fortune else '' }}</div>
+    </div>
+  </div>
+
+  <!-- Lucky -->
+  <div class="lucky-grid">
+    <div class="lucky-card">
+      <div class="lucky-label">COLOR</div>
+      <div class="lucky-val" id="lucky-color">{{ fortune.lucky_color if fortune else '' }}</div>
+    </div>
+    <div class="lucky-card">
+      <div class="lucky-label">NUMBER</div>
+      <div class="lucky-val" id="lucky-number">{{ fortune.lucky_number if fortune else '' }}</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:16px">
+    <button class="btn-dark" onclick="shareDaily()">シェアする</button>
+  </div>
+</div>
+
+<div class="footer"><div class="footer-text">LUNA ORACLE 2026</div></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var form = document.getElementById('daily-form');
+  if (!form) return;
+  var saved = localStorage.getItem('fortune_profile');
+  if (saved) {
+    try { var s=JSON.parse(saved);
+      document.getElementById('d_year').value=s.y||'';
+      document.getElementById('d_month').value=s.m||'';
+      document.getElementById('d_day').value=s.d||'';
+      if(s.blood) document.getElementById('d_blood').value=s.blood;
+      if(s.place) document.getElementById('d_place').value=s.place;
+    } catch(e){}
+  }
+  {% if fortune %}animateScore({{ fortune.overall_luck }});{% endif %}
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    var y=document.getElementById('d_year').value.trim();
+    var m=document.getElementById('d_month').value.trim().padStart(2,'0');
+    var d=document.getElementById('d_day').value.trim().padStart(2,'0');
+    var blood=document.getElementById('d_blood').value;
+    var place=document.getElementById('d_place').value.trim();
+    if(!y||!m||!d) return;
+    localStorage.setItem('fortune_profile',JSON.stringify({y:y,m:document.getElementById('d_month').value.trim(),d:document.getElementById('d_day').value.trim(),blood:blood,place:place}));
+    document.getElementById('input-section').style.display='none';
+    document.getElementById('loading-section').style.display='block';
+    try {
+      var bd=y+'-'+m+'-'+d;
+      fetch('/api/daily/weekly-arc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({birth_date:bd})});
+      var resp=await fetch('/api/daily/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({birth_date:bd,blood_type:blood||null,birth_place:place||null})});
+      var data=await resp.json();
+      if(data.error){alert(data.error);location.reload();return;}
+      renderResult(data);
+    } catch(err){alert('通信エラー');location.reload();}
+  });
+  {% if not fortune %}
+  if(saved){var s=JSON.parse(saved);if(s.y&&s.m&&s.d) form.dispatchEvent(new Event('submit'));}
+  {% endif %}
+})();
+
+function animateScore(luck){
+  var arc=document.getElementById('luck-arc');
+  if(arc) setTimeout(function(){arc.style.strokeDashoffset=314*(1-luck/100);},100);
+}
+
+var COLOR_MAP={'アイボリー':'#FFFFF0','ホワイト':'#FFFFFF','ベージュ':'#D4C5A9','キャメル':'#C19A6B','ブラウン':'#8B4513','コーラル':'#FF7F50','ピンク':'#FFB6C1','ラベンダー':'#B8A9C9','パープル':'#8B5CF6','ネイビー':'#1E3A5F','ブルー':'#4A90D9','ミント':'#98FB98','グリーン':'#6B8E5A','グレー':'#A0A0A0','ブラック':'#2D2D2D','ゴールド':'#D4AF37','ワインレッド':'#722F37','マスタード':'#DABB5B','オレンジ':'#E8913A','レッド':'#CC3333','クリーム':'#FFFDD0'};
+function getHex(n){for(var k in COLOR_MAP){if(n&&n.indexOf(k)!==-1)return COLOR_MAP[k];}return '#A0A0A0';}
+
+function reportHit(result, fortuneId, btn){
+  fetch('/api/daily/prediction-check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fortune_id:fortuneId,result:result})})
+  .then(function(r){return r.json();})
+  .then(function(){
+    btn.parentElement.querySelectorAll('button').forEach(function(b){b.style.borderColor='rgba(212,165,116,.15)';b.style.color='var(--gold-dim)';});
+    btn.style.borderColor='var(--green)';btn.style.color='var(--green)';
+    showToast(result === 'hit' ? 'HIT!' : result === 'miss' ? 'MISS' : 'N/A');
+    setTimeout(function(){ var s=document.getElementById('yest-section'); if(s) s.style.display='none'; }, 1500);
+  });
+}
+
+function renderResult(d){
+  document.getElementById('loading-section').style.display='none';
+  document.getElementById('result-section').style.display='block';
+  document.getElementById('one-liner').textContent=d.one_liner;
+  document.getElementById('daily-message').textContent=d.message;
+  document.getElementById('daily-action').textContent=d.action_tip;
+  document.getElementById('daily-caution').textContent=d.caution;
+  document.getElementById('stone-name').textContent=d.lucky_stone;
+  document.getElementById('stone-msg').textContent=d.stone_message;
+  document.getElementById('nail-name').textContent=d.nail_color;
+  document.getElementById('nail-swatch').style.background=d.nail_color_code;
+  document.getElementById('nail-msg').textContent=d.nail_message;
+  document.getElementById('fashion-name').textContent=d.fashion_base+' x '+d.fashion_accent;
+  document.getElementById('fashion-msg').textContent=d.fashion_message;
+  document.getElementById('fashion-base').style.background=getHex(d.fashion_base);
+  document.getElementById('fashion-accent').style.background=getHex(d.fashion_accent);
+  document.getElementById('lucky-color').textContent=d.lucky_color;
+  document.getElementById('lucky-number').textContent=d.lucky_number;
+  document.getElementById('luck-num').innerHTML=d.overall_luck+'<small>/100</small>';
+  animateScore(d.overall_luck);
+
+  if(d.prediction){
+    var pc=document.getElementById('prediction-card-dynamic');
+    if(pc){pc.style.display='block';document.getElementById('daily-prediction-dynamic').textContent=d.prediction;}
+  }
+}
+
+function shareDaily(){
+  html2canvas(document.getElementById('result-section'),{useCORS:true,scale:2,backgroundColor:'#FDFAF6'}).then(function(c){
+    var a=document.createElement('a');a.href=c.toDataURL('image/png');a.download='luna-daily.png';a.click();
+    showToast('保存しました');
+  });
+}
+</script>
+{% endblock %}

@@ -20,6 +20,7 @@ class BrowserIdMiddleware(BaseHTTPMiddleware):
             browser_id = str(uuid.uuid4())
             need_set = True
         request.state.browser_id = browser_id
+        request.state.theme = request.cookies.get("luna_theme", "default")
         response = await call_next(request)
         if need_set:
             response.set_cookie(

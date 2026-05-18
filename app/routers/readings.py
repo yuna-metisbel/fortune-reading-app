@@ -33,6 +33,32 @@ router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
 
 
+def _parse_cognitive_profile(content: str, is_compat: bool = False) -> list[dict]:
+    """Parse cognitive profile scores from reading content.
+
+    Personal format: - 分析力：**82** ── 説明
+    Compat table:    | 分析力 | 55 | 82 |
+    """
+    if not content:
+        return []
+
+    names = ["分析力", "直感力", "共感力", "決断速度", "柔軟性"]
+    result = []
+
+    if is_compat:
+        for name in names:
+            m = re.search(rf'\|\s*{name}\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|', content)
+            if m:
+                result.append({"name": name, "value1": int(m.group(1)), "value2": int(m.group(2))})
+    else:
+        for name in names:
+            m = re.search(rf'{name}[：:]\s*\**(\d+)\**', content)
+            if m:
+                result.append({"name": name, "value": int(m.group(1))})
+
+    return result
+
+
 async def _generate_type_badge(reading_id: int):
     """Generate a 〇〇タイプ badge from reading content."""
     try:
@@ -498,6 +524,8 @@ async def reading_result(
     if reading is None:
         raise HTTPException(status_code=404, detail="Reading not found")
 
+    cognitive_profile = _parse_cognitive_profile(reading.content or "", reading.type == "compatibility")
+
     # Parse markdown into sections
     sections = []
     if reading.content:
@@ -624,13 +652,21 @@ async def reading_result(
             theme = compat_themes[i] if i < len(compat_themes) else compat_themes[0]
             section["theme"] = theme
 
+    theme = getattr(request.state, "theme", "default")
+    tpl_name = "reading_result.html"
+    if theme in ("a", "b", "c"):
+        _themed = Path(__file__).resolve().parent.parent / "templates" / theme / "reading_result.html"
+        if _themed.exists():
+            tpl_name = f"{theme}/reading_result.html"
+
     return templates.TemplateResponse(
-        "reading_result.html", {
+        tpl_name, {
             "request": request,
             "reading": reading,
             "sections": sections,
             "monthly_data": monthly_data,
             "is_compat": is_compat,
+            "cognitive_profile": cognitive_profile,
         }
     )
 

@@ -1,0 +1,190 @@
+{% extends "b/base.html" %}
+{% block title %}LUNA ORACLE{% endblock %}
+
+{% block style %}
+/* Hero */
+.hero-b{text-align:center;padding-top:48px;margin-bottom:40px;position:relative}
+.hero-b::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;height:300px;background:radial-gradient(ellipse 100% 60% at 50% 15%,rgba(212,165,116,.08) 0%,transparent 60%);pointer-events:none}
+
+/* Soft moon */
+.moon-soft{width:100px;height:100px;border-radius:50%;background:radial-gradient(circle at 38% 35%,rgba(232,201,160,.6),rgba(212,165,116,.3) 50%,rgba(155,123,94,.12) 80%,transparent);margin:0 auto 32px;position:relative}
+
+.brand{font-family:var(--f-label);font-size:9px;font-weight:700;letter-spacing:5px;color:rgba(155,123,94,.4);margin-bottom:12px;position:relative}
+.hero-title{font-family:var(--f-head);font-size:22px;font-weight:700;line-height:1.8;color:var(--text);margin-bottom:8px;position:relative}
+.hero-sub{font-size:11px;color:var(--gold-dim);line-height:2;margin-bottom:28px;position:relative}
+
+/* Feature menu */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
+.feat-card{padding:20px 14px;background:var(--card);border:1px solid var(--card-b);border-radius:12px;text-align:center;text-decoration:none;color:var(--text);transition:all .3s}
+.feat-card:hover{box-shadow:0 2px 16px rgba(0,0,0,.05);transform:translateY(-2px)}
+.feat-icon{font-size:24px;margin-bottom:8px;opacity:.4}
+.feat-icon svg{width:28px;height:28px;stroke:var(--gold-dim);fill:none;stroke-width:1.5}
+.feat-title{font-family:var(--f-head);font-size:13px;font-weight:700;margin-bottom:3px}
+.feat-desc{font-size:9px;color:var(--gold-dim);line-height:1.5}
+
+/* Recent */
+.recent-h{font-family:var(--f-label);font-size:10px;font-weight:700;letter-spacing:4px;color:rgba(155,123,94,.35);margin:32px 0 14px}
+.recent-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--card);border:1px solid var(--card-b);border-radius:10px;margin-bottom:8px;text-decoration:none;color:var(--text);transition:all .3s}
+.recent-item:hover{box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.recent-icon{font-size:16px;color:var(--gold-dim)}
+.recent-info{flex:1}
+.recent-name{font-size:13px;font-weight:600;margin-bottom:2px}
+.recent-date{font-family:var(--f-label);font-size:9px;color:rgba(155,123,94,.35);letter-spacing:1px}
+{% endblock %}
+
+{% block content %}
+<div class="hero-b">
+  <div class="moon-soft"></div>
+
+  <div class="brand">LUNA ORACLE</div>
+  <div class="hero-title">あなたの月を<br>読み解く</div>
+  <div class="hero-sub">あなたの思考回路を雑誌のように読む</div>
+
+  <!-- Input -->
+  <form id="oracle-form" style="text-align:left">
+    <div class="input-label">BIRTHDAY *</div>
+    <div class="input-row">
+      <input type="text" id="r_year" class="input-f" placeholder="1995" inputmode="numeric" maxlength="4" required>
+      <input type="text" id="r_month" class="input-f" placeholder="6" inputmode="numeric" maxlength="2" required>
+      <input type="text" id="r_day" class="input-f" placeholder="15" inputmode="numeric" maxlength="2" required>
+    </div>
+
+    <div class="card" style="padding:16px">
+      <div class="input-label" style="margin-bottom:10px">MORE INFO = MORE ACCURACY</div>
+
+      <div class="input-label">NICKNAME</div>
+      <input type="text" id="r_nick" class="input-f" placeholder="呼ばれたい名前" style="text-align:left;margin-bottom:12px">
+
+      <div class="input-label">BLOOD TYPE <span class="input-opt">OPTIONAL</span></div>
+      <select id="r_blood" class="input-f" style="margin-bottom:12px">
+        <option value="">選択してください</option>
+        <option value="不明">不明</option>
+        <option value="A">A型</option>
+        <option value="B">B型</option>
+        <option value="O">O型</option>
+        <option value="AB">AB型</option>
+      </select>
+
+      <div class="input-label">BIRTHPLACE <span class="input-opt">OPTIONAL</span></div>
+      <input type="text" id="r_place" class="input-f" placeholder="東京都" style="text-align:left;margin-bottom:12px" autocomplete="off">
+
+      <div class="input-label">BIRTH TIME <span class="input-opt">OPTIONAL</span></div>
+      <div class="input-row">
+        <input type="text" id="r_hour" class="input-f" placeholder="14" inputmode="numeric" maxlength="2">
+        <input type="text" id="r_min" class="input-f" placeholder="30" inputmode="numeric" maxlength="2">
+      </div>
+    </div>
+
+    <div class="input-label">THEME</div>
+    <textarea id="r_theme" class="input-f" placeholder="恋愛、仕事、人間関係など" required style="margin-bottom:16px"></textarea>
+
+    <button type="submit" class="btn-dark">読み解く</button>
+  </form>
+</div>
+
+<div class="divider-line"></div>
+
+<!-- Features -->
+<div class="feat-grid">
+  <a href="/daily" class="feat-card">
+    <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3"/></svg></div>
+    <div class="feat-title">今日の運勢</div>
+    <div class="feat-desc">毎日変わるメッセージ</div>
+  </a>
+  <a href="/daily/compatibility" class="feat-card">
+    <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg></div>
+    <div class="feat-title">今日の相性</div>
+    <div class="feat-desc">大切な人との今日</div>
+  </a>
+  <a href="/face-reading" class="feat-card">
+    <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg></div>
+    <div class="feat-title">人相占い</div>
+    <div class="feat-desc">写真で性格を読む</div>
+  </a>
+  <a href="/palm-reading" class="feat-card">
+    <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M18 8c-1-1-2.5-.5-3 .5L14 11V6c0-1.5-1-2.5-2.5-2.5S9 4.5 9 6v3c0-1.5-1-2.5-2.5-2.5S4 7.5 4 9v7c0 5 3.5 8 8 8s8-3 8-8v-5c0-1.5-1-2.5-2-3z"/></svg></div>
+    <div class="feat-title">手相占い</div>
+    <div class="feat-desc">手のひらの運命線</div>
+  </a>
+</div>
+
+{% if readings %}
+<div class="recent-h">RECENT READINGS</div>
+{% for reading in readings %}
+<a href="/reading/{{ reading.id }}" class="recent-item">
+  <span class="recent-icon">{% if reading.type == 'compatibility' %}&#9826;{% else %}&#9790;{% endif %}</span>
+  <div class="recent-info">
+    <div class="recent-name">{{ reading.theme }}</div>
+    <div class="recent-date">{{ reading.created_at.strftime('%Y.%m.%d') }}</div>
+  </div>
+</a>
+{% endfor %}
+{% endif %}
+
+<div class="footer"><div class="footer-text">LUNA ORACLE 2026</div></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var saved = localStorage.getItem('fortune_profile');
+  if (saved) {
+    try {
+      var s = JSON.parse(saved);
+      if (s.y) document.getElementById('r_year').value = s.y;
+      if (s.m) document.getElementById('r_month').value = s.m;
+      if (s.d) document.getElementById('r_day').value = s.d;
+      if (s.blood) document.getElementById('r_blood').value = s.blood;
+      if (s.place) document.getElementById('r_place').value = s.place;
+    } catch(e){}
+  }
+
+  document.getElementById('oracle-form').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var y = document.getElementById('r_year').value.trim();
+    var m = document.getElementById('r_month').value.trim().padStart(2,'0');
+    var d = document.getElementById('r_day').value.trim().padStart(2,'0');
+    var nick = document.getElementById('r_nick').value.trim() || 'あなた';
+    var blood = document.getElementById('r_blood').value;
+    var place = document.getElementById('r_place').value.trim();
+    var bh = document.getElementById('r_hour').value.trim();
+    var bm = document.getElementById('r_min').value.trim();
+    var theme = document.getElementById('r_theme').value.trim();
+    if (!y || !m || !d || !theme) return;
+
+    localStorage.setItem('fortune_profile', JSON.stringify({y:y,m:document.getElementById('r_month').value.trim(),d:document.getElementById('r_day').value.trim(),blood:blood,place:place}));
+
+    var btn = this.querySelector('[type=submit]');
+    btn.disabled = true; btn.textContent = '読み解き中...';
+
+    try {
+      var resp = await fetch('/api/readings/personal/stream', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          nickname: nick, birth_date: y+'-'+m+'-'+d,
+          birth_time: (bh && bm) ? bh.padStart(2,'0')+':'+bm.padStart(2,'0') : null,
+          birth_place: place || null, gender: null,
+          blood_type: blood || null, theme: theme
+        })
+      });
+      if (!resp.ok) { alert('エラーが発生しました'); btn.disabled=false; btn.textContent='読み解く'; return; }
+      var reader = resp.body.getReader();
+      var decoder = new TextDecoder();
+      var buf = '', rid = null, isDone = false;
+      while(true){
+        var r = await reader.read();
+        if(r.done) break;
+        buf += decoder.decode(r.value,{stream:true});
+        var lines = buf.split('\n'); buf = lines.pop();
+        for(var i=0;i<lines.length;i++){
+          var ln = lines[i].trim();
+          if(ln==='event: done'||ln==='event:done') isDone=true;
+          if(ln.startsWith('data:') && isDone){rid=parseInt(ln.slice(5).trim());isDone=false;}
+        }
+      }
+      if(rid) window.location.href='/reading/'+rid;
+    } catch(err){ alert('通信エラー'); btn.disabled=false; btn.textContent='読み解く'; }
+  });
+})();
+</script>
+{% endblock %}

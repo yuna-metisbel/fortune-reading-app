@@ -8,13 +8,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700;800;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Kaisei+Decol:wght@400;700&family=Shippori+Mincho:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
+    {% set theme = request.state.theme if request and request.state and request.state.theme else 'default' %}
+    {% if theme and theme != 'default' %}
+    <link rel="stylesheet" href="/static/css/theme-{{ theme }}.css">
+    {% endif %}
     <meta property="og:site_name" content="星図リーディング">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     {% block head %}{% endblock %}
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
-<body>
+<body class="theme-{{ theme }}" data-theme="{{ theme }}">
     <div class="bg-layer"></div>
     <div class="glow-orb a"></div>
     <div class="glow-orb b"></div>

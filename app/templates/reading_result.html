@@ -120,6 +120,35 @@
 {% if sections %}
 <div class="detail-section">
   <div class="detail-header">✧ DETAILED READING ✧</div>
+
+  {% if cognitive_profile %}
+  <div class="cog-chart" style="margin:0 0 20px;padding:20px 18px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.15);border-radius:12px">
+    <div style="font-family:var(--font-label);font-size:9px;font-weight:700;letter-spacing:3px;color:rgba(167,139,250,.6);margin-bottom:14px">COGNITIVE PROFILE</div>
+    {% if not is_compat %}
+      {% for item in cognitive_profile %}
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="width:56px;font-family:var(--font-label);font-size:10px;color:rgba(216,180,254,.6);text-align:right;flex-shrink:0">{{ item.name }}</div>
+        <div style="flex:1;height:5px;background:rgba(167,139,250,.1);border-radius:3px;overflow:hidden"><div class="cog-bar" style="height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,#a78bfa,rgba(167,139,250,.3));transition:width 1s ease-out" data-w="{{ item.value }}%"></div></div>
+        <div style="width:24px;font-family:var(--font-label);font-size:11px;font-weight:700;color:rgba(245,240,255,.85);text-align:right">{{ item.value }}</div>
+      </div>
+      {% endfor %}
+    {% else %}
+      {% for item in cognitive_profile %}
+      <div style="margin-bottom:10px">
+        <div style="font-family:var(--font-label);font-size:9px;color:rgba(216,180,254,.5);margin-bottom:4px">{{ item.name }}</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <div style="flex:1;height:4px;background:rgba(167,139,250,.1);border-radius:2px;overflow:hidden;direction:rtl"><div class="cog-bar" style="height:100%;width:0%;border-radius:2px;background:linear-gradient(270deg,#d4a0ff,rgba(212,160,255,.3));transition:width 1s ease-out" data-w="{{ item.value1 }}%"></div></div>
+          <div style="width:20px;text-align:center;font-family:var(--font-label);font-size:9px;font-weight:700;color:rgba(245,240,255,.7)">{{ item.value1 }}</div>
+          <div style="width:4px;height:4px;border-radius:50%;background:rgba(216,180,254,.3)"></div>
+          <div style="width:20px;text-align:center;font-family:var(--font-label);font-size:9px;font-weight:700;color:rgba(245,240,255,.7)">{{ item.value2 }}</div>
+          <div style="flex:1;height:4px;background:rgba(245,198,255,.1);border-radius:2px;overflow:hidden"><div class="cog-bar" style="height:100%;width:0%;border-radius:2px;background:linear-gradient(90deg,#f5c6ff,rgba(245,198,255,.3));transition:width 1s ease-out" data-w="{{ item.value2 }}%"></div></div>
+        </div>
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  {% endif %}
+
   <div class="detail-grid">
   {% for section in sections %}
   {% set theme = section.theme %}
@@ -614,6 +643,7 @@ document.addEventListener('DOMContentLoaded', function() {
   groupPersonCards();
   formatKeyPoints();
   formatCatchcopies();
+  setTimeout(function(){ document.querySelectorAll('.cog-bar').forEach(function(b){ b.style.width = b.dataset.w; }); }, 300);
 });
 </script>
 {% endblock %}

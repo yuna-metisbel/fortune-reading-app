@@ -1,0 +1,276 @@
+{% extends "c/base.html" %}
+{% block title %}{{ reading.theme }} — LUNA ORACLE{% endblock %}
+
+{% block head %}
+<meta property="og:title" content="{{ reading.profile.nickname if reading.profile else 'user' }} — LUNA ORACLE">
+<meta property="og:description" content="{% if sections %}{{ sections[0].key_points[0] if sections[0].key_points else '' }}{% endif %}">
+{% endblock %}
+
+{% block style %}
+/* Header bar */
+.result-bar{display:flex;justify-content:space-between;align-items:center;padding-top:48px;margin-bottom:3px}
+.result-count{font-family:var(--f-mono);font-size:10px;color:rgba(0,212,170,.4)}
+.result-date{font-family:var(--f-mono);font-size:8px;font-weight:600;letter-spacing:2px;color:#222;margin-bottom:16px}
+
+/* Type card */
+.cd-type{background:linear-gradient(135deg,rgba(0,212,170,.06),rgba(0,212,170,.015));border:1px solid rgba(0,212,170,.18);border-radius:6px;padding:28px 20px;text-align:center;margin-bottom:10px}
+.cd-type-label{font-family:var(--f-mono);font-size:8px;font-weight:700;letter-spacing:4px;color:var(--cyan);margin-bottom:12px}
+.cd-type-name{font-family:var(--f-head);font-size:26px;font-weight:800;color:var(--text);margin-bottom:3px}
+.cd-type-en{font-family:var(--f-mono);font-size:9px;letter-spacing:3px;color:#444;margin-bottom:12px}
+.cd-type-catch{font-size:13px;line-height:1.9;color:#777}
+.cd-type-share{display:inline-block;margin-top:14px;padding:7px 18px;border:1px solid rgba(0,212,170,.2);border-radius:3px;font-family:var(--f-mono);font-size:9px;color:var(--cyan);letter-spacing:2px;cursor:pointer;background:transparent;transition:all .3s}
+.cd-type-share:hover{background:rgba(0,212,170,.06)}
+
+/* Cognitive profile / bar charts */
+.cd-met{background:var(--card);border:1px solid var(--card-b);border-radius:6px;padding:20px 18px;margin-bottom:10px}
+.cd-met-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.cd-met-label{font-family:var(--f-mono);font-size:8px;font-weight:700;letter-spacing:3px;color:var(--cyan)}
+.cd-met-sub{font-family:var(--f-mono);font-size:8px;color:#333}
+.bars{display:flex;flex-direction:column;gap:8px}
+.br{display:flex;align-items:center;gap:7px}
+.br-name{width:55px;font-family:var(--f-mono);font-size:9px;color:#555;text-align:right;flex-shrink:0}
+.br-track{flex:1;height:5px;background:rgba(255,255,255,.03);border-radius:2px;overflow:hidden}
+.br-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#00D4AA,rgba(0,212,170,.3));transition:width 1s ease-out}
+.br-val{width:22px;font-family:var(--f-mono);font-size:10px;font-weight:700;color:var(--text);text-align:right}
+
+/* Insight cards */
+.cd-ins{background:var(--card);border:1px solid var(--card-b);border-radius:6px;padding:20px 18px;margin-bottom:10px;animation:fadeUp .5s ease-out both}
+.cd-ins-label{font-family:var(--f-mono);font-size:8px;font-weight:700;letter-spacing:3px;margin-bottom:10px}
+.cd-ins-title{font-family:var(--f-head);font-size:16px;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.5}
+.cd-ins-body{font-size:12px;line-height:2.2;color:var(--dim)}
+.cd-ins-body strong{color:var(--cyan);font-weight:600}
+
+/* KP items */
+.kp{display:flex;gap:8px;align-items:baseline;margin-bottom:4px;font-size:11px;line-height:1.9;color:#555}
+.kp-dot{color:var(--cyan);flex-shrink:0;font-family:var(--f-mono);font-size:8px}
+
+/* Stop Doing card */
+.cd-stop{background:rgba(255,68,68,.03);border:1px solid rgba(255,68,68,.1);border-radius:6px;padding:20px 18px;margin-bottom:10px;animation:fadeUp .5s ease-out both}
+.cd-stop-label{font-family:var(--f-mono);font-size:8px;font-weight:700;letter-spacing:3px;color:var(--red);margin-bottom:10px}
+.cd-stop-list{list-style:none}
+.cd-stop-list li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:12px;line-height:1.7;color:#888;display:flex;gap:8px;align-items:baseline}
+.cd-stop-list li:last-child{border:none}
+.stop-num{font-family:var(--f-mono);font-size:9px;color:var(--red);flex-shrink:0;width:16px}
+
+/* Timeline */
+.cd-tl{background:var(--card);border:1px solid rgba(255,255,255,.04);border-radius:6px;padding:18px;margin-bottom:10px}
+.cd-tl-label{font-family:var(--f-mono);font-size:8px;font-weight:700;letter-spacing:3px;color:var(--cyan);margin-bottom:10px}
+.tl-row{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tl-row::-webkit-scrollbar{display:none}
+.tl-c{min-width:64px;padding:10px 6px;border:1px solid rgba(255,255,255,.04);border-radius:4px;text-align:center;flex-shrink:0;transition:all .3s}
+.tl-c.now{border-color:rgba(0,212,170,.3);background:rgba(0,212,170,.06)}
+.tl-m{font-family:var(--f-mono);font-size:9px;font-weight:600;color:#444;margin-bottom:2px}
+.tl-c.now .tl-m{color:var(--cyan)}
+.tl-kw{font-size:10px;font-weight:700;color:#888}
+
+/* Basis */
+.cd-basis{background:rgba(255,255,255,.01);border:1px solid rgba(255,255,255,.03);border-radius:6px;padding:16px 18px;margin-bottom:10px}
+.cd-basis-label{font-family:var(--f-mono);font-size:8px;font-weight:700;letter-spacing:3px;color:#333;margin-bottom:8px}
+.cd-basis-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px}
+.cd-basis-item{font-family:var(--f-mono);font-size:9px;color:#333;line-height:1.4}
+.cd-basis-item span{color:var(--dim)}
+
+/* Read more */
+.rm-toggle{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:1px;color:var(--cyan);background:none;border:1px solid rgba(0,212,170,.15);cursor:pointer;padding:6px 12px;border-radius:4px;transition:all .3s}
+.rm-toggle:hover{background:rgba(0,212,170,.04)}
+.rm-body{max-height:0;overflow:hidden;transition:max-height .5s ease}
+.rm-body.open{max-height:5000px}
+.rm-content{margin-top:14px;font-size:12px;line-height:2.2;color:#555}
+.rm-content strong{color:var(--cyan);font-weight:600}
+.rm-content h4{font-family:var(--f-head);font-size:13px;font-weight:700;color:var(--text);margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.04)}
+.rm-content ul{list-style:none;margin:10px 0}
+.rm-content li{padding:8px 12px;margin-bottom:3px;background:rgba(0,212,170,.02);border-radius:4px;border-left:2px solid rgba(0,212,170,.1);line-height:1.9}
+.rm-content p{margin-bottom:10px}
+
+/* Share card for capture */
+.share-card{margin:0 0 16px;padding:24px 20px;background:linear-gradient(135deg,rgba(0,212,170,.06),rgba(0,212,170,.015));border:1px solid rgba(0,212,170,.15);border-radius:6px;text-align:center}
+.share-card-type{font-family:var(--f-head);font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px}
+.share-card-catch{font-size:11px;line-height:1.8;color:var(--cyan);margin-bottom:10px}
+.share-card-meta{font-family:var(--f-mono);font-size:8px;font-weight:600;letter-spacing:2px;color:#333;margin-bottom:12px}
+{% endblock %}
+
+{% block content %}
+<div class="result-bar">
+  <a href="/" class="page-back">&larr; back</a>
+  <div class="result-count">{% if sections %}{{ sections|length }} cards{% endif %}</div>
+</div>
+<div class="result-date">{{ reading.created_at.strftime('%Y.%m.%d') }} // ANALYSIS COMPLETE</div>
+
+<!-- Card 1: ARCHETYPE -->
+<div class="cd-type" id="share-capture">
+  <div class="cd-type-label">ARCHETYPE</div>
+  {% if reading.type_badge %}
+  <div class="cd-type-name">{{ reading.type_badge | replace('タイプ','') }}</div>
+  {% elif sections and sections[0].key_points %}
+  <div class="cd-type-name">{{ sections[0].key_points[0] | replace('「','') | replace('」','') }}</div>
+  {% endif %}
+  {% if reading.type_badge %}
+  <div class="cd-type-en">{{ reading.type_badge }}</div>
+  {% endif %}
+  {% if sections and sections[0].key_points|length > 1 %}
+  <div class="cd-type-catch">{{ sections[0].key_points[1] | replace('「','') | replace('」','') }}</div>
+  {% endif %}
+  <div class="share-card-meta">LUNA ORACLE &middot; {{ reading.created_at.strftime('%Y.%m.%d') }}</div>
+  <button class="cd-type-share" onclick="shareCard()">SHARE</button>
+</div>
+
+<!-- Card 2: COGNITIVE PROFILE -->
+{% if cognitive_profile %}
+<div class="cd-met">
+  <div class="cd-met-head">
+    <div class="cd-met-label">COGNITIVE PROFILE</div>
+    <div class="cd-met-sub">
+      {% if reading.profile and reading.profile.blood_type %}{{ reading.profile.blood_type }}{% endif %}
+    </div>
+  </div>
+  {% if not is_compat %}
+  <div class="bars">
+    {% for item in cognitive_profile %}
+    <div class="br"><div class="br-name">{{ item.name }}</div><div class="br-track"><div class="br-fill" style="width:0%" data-target="{{ item.value }}"></div></div><div class="br-val">{{ item.value }}</div></div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="bars">
+    {% for item in cognitive_profile %}
+    <div style="margin-bottom:8px">
+      <div style="font-family:var(--f-mono);font-size:8px;color:#444;margin-bottom:3px">{{ item.name }}</div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <div style="flex:1;height:4px;background:rgba(255,255,255,.03);border-radius:2px;overflow:hidden;direction:rtl"><div class="br-fill" style="height:100%;width:0%;border-radius:2px;background:linear-gradient(270deg,#00D4AA,rgba(0,212,170,.2))" data-target="{{ item.value1 }}"></div></div>
+        <div style="width:18px;text-align:center;font-family:var(--f-mono);font-size:9px;font-weight:700;color:var(--text)">{{ item.value1 }}</div>
+        <div style="width:3px;height:3px;border-radius:50%;background:rgba(0,212,170,.2)"></div>
+        <div style="width:18px;text-align:center;font-family:var(--f-mono);font-size:9px;font-weight:700;color:var(--text)">{{ item.value2 }}</div>
+        <div style="flex:1;height:4px;background:rgba(255,255,255,.03);border-radius:2px;overflow:hidden"><div class="br-fill" style="height:100%;width:0%;border-radius:2px;background:linear-gradient(90deg,#FF6B6B,rgba(255,107,107,.2))" data-target="{{ item.value2 }}"></div></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- Card 3+: INSIGHT SECTIONS -->
+{% if sections %}
+{% for section in sections %}
+{% set theme_s = section.theme %}
+
+{% if section.title and '止' in section.title or section.title and 'stop' in section.title|lower or section.title and 'やめる' in section.title %}
+{# STOP DOING card #}
+<div class="cd-stop" style="animation-delay:{{ loop.index0 * 0.05 }}s">
+  <div class="cd-stop-label">STOP DOING</div>
+  {% if section.key_points %}
+  <ul class="cd-stop-list">
+    {% for kp in section.key_points %}
+    <li><span class="stop-num">{{ '%02d' % loop.index }}</span>{{ kp | replace('「','') | replace('」','') }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if section.detail_body %}
+  <button class="rm-toggle" onclick="toggleMore(this)" style="border-color:rgba(255,68,68,.15);color:var(--red)">+ detail</button>
+  <div class="rm-body">
+    <div class="rm-content" data-raw="{{ section.detail_body | e }}"></div>
+  </div>
+  {% endif %}
+</div>
+
+{% else %}
+{# Standard insight card #}
+<div class="cd-ins" style="animation-delay:{{ loop.index0 * 0.05 }}s">
+  <div class="cd-ins-label" style="color:{{ theme_s.color }}">{{ section.title | upper }}</div>
+  {% if section.key_points %}
+  <div class="cd-ins-title">{{ section.key_points[0] | replace('「','') | replace('」','') }}</div>
+  {% for kp in section.key_points[1:] %}
+  <div class="kp"><span class="kp-dot">&gt;</span>{{ kp }}</div>
+  {% endfor %}
+  {% endif %}
+  {% if section.detail_body %}
+  <button class="rm-toggle" onclick="toggleMore(this)">+ detail</button>
+  <div class="rm-body">
+    <div class="rm-content" data-raw="{{ section.detail_body | e }}"></div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endfor %}
+
+<!-- TIMELINE -->
+{% if monthly_data %}
+<div class="cd-tl">
+  <div class="cd-tl-label">TIMELINE</div>
+  <div class="tl-row">
+    {% for m in monthly_data %}
+    <div class="tl-c {% if m.num == '5' %}now{% endif %}">
+      <div class="tl-m">{{ m.num }}月</div>
+      <div class="tl-kw">{{ m.keyword }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endif %}
+
+<!-- BASIS -->
+<div class="cd-basis">
+  <div class="cd-basis-label">CALCULATION BASIS</div>
+  <div class="cd-basis-grid">
+    {% if reading.profile %}
+    <div class="cd-basis-item">Birth <span>{{ reading.profile.birth_date.strftime('%Y.%m.%d') if reading.profile.birth_date else '---' }}</span></div>
+    <div class="cd-basis-item">Blood <span>{{ reading.profile.blood_type or '---' }}</span></div>
+    <div class="cd-basis-item">Place <span>{{ reading.profile.birth_place or '---' }}</span></div>
+    <div class="cd-basis-item">Time <span>{{ reading.profile.birth_time.strftime('%H:%M') if reading.profile.birth_time else '---' }}</span></div>
+    <div class="cd-basis-item">Face <span>not scanned</span></div>
+    <div class="cd-basis-item">Palm <span>not scanned</span></div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- CTA -->
+<div style="text-align:center;margin-top:20px">
+  <a href="/chat/{{ reading.id }}" class="btn-void" style="display:block;text-align:center;text-decoration:none;color:var(--cyan)">CONSULT</a>
+  <a href="/" class="page-back" style="display:block;margin-top:12px">&larr; back</a>
+</div>
+
+<div class="footer"><div class="footer-text">LUNA ORACLE 2026</div></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleMore(btn){var b=btn.nextElementSibling;b.classList.toggle('open');btn.textContent=b.classList.contains('open')?'- close':'+ detail';}
+function copyLink(){navigator.clipboard.writeText(location.href).then(function(){showToast('Link copied');});}
+function shareCard(){
+  var el=document.getElementById('share-capture');
+  html2canvas(el,{useCORS:true,scale:2,backgroundColor:'#08060E'}).then(function(c){
+    var a=document.createElement('a');a.href=c.toDataURL('image/png');a.download='luna-void-share.png';a.click();
+    showToast('Image saved');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  // Animate bar charts
+  setTimeout(function(){
+    document.querySelectorAll('.br-fill').forEach(function(bar){
+      var target = bar.dataset.target;
+      if(target) bar.style.width = target + '%';
+    });
+  }, 200);
+
+  // Render detail markdown
+  document.querySelectorAll('.rm-content').forEach(function(el){
+    var raw = el.dataset.raw || '';
+    if (!raw) return;
+    raw = raw.replace(/[「」『』]/g,'');
+    var lines = raw.split('\n'), html = '', inList = false;
+    for (var i=0; i<lines.length; i++){
+      var t = lines[i].trim();
+      if (!t) { if(inList){html+='</ul>';inList=false;} continue; }
+      if (/^### (.+)/.test(t)) { if(inList){html+='</ul>';inList=false;} html+='<h4>'+t.replace(/^### /,'')+'</h4>'; }
+      else if (/^[-*] (.+)/.test(t)) { if(!inList){html+='<ul>';inList=true;} html+='<li>'+t.replace(/^[-*] /,'')+'</li>'; }
+      else { if(inList){html+='</ul>';inList=false;} html+='<p>'+t+'</p>'; }
+    }
+    if(inList) html+='</ul>';
+    html = html.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+    el.innerHTML = html;
+  });
+});
+</script>
+{% endblock %}
