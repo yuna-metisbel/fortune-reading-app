@@ -1,3 +1,4 @@
+import os
 import uuid
 
 from fastapi import Depends, Request
@@ -10,6 +11,7 @@ from app.models import User
 
 COOKIE_NAME = "fortune_bid"
 COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 5  # 5 years
+FORCED_THEME = os.environ.get("FORCED_THEME", "")
 
 
 class BrowserIdMiddleware(BaseHTTPMiddleware):
@@ -20,7 +22,10 @@ class BrowserIdMiddleware(BaseHTTPMiddleware):
             browser_id = str(uuid.uuid4())
             need_set = True
         request.state.browser_id = browser_id
-        request.state.theme = request.cookies.get("luna_theme", "default")
+        if FORCED_THEME:
+            request.state.theme = FORCED_THEME
+        else:
+            request.state.theme = request.cookies.get("luna_theme", "default")
         response = await call_next(request)
         if need_set:
             response.set_cookie(
