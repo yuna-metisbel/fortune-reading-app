@@ -24,12 +24,17 @@ async def generate_message(
     return response.content[0].text
 
 
+SUPPORTED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
+
+
 async def generate_vision_message(
     system_prompt: str,
     user_prompt: str,
     image_base64: str,
     media_type: str = "image/jpeg",
 ) -> str:
+    if media_type not in SUPPORTED_IMAGE_TYPES:
+        media_type = "image/jpeg"
     client = get_client()
     response = await client.messages.create(
         model="claude-sonnet-4-6",
