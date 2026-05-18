@@ -70,7 +70,12 @@ async def analyze_palm(
     media_type = body.get("media_type", "image/jpeg")
 
     for attempt in range(2):
-        raw = await generate_vision_message(PALM_SYSTEM_PROMPT, PALM_USER_PROMPT, image_data, media_type)
+        try:
+            raw = await generate_vision_message(PALM_SYSTEM_PROMPT, PALM_USER_PROMPT, image_data, media_type)
+        except Exception:
+            if attempt == 1:
+                return JSONResponse({"error": "画像を処理できませんでした。手のひらがはっきり写った写真を使ってください"}, status_code=400)
+            continue
         try:
             match = re.search(r'\{.*\}', raw, re.DOTALL)
             data = json.loads(match.group()) if match else json.loads(raw)
