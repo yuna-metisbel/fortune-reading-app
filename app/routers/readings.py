@@ -24,6 +24,7 @@ from app.services.prompts import (
     SYSTEM_PROMPT_PERSONAL,
     build_compatibility_user_prompt,
     build_personal_user_prompt,
+    get_zodiac_sign,
 )
 from app.services.numerology import calculate_life_path
 from app.services.rokusei import calculate_cycle_position, calculate_rokusei
@@ -206,6 +207,7 @@ async def personal_stream(
     )
 
     rokusei_result, shichusuimei_result, numerology_result = _compute_fortune_data(body.birth_date)
+    zodiac_sign = get_zodiac_sign(body.birth_date)
 
     user_prompt = build_personal_user_prompt(
         nickname=body.nickname,
@@ -218,6 +220,7 @@ async def personal_stream(
         rokusei_result=rokusei_result,
         shichusuimei_result=shichusuimei_result,
         numerology_result=numerology_result,
+        zodiac_sign=zodiac_sign,
     )
 
     reading = Reading(
@@ -318,6 +321,8 @@ async def compatibility_stream(
 
     p1_rokusei, p1_shichusuimei, p1_numerology = _compute_fortune_data(body.person1_birth_date)
     p2_rokusei, p2_shichusuimei, p2_numerology = _compute_fortune_data(body.person2_birth_date)
+    p1_zodiac = get_zodiac_sign(body.person1_birth_date)
+    p2_zodiac = get_zodiac_sign(body.person2_birth_date)
 
     user_prompt = build_compatibility_user_prompt(
         person1_nickname=body.person1_nickname,
@@ -341,6 +346,8 @@ async def compatibility_stream(
         person2_rokusei=p2_rokusei,
         person2_shichusuimei=p2_shichusuimei,
         person2_numerology=p2_numerology,
+        person1_zodiac=p1_zodiac,
+        person2_zodiac=p2_zodiac,
     )
 
     reading = Reading(

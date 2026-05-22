@@ -85,8 +85,12 @@ def _build_daily_prompt(birth_date: date, today: date, blood_type: str | None = 
     format_type = DAILY_FORMAT_TYPES[format_idx]
     format_instruction = DAILY_FORMAT_INSTRUCTIONS[format_type]
 
+    from app.services.prompts import get_zodiac_sign
+    zodiac = get_zodiac_sign(birth_date.isoformat())
+
     lines = [
         f"生年月日: {birth_date.isoformat()}",
+        f"太陽星座: {zodiac}",
         f"今日の日付: {today.isoformat()}",
         f"曜日: {today.strftime('%A')}",
         f"ライフパスナンバー: {life_path.get('life_path', '不明')}",

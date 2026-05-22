@@ -234,6 +234,33 @@ SYSTEM_PROMPT_CHAT = """あなたは占い師AIアシスタントです。
 
 
 # ============================================================
+# 西洋占星術 — 太陽星座の事前計算
+# ============================================================
+
+def get_zodiac_sign(birth_date: str) -> str:
+    """生年月日文字列 (YYYY-MM-DD) から太陽星座を返す。"""
+    try:
+        parts = birth_date.split("-")
+        month, day = int(parts[1]), int(parts[2])
+    except (IndexError, ValueError):
+        return "不明"
+
+    # (月, 開始日, 星座名)  — 各星座の開始日
+    _SIGNS = [
+        (1, 20, "水瓶座"),  (2, 19, "魚座"),    (3, 21, "牡羊座"),
+        (4, 20, "牡牛座"),  (5, 21, "双子座"),  (6, 22, "蟹座"),
+        (7, 23, "獅子座"),  (8, 23, "乙女座"),  (9, 23, "天秤座"),
+        (10, 23, "蠍座"),   (11, 22, "射手座"), (12, 22, "山羊座"),
+    ]
+    # 逆順で走査し、month/day が開始日以降なら確定
+    for m, d, sign in reversed(_SIGNS):
+        if (month > m) or (month == m and day >= d):
+            return sign
+    # 1/1〜1/19 → 山羊座
+    return "山羊座"
+
+
+# ============================================================
 # ユーザープロンプトビルダー関数
 # ============================================================
 
@@ -248,6 +275,7 @@ def build_personal_user_prompt(
     rokusei_result: dict | None = None,
     shichusuimei_result: dict | None = None,
     numerology_result: dict | None = None,
+    zodiac_sign: str | None = None,
 ) -> str:
     """個人リーディング用のユーザープロンプトを構築する。
 
@@ -280,6 +308,9 @@ def build_personal_user_prompt(
         f"- 血液型：{_val(blood_type)}",
     ]
 
+    if zodiac_sign:
+        lines.append(f"- 西洋占星術（太陽星座）：{zodiac_sign}")
+
     if rokusei_result:
         lines.append(f"- 六星占術：{rokusei_result['star_full']}")
 
@@ -307,8 +338,8 @@ def build_personal_user_prompt(
     if rokusei_result:
         lines += [
             "",
-            "【重要】六星占術の運命星は上記の通り正確に算出済みです。"
-            "リーディング内では必ずこの結果をそのまま使用してください。"
+            "【重要】六星占術の運命星・西洋占星術の太陽星座は上記の通り正確に算出済みです。"
+            "リーディング内では必ずこれらの結果をそのまま使用してください。"
             "独自に再計算しないでください。",
         ]
 
@@ -337,6 +368,8 @@ def build_compatibility_user_prompt(
     person2_rokusei: dict | None = None,
     person2_shichusuimei: dict | None = None,
     person2_numerology: dict | None = None,
+    person1_zodiac: str | None = None,
+    person2_zodiac: str | None = None,
 ) -> str:
     """相性リーディング用のユーザープロンプトを構築する。
 
@@ -378,6 +411,8 @@ def build_compatibility_user_prompt(
         f"- 血液型：{_val(person1_blood_type)}",
     ]
 
+    if person1_zodiac:
+        lines.append(f"- 西洋占星術（太陽星座）：{person1_zodiac}")
     if person1_rokusei:
         lines.append(f"- 六星占術：{person1_rokusei['star_full']}")
     if person1_shichusuimei:
@@ -398,6 +433,8 @@ def build_compatibility_user_prompt(
         f"- 血液型：{_val(person2_blood_type)}",
     ]
 
+    if person2_zodiac:
+        lines.append(f"- 西洋占星術（太陽星座）：{person2_zodiac}")
     if person2_rokusei:
         lines.append(f"- 六星占術：{person2_rokusei['star_full']}")
     if person2_shichusuimei:
@@ -427,12 +464,12 @@ def build_compatibility_user_prompt(
         "上記の情報をもとに、指定のフォーマットで詳細な相性リーディングを行ってください。",
     ]
 
-    has_rokusei = person1_rokusei or person2_rokusei
-    if has_rokusei:
+    has_precomputed = person1_rokusei or person2_rokusei or person1_zodiac or person2_zodiac
+    if has_precomputed:
         lines += [
             "",
-            "【重要】六星占術の運命星は上記の通り正確に算出済みです。"
-            "リーディング内では必ずこの結果をそのまま使用してください。"
+            "【重要】六星占術の運命星・西洋占星術の太陽星座は上記の通り正確に算出済みです。"
+            "リーディング内では必ずこれらの結果をそのまま使用してください。"
             "独自に再計算しないでください。",
         ]
 
