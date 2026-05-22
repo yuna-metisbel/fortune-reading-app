@@ -249,9 +249,15 @@ async def personal_stream(
 
     async def event_stream() -> AsyncIterator[str]:
         chunks: list[str] = []
-        async for chunk in stream_message(SYSTEM_PROMPT_PERSONAL, user_prompt):
-            chunks.append(chunk)
-            yield f"data: {chunk.replace(chr(10), '⏎')}\n\n"
+        try:
+            async for chunk in stream_message(SYSTEM_PROMPT_PERSONAL, user_prompt):
+                chunks.append(chunk)
+                yield f"data: {chunk.replace(chr(10), '⏎')}\n\n"
+        except Exception as exc:
+            import logging
+            logging.getLogger(__name__).error("stream_message error: %s", exc)
+            yield f"event: error\ndata: APIエラーが発生しました。しばらくしてから再度お試しください。\n\n"
+            return
 
         content = "".join(chunks)
 
@@ -369,9 +375,15 @@ async def compatibility_stream(
 
     async def event_stream() -> AsyncIterator[str]:
         chunks: list[str] = []
-        async for chunk in stream_message(SYSTEM_PROMPT_COMPATIBILITY, user_prompt):
-            chunks.append(chunk)
-            yield f"data: {chunk.replace(chr(10), '⏎')}\n\n"
+        try:
+            async for chunk in stream_message(SYSTEM_PROMPT_COMPATIBILITY, user_prompt):
+                chunks.append(chunk)
+                yield f"data: {chunk.replace(chr(10), '⏎')}\n\n"
+        except Exception as exc:
+            import logging
+            logging.getLogger(__name__).error("stream_message error: %s", exc)
+            yield f"event: error\ndata: APIエラーが発生しました。しばらくしてから再度お試しください。\n\n"
+            return
 
         content = "".join(chunks)
 
@@ -491,9 +503,15 @@ async def generate_paid_reading(
 
     async def event_stream() -> AsyncIterator[str]:
         chunks: list[str] = []
-        async for chunk in stream_message(system_prompt, user_prompt):
-            chunks.append(chunk)
-            yield f"data: {chunk.replace(chr(10), '⏎')}\n\n"
+        try:
+            async for chunk in stream_message(system_prompt, user_prompt):
+                chunks.append(chunk)
+                yield f"data: {chunk.replace(chr(10), '⏎')}\n\n"
+        except Exception as exc:
+            import logging
+            logging.getLogger(__name__).error("stream_message error: %s", exc)
+            yield f"event: error\ndata: APIエラーが発生しました。しばらくしてから再度お試しください。\n\n"
+            return
         content = "".join(chunks)
         async with async_session() as save_db:
             r = await save_db.get(Reading, reading_id)

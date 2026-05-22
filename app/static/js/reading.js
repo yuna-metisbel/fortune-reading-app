@@ -79,7 +79,20 @@ async function handleStream(resp) {
       if (line === '') continue;
 
       if (line.startsWith('event:')) {
-        if (line.replace('event:', '').trim() === 'done') isEventDone = true;
+        var eventName = line.replace('event:', '').trim();
+        if (eventName === 'done') isEventDone = true;
+        if (eventName === 'error') {
+          if (window._ritualInterval) clearInterval(window._ritualInterval);
+          var nextLine = lines[i + 1];
+          var errMsg = 'エラーが発生しました。もう一度お試しください。';
+          if (nextLine && nextLine.trim().startsWith('data:')) {
+            errMsg = nextLine.trim().replace(/^data:\s*/, '');
+            i++;
+          }
+          alert(errMsg);
+          window.location.href = '/';
+          return;
+        }
         continue;
       }
 
